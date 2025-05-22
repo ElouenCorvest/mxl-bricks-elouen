@@ -1,0 +1,92 @@
+"""ascorbate peroxidase
+
+EC FIXME
+
+Equilibrator
+Ascorbate(aq) + H2O2(aq) ⇌ Dehydroascorbate(aq) + 2 H2O(l)
+
+Ascorbate(aq) + H2O2(aq) + 0.5 NADH(aq) ⇌ Monodehydroascorbate(aq) + 2 H2O(l) + 0.5 NAD (aq)
+
+
+"""
+
+from mxlbricks import names as n
+from mxlbricks.utils import filter_stoichiometry
+from mxlpy import Model
+
+ENZYME = n.ascorbate_peroxidase()
+
+
+def _rate_ascorbate_peroxidase(
+    A: float,
+    H: float,
+    kf1: float,
+    kr1: float,
+    kf2: float,
+    kr2: float,
+    kf3: float,
+    kf4: float,
+    kr4: float,
+    kf5: float,
+    XT: float,
+) -> float:
+    """lumped reaction of ascorbate peroxidase
+    the cycle stretched to a linear chain with
+    two steps producing the MDA
+    two steps releasing ASC
+    and one step producing hydrogen peroxide
+    """
+    nom = A * H * XT
+    denom = (
+        A * H * (1 / kf3 + 1 / kf5)
+        + A / kf1
+        + H / kf4
+        + H * kr4 / (kf4 * kf5)
+        + H / kf2
+        + H * kr2 / (kf2 * kf3)
+        + kr1 / (kf1 * kf2)
+        + kr1 * kr2 / (kf1 * kf2 * kf3)
+    )
+    return nom / denom
+
+
+def add_ascorbate_peroxidase(model: Model) -> Model:
+    model.add_parameters(
+        {
+            "kf1": 10000.0,
+            "kr1": 220.0,
+            "kf2": 10000.0,
+            "kr2": 4000.0,
+            "kf3": 2510.0,
+            "kf4": 10000.0,
+            "kr4": 4000.0,
+            "kf5": 2510.0,
+            "XT": 0.07,  # according to Valero
+        }
+    )
+    model.add_reaction(
+        name=ENZYME,
+        fn=_rate_ascorbate_peroxidase,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                n.ascorbate(): -1,
+                n.h2o2(): -1,
+                n.mda(): 2,
+            },
+        ),
+        args=[
+            n.ascorbate(),
+            n.h2o2(),
+            "kf1",
+            "kr1",
+            "kf2",
+            "kr2",
+            "kf3",
+            "kf4",
+            "kr4",
+            "kf5",
+            "XT",
+        ],
+    )
+    return model
