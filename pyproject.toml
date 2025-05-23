@@ -31,8 +31,6 @@ name = "mxlbricks"
 readme = "README.md"
 version = "0.1.0"
 dependencies = [
-  "black>=25.1.0",
-  "isort>=6.0.1",
   "mxlpy>=0.19.0",
 ]
 
@@ -52,6 +50,8 @@ dev = [
   "pre-commit>=4.0.1",
   "pyright>=1.1.387",
   "ssort>=0.13.0",
+  "black>=25.1.0",
+  "isort>=6.0.1",
 ]
 
 [tool.bandit]

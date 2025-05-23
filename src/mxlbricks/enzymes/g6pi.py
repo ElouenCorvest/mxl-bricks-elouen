@@ -7,10 +7,11 @@ D-Fructose 6-phosphate(aq) ⇌ D-Glucose 6-phosphate(aq)
 Keq = 3 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_1s_1p
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.g6pi()
 

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-EMPTY = ""
+from typing import Literal
+
+EMPTY: Literal[""] = ""
 
 ###############################################################################
 # Parameter fns

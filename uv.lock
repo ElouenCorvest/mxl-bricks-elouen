@@ -1415,14 +1415,14 @@ name = "mxlbricks"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "black" },
-    { name = "isort" },
     { name = "mxlpy" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "black" },
     { name = "coverage" },
+    { name = "isort" },
     { name = "jupyter" },
     { name = "mkdocs" },
     { name = "mkdocs-jupyter" },
@@ -1438,15 +1438,13 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "black", specifier = ">=25.1.0" },
-    { name = "isort", specifier = ">=6.0.1" },
-    { name = "mxlpy", specifier = ">=0.19.0" },
-]
+requires-dist = [{ name = "mxlpy", specifier = ">=0.19.0" }]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "black", specifier = ">=25.1.0" },
     { name = "coverage", specifier = ">=7.6.4" },
+    { name = "isort", specifier = ">=6.0.1" },
     { name = "jupyter", specifier = ">=1.1.1" },
     { name = "mkdocs", specifier = ">=1.6.1" },
     { name = "mkdocs-jupyter", specifier = ">=0.25.1" },
