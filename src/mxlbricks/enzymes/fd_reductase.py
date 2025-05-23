@@ -1,7 +1,8 @@
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s
 from mxlbricks.utils import filter_stoichiometry, static
-from mxlpy import Model
 
 ENZYME = n.ferredoxin_reductase()
 

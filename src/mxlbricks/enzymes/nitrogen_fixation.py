@@ -5,9 +5,10 @@ EC FIXME
 Equilibrator
 """
 
+from mxlpy import Derived, Model
+
 from mxlbricks import names as n
 from mxlbricks.utils import filter_stoichiometry, static
-from mxlpy import Derived, Model
 
 ENZYME = n.nitrogen_fixation()
 

@@ -1,8 +1,9 @@
 from collections.abc import Mapping
 
-from mxlbricks import names as n
 from mxlpy import Derived, Model
 from mxlpy.fns import mul
+
+from mxlbricks import names as n
 
 
 def static(

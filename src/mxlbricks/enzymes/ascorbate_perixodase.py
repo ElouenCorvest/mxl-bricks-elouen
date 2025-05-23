@@ -10,9 +10,10 @@ Ascorbate(aq) + H2O2(aq) + 0.5 NADH(aq) ⇌ Monodehydroascorbate(aq) + 2 H2O(l) 
 
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.utils import filter_stoichiometry
-from mxlpy import Model
 
 ENZYME = n.ascorbate_peroxidase()
 

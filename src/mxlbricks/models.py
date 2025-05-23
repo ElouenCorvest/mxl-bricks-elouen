@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.enzymes.rubisco import add_rubisco_poolman
 from mxlbricks.utils import fcbb_regulated, static, thioredixon_regulated
-from mxlpy import Model
 
 from .derived import (
     add_adenosin_moiety,

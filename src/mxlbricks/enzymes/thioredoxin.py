@@ -5,6 +5,8 @@ EC FIXME
 Equilibrator
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import (
     mass_action_1s,
@@ -12,7 +14,6 @@ from mxlbricks.fns import (
     michaelis_menten_1s,
 )
 from mxlbricks.utils import filter_stoichiometry, static
-from mxlpy import Model
 
 
 def add_cbb_pfd_speedup(

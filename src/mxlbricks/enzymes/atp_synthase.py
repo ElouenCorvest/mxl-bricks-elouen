@@ -15,11 +15,11 @@ import math
 from typing import cast
 
 import numpy as np
+from mxlpy import Derived, Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s, neg_div, value
 from mxlbricks.utils import filter_stoichiometry, static
-from mxlpy import Derived, Model
 
 ENZYME = n.atp_synthase()
 

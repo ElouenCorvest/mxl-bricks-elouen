@@ -1,9 +1,10 @@
 import math
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import div, mass_action_1s, moiety_1, moiety_2
 from mxlbricks.utils import static
-from mxlpy import Model
 
 
 def add_ascorbate_moiety(

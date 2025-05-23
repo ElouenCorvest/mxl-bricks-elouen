@@ -1,7 +1,8 @@
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import reversible_mass_action_keq_2s_2p
 from mxlbricks.utils import filter_stoichiometry, static
-from mxlpy import Model
 
 ENZYME = n.oxidative_phosphorylation()
 

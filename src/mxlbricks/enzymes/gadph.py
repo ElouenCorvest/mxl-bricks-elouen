@@ -10,10 +10,11 @@ Equilibrator
 FIXME: Poolman uses H+ in the description. Why?
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_3s_3p
 from mxlbricks.utils import filter_stoichiometry, static
-from mxlpy import Model
 
 ENZYME = n.gadph()
 

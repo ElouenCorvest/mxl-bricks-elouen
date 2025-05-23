@@ -10,12 +10,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
+from mxlpy import Derived, Model
+from mxlpy.surrogates import qss
 
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s, mass_action_2s, value
 from mxlbricks.utils import filter_stoichiometry, static
-from mxlpy import Derived, Model
-from mxlpy.surrogates import qss
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
