@@ -195,6 +195,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/c1/11/114d0a5f4dabbdcedc1125dee0888514c3c3b16d3e9facad87ed96fad97c/isort-6.0.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/bc/b3/9458adb9472e61a998c8c4d95cfdfec91c73c53a375b30b1428310f923e4/kiwisolver-1.4.8-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c0/0e/ce3ed3554ba3d37143d5aae1b8733220a29e26306680a67ee53ed373cd17/latexify_py-0.4.4-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/44/2e/5378f9b9cbc893826c2ecb022646c97ece9efbaad351adf89425fff33990/lazy_import-0.2.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/ad/36/239820114bf1d71f38f12208b9c58dec033cbcf80101cde006b9bde5cffd/lxml-5.4.0-cp312-cp312-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/51/3f/afe76f8e2246ffbc867440cbcf90525264df0e658f8a5ca1f872b3f6192a/markdown-3.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c4/91/ba0ae1ff4b3f30972ad01cd4a8029e70a0ec3b8ea5be04764b128b66f763/matplotlib-3.10.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
@@ -205,7 +206,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/2b/9f/7ba6f94fc1e9ac3d2b853fdff3035fb2fa5afbed898c4a72b8a020610594/more_itertools-10.7.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/43/e3/7d92a15f894aa0c9c4b49b8ee9ac9850d6e63b03c9c32c0367a13ae62209/mpmath-1.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/bf/b6/5f922792be93b82ec6b5f270bbb1ef031fd0622847070bbcf9da816502cc/multiprocess-0.70.18-py312-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/62/55/eb27182c92f1aad2d3295be0d9faff2b978542fab22d6cb29cc209c73d7a/mxlpy-0.18.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/01/d8/e155706819aad2ef3ed620149ec5b7471a9e5f7b3443d59a2ed59c00accd/mxlpy-0.19.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/79/7b/2c79738432f5c924bef5071f933bcc9efd0473bac3b4aa584a6f7c1c8df8/mypy_extensions-1.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/55/8b/5ab7257531a5d830fc8000c476e63c935488d74609b50f9384a643ec0a62/outcome-1.3.0.post0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/38/f8/d8fddee9ed0d0c0f4a2132c1dfcf0e3e53265055da8df952a53e7eaf178c/pandas-2.2.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
@@ -426,6 +427,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/c1/11/114d0a5f4dabbdcedc1125dee0888514c3c3b16d3e9facad87ed96fad97c/isort-6.0.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/26/d6a0db6785dd35d3ba5bf2b2df0aedc5af089962c6eb2cbf67a15b81369e/kiwisolver-1.4.8-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/c0/0e/ce3ed3554ba3d37143d5aae1b8733220a29e26306680a67ee53ed373cd17/latexify_py-0.4.4-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/44/2e/5378f9b9cbc893826c2ecb022646c97ece9efbaad351adf89425fff33990/lazy_import-0.2.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/f8/4c/d101ace719ca6a4ec043eb516fcfcb1b396a9fccc4fcd9ef593df34ba0d5/lxml-5.4.0-cp312-cp312-macosx_10_9_universal2.whl
       - pypi: https://files.pythonhosted.org/packages/51/3f/afe76f8e2246ffbc867440cbcf90525264df0e658f8a5ca1f872b3f6192a/markdown-3.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0f/70/d61a591958325c357204870b5e7b164f93f2a8cca1dc6ce940f563909a13/matplotlib-3.10.3-cp312-cp312-macosx_11_0_arm64.whl
@@ -436,7 +438,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/2b/9f/7ba6f94fc1e9ac3d2b853fdff3035fb2fa5afbed898c4a72b8a020610594/more_itertools-10.7.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/43/e3/7d92a15f894aa0c9c4b49b8ee9ac9850d6e63b03c9c32c0367a13ae62209/mpmath-1.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/bf/b6/5f922792be93b82ec6b5f270bbb1ef031fd0622847070bbcf9da816502cc/multiprocess-0.70.18-py312-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/62/55/eb27182c92f1aad2d3295be0d9faff2b978542fab22d6cb29cc209c73d7a/mxlpy-0.18.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/01/d8/e155706819aad2ef3ed620149ec5b7471a9e5f7b3443d59a2ed59c00accd/mxlpy-0.19.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/79/7b/2c79738432f5c924bef5071f933bcc9efd0473bac3b4aa584a6f7c1c8df8/mypy_extensions-1.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/55/8b/5ab7257531a5d830fc8000c476e63c935488d74609b50f9384a643ec0a62/outcome-1.3.0.post0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e1/0c/ad295fd74bfac85358fd579e271cded3ac969de81f62dd0142c426b9da91/pandas-2.2.3-cp312-cp312-macosx_11_0_arm64.whl
@@ -684,6 +686,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/c1/11/114d0a5f4dabbdcedc1125dee0888514c3c3b16d3e9facad87ed96fad97c/isort-6.0.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/bd/72/dfff0cc97f2a0776e1c9eb5bef1ddfd45f46246c6533b0191887a427bca5/kiwisolver-1.4.8-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/c0/0e/ce3ed3554ba3d37143d5aae1b8733220a29e26306680a67ee53ed373cd17/latexify_py-0.4.4-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/44/2e/5378f9b9cbc893826c2ecb022646c97ece9efbaad351adf89425fff33990/lazy_import-0.2.2.tar.gz
       - pypi: https://files.pythonhosted.org/packages/91/1e/05ddcb57ad2f3069101611bd5f5084157d90861a2ef460bf42f45cced944/lxml-5.4.0-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/51/3f/afe76f8e2246ffbc867440cbcf90525264df0e658f8a5ca1f872b3f6192a/markdown-3.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b1/79/0d1c165eac44405a86478082e225fce87874f7198300bbebc55faaf6d28d/matplotlib-3.10.3-cp312-cp312-win_amd64.whl
@@ -694,7 +697,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/2b/9f/7ba6f94fc1e9ac3d2b853fdff3035fb2fa5afbed898c4a72b8a020610594/more_itertools-10.7.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/43/e3/7d92a15f894aa0c9c4b49b8ee9ac9850d6e63b03c9c32c0367a13ae62209/mpmath-1.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/bf/b6/5f922792be93b82ec6b5f270bbb1ef031fd0622847070bbcf9da816502cc/multiprocess-0.70.18-py312-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/62/55/eb27182c92f1aad2d3295be0d9faff2b978542fab22d6cb29cc209c73d7a/mxlpy-0.18.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/01/d8/e155706819aad2ef3ed620149ec5b7471a9e5f7b3443d59a2ed59c00accd/mxlpy-0.19.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/79/7b/2c79738432f5c924bef5071f933bcc9efd0473bac3b4aa584a6f7c1c8df8/mypy_extensions-1.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/55/8b/5ab7257531a5d830fc8000c476e63c935488d74609b50f9384a643ec0a62/outcome-1.3.0.post0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/29/d4/1244ab8edf173a10fd601f7e13b9566c1b525c4f365d6bee918e68381889/pandas-2.2.3-cp312-cp312-win_amd64.whl
@@ -2335,6 +2338,14 @@ packages:
   - mypy>=1.9 ; extra == 'mypy'
   - pytest>=7.1 ; extra == 'mypy'
   requires_python: '>=3.9,<3.14'
+- pypi: https://files.pythonhosted.org/packages/44/2e/5378f9b9cbc893826c2ecb022646c97ece9efbaad351adf89425fff33990/lazy_import-0.2.2.tar.gz
+  name: lazy-import
+  version: 0.2.2
+  sha256: 2149aef8579459407c62cfeccf118527939c9931ace124f355236360644f8a3d
+  requires_dist:
+  - six
+  - pytest ; extra == 'test'
+  - pytest-xdist ; extra == 'test'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/ld_impl_linux-64-2.43-h712a8e2_4.conda
   sha256: db73f38155d901a610b2320525b9dd3b31e4949215c870685fd92ea61b5ce472
   md5: 01f8d123c96816249efd255a31ad7712
@@ -4309,20 +4320,21 @@ packages:
 - pypi: .
   name: mxlbricks
   version: 0.1.0
-  sha256: 8c45ac30b4f72a6b34444df1a72d9dba3a43f006589429935e459cd1c576cc6a
+  sha256: 5dd6f056579708583baf02f18940a1b37af3311838b3453e7858ed4b3b0a8201
   requires_dist:
   - black>=25.1.0
   - isort>=6.0.1
-  - mxlpy>=0.18.0
+  - mxlpy>=0.19.0
   requires_python: '>=3.12'
   editable: true
-- pypi: https://files.pythonhosted.org/packages/62/55/eb27182c92f1aad2d3295be0d9faff2b978542fab22d6cb29cc209c73d7a/mxlpy-0.18.0-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/01/d8/e155706819aad2ef3ed620149ec5b7471a9e5f7b3443d59a2ed59c00accd/mxlpy-0.19.0-py3-none-any.whl
   name: mxlpy
-  version: 0.18.0
-  sha256: a64d8c17f89345de49844c96a6142a4f5ef4317674ee9ff7d612397c20324b65
+  version: 0.19.0
+  sha256: 1470444f3d03a8b4f776af7c57b9ec2e15ef8e518dd31171ef5996de8af5a527
   requires_dist:
   - dill>=0.3.9
   - latexify-py>=0.4.4
+  - lazy-import>=0.2.2
   - matplotlib>=3.9.2
   - mike>=2.1.3
   - more-itertools>=10.5.0
@@ -4340,19 +4352,8 @@ packages:
   - toml>=0.10.2
   - tqdm>=4.66.6
   - typing-extensions>=4.12.2
-  - coverage>=7.6.4 ; extra == 'dev'
-  - jupyter>=1.1.1 ; extra == 'dev'
-  - mkdocs-jupyter>=0.25.1 ; extra == 'dev'
-  - mkdocs-material>=9.5.42 ; extra == 'dev'
-  - mkdocs>=1.6.1 ; extra == 'dev'
-  - pre-commit>=4.0.1 ; extra == 'dev'
-  - pyright>=1.1.387 ; extra == 'dev'
-  - pytest-cov>=5.0.0 ; extra == 'dev'
-  - pytest>=8.3.3 ; extra == 'dev'
-  - requests>=2.32.3 ; extra == 'dev'
-  - ruff>=0.7.1 ; extra == 'dev'
-  - ssort>=0.13.0 ; extra == 'dev'
-  - toml-sort>=0.23.1,<0.24 ; extra == 'dev'
+  - keras>=3.9.2 ; extra == 'keras'
+  - tensorflow>=2.19.0 ; extra == 'tensorflow'
   - torch>=2.5.1 ; extra == 'torch'
   requires_python: '>=3.12'
 - pypi: https://files.pythonhosted.org/packages/79/7b/2c79738432f5c924bef5071f933bcc9efd0473bac3b4aa584a6f7c1c8df8/mypy_extensions-1.1.0-py3-none-any.whl

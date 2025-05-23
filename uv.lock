@@ -1073,6 +1073,15 @@ wheels = [
 ]
 
 [[package]]
+name = "lazy-import"
+version = "0.2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/44/2e/5378f9b9cbc893826c2ecb022646c97ece9efbaad351adf89425fff33990/lazy_import-0.2.2.tar.gz", hash = "sha256:2149aef8579459407c62cfeccf118527939c9931ace124f355236360644f8a3d", size = 15265, upload-time = "2018-01-22T02:19:32.029Z" }
+
+[[package]]
 name = "lxml"
 version = "5.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1432,7 +1441,7 @@ dev = [
 requires-dist = [
     { name = "black", specifier = ">=25.1.0" },
     { name = "isort", specifier = ">=6.0.1" },
-    { name = "mxlpy", specifier = ">=0.18.0" },
+    { name = "mxlpy", specifier = ">=0.19.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -1454,11 +1463,12 @@ dev = [
 
 [[package]]
 name = "mxlpy"
-version = "0.18.0"
+version = "0.19.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dill" },
     { name = "latexify-py" },
+    { name = "lazy-import" },
     { name = "matplotlib" },
     { name = "mike" },
     { name = "more-itertools" },
@@ -1477,9 +1487,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/06/19/e307ef4ff481afa7de0f3e84a2e42101aba3cf3ba2b9180214e8c6b22196/mxlpy-0.18.0.tar.gz", hash = "sha256:3a231cbe33a9246556a734a34c12e955efef8e5fadfdced866b105351501eb8c", size = 4853968, upload-time = "2025-05-13T05:27:35.471Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e0/b0/d2ab50aa89a50e9a403b90ed2d35e33640b8b82d8bd560977a94c2d0d8f7/mxlpy-0.19.0.tar.gz", hash = "sha256:e2112124c5f747576f96dda14023d7a7a35a7faa7ec18308f55061d3a56d6e02", size = 4855307, upload-time = "2025-05-23T05:29:22.7Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/62/55/eb27182c92f1aad2d3295be0d9faff2b978542fab22d6cb29cc209c73d7a/mxlpy-0.18.0-py3-none-any.whl", hash = "sha256:a64d8c17f89345de49844c96a6142a4f5ef4317674ee9ff7d612397c20324b65", size = 107165, upload-time = "2025-05-13T05:27:33.57Z" },
+    { url = "https://files.pythonhosted.org/packages/01/d8/e155706819aad2ef3ed620149ec5b7471a9e5f7b3443d59a2ed59c00accd/mxlpy-0.19.0-py3-none-any.whl", hash = "sha256:1470444f3d03a8b4f776af7c57b9ec2e15ef8e518dd31171ef5996de8af5a527", size = 112306, upload-time = "2025-05-23T05:29:20.852Z" },
 ]
 
 [[package]]
