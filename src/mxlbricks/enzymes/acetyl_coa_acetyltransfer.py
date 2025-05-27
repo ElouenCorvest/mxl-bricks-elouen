@@ -30,7 +30,7 @@ ENZYME = n.acetyl_coa_acetyltransfer()
 def add_acetyl_coa_acetyltransfer(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

@@ -9,7 +9,7 @@ ENZYME = n.quencher()
 
 def add_quenching_reaction(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     kf: str | None = None,
 ) -> Model:
     kf = static(model, kf := n.kre(ENZYME), 1.0) if kf is None else kf

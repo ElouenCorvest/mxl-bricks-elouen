@@ -79,11 +79,7 @@ from .enzymes import (
 )
 
 
-def get_yokota1985(
-    *,
-    chl_stroma: str = "",
-    per: str = "",
-) -> Model:
+def get_yokota1985() -> Model:
     model = Model()
     model.add_variables(
         {
@@ -96,36 +92,20 @@ def get_yokota1985(
         }
     )
 
-    add_phosphoglycolate_influx(
-        model=model,
-        chl_stroma=chl_stroma,
-    )
-    add_glycolate_oxidase_yokota(
-        model=model,
-        compartment=chl_stroma,
-    )
-    add_glycine_transaminase_yokota(
-        model=model,
-    )
+    add_phosphoglycolate_influx(model=model)
+    add_glycolate_oxidase_yokota(model=model)
+    add_glycine_transaminase_yokota(model=model)
     add_glycine_decarboxylase_yokota(
         model=model,
         e0=static(model, n.e0(n.glycine_decarboxylase()), 0.5),
     )
-    add_serine_glyoxylate_transaminase_irreversible(
-        model=model,
-    )
-    add_hpa_outflux(
-        model=model,
-        compartment=per,
-    )
+    add_serine_glyoxylate_transaminase_irreversible(model=model)
+    add_hpa_outflux(model=model)
     add_catalase(model=model)
     return model
 
 
-def get_poolman2000(
-    *,
-    chl_stroma: str = "",
-) -> Model:
+def get_poolman2000() -> Model:
     model = Model()
     model.add_variables(
         {
@@ -151,56 +131,58 @@ def get_poolman2000(
         {
             n.co2(): 0.2,
             n.nadph(): 0.21,
-            n.h(chl_stroma): 1.2589254117941661e-05,
+            n.h(): 1.2589254117941661e-05,
         }
     )
 
-    add_adenosin_moiety(model, total=static(model, n.total_adenosines(), 0.5))
-    add_nadp_moiety(model, total=static(model, n.total_nadp(), 0.5))
+    add_adenosin_moiety(
+        model,
+        total=static(model, n.total_adenosines(), 0.5),
+    )
+    add_nadp_moiety(
+        model,
+        total=static(model, n.total_nadp(), 0.5),
+    )
     add_orthophosphate_moiety_cbb(
-        model, total=static(model, n.total_orthophosphate(), 15.0)
+        model,
+        total=static(model, n.total_orthophosphate(), 15.0),
     )
 
     # Reactions
-    add_rubisco_poolman(model, chl_stroma=chl_stroma)
-    add_phosphoglycerate_kinase_poolman(model, compartment=chl_stroma)
-    add_gadph(model, chl_stroma=chl_stroma)
-    add_triose_phosphate_isomerase(model, chl_stroma=chl_stroma)
-    add_aldolase_dhap_gap_req(model, compartment=chl_stroma)
-    add_aldolase_dhap_e4p_req(model, compartment=chl_stroma)
-    add_fbpase(model, chl_stroma=chl_stroma)
-    add_transketolase_x5p_e4p_f6p_gap(model, chl_stroma=chl_stroma)
-    add_transketolase_x5p_r5p_s7p_gap(model, chl_stroma=chl_stroma)
-    add_sbpase(model, chl_stroma=chl_stroma)
-    add_ribose_5_phosphate_isomerase(model, chl_stroma=chl_stroma)
-    add_ribulose_5_phosphate_3_epimerase(model, chl_stroma=chl_stroma)
-    add_phosphoribulokinase(model, chl_stroma=chl_stroma)
-    add_glucose_6_phosphate_isomerase_re(model, compartment=chl_stroma)
-    add_phosphoglucomutase(model, compartment=chl_stroma)
-    add_triose_phosphate_exporters(model, chl_stroma=chl_stroma)
-    add_g1p_efflux(model, chl_stroma=chl_stroma)
+    add_rubisco_poolman(model)
+    add_phosphoglycerate_kinase_poolman(model)
+    add_gadph(model)
+    add_triose_phosphate_isomerase(model)
+    add_aldolase_dhap_gap_req(model)
+    add_aldolase_dhap_e4p_req(model)
+    add_fbpase(model)
+    add_transketolase_x5p_e4p_f6p_gap(model)
+    add_transketolase_x5p_r5p_s7p_gap(model)
+    add_sbpase(model)
+    add_ribose_5_phosphate_isomerase(model)
+    add_ribulose_5_phosphate_3_epimerase(model)
+    add_phosphoribulokinase(model)
+    add_glucose_6_phosphate_isomerase_re(model)
+    add_phosphoglucomutase(model)
+    add_triose_phosphate_exporters(model)
+    add_g1p_efflux(model)
 
     # Other
-    add_atp_synthase_static_protons(
-        model,
-        chl_stroma=chl_stroma,
-    )
-
+    add_atp_synthase_static_protons(model)
     return model
 
 
 def get_matuszynska2016npq(
     *,
-    chl_stroma: str = "",
     chl_lumen: str = "_lumen",
 ) -> Model:
     model = Model()
     model.add_variables(
         {
-            n.atp(chl_stroma): 1.6999999999999997,
-            n.pq_ox(chl_stroma): 4.706348349506148,
-            n.pc_ox(chl_stroma): 3.9414515288091567,
-            n.fd_ox(chl_stroma): 3.7761613271207324,
+            n.atp(): 1.6999999999999997,
+            n.pq_ox(): 4.706348349506148,
+            n.pc_ox(): 3.9414515288091567,
+            n.fd_ox(): 3.7761613271207324,
             n.h(chl_lumen): 7.737821100836988,
             n.lhc(): 0.5105293511676007,
             n.psbs_de(): 0.5000000001374878,
@@ -209,7 +191,7 @@ def get_matuszynska2016npq(
     )
     model.add_parameters(
         {
-            n.ph(chl_stroma): 7.9,
+            n.ph(): 7.9,
             n.pfd(): 100.0,
             n.nadph(): 0.6,
             n.o2(chl_lumen): 8.0,
@@ -229,7 +211,6 @@ def get_matuszynska2016npq(
     add_rt(model)
     add_adenosin_moiety(
         model,
-        compartment=chl_stroma,
         total=static(model, n.total_adenosines(), value=2.55, unit="mmol / mol Chl"),
     )
     add_ph_lumen(model, chl_lumen=chl_lumen)
@@ -239,20 +220,18 @@ def get_matuszynska2016npq(
     add_psbs_moietry(model)
     add_lhc_moiety(model)
     add_quencher(model)
-    add_plastoquinone_keq(model, chl_stroma=chl_stroma)
+    add_plastoquinone_keq(model)
     add_plastoquinone_moiety(model)
     add_ps2_cross_section(model)
 
     # Reactions
     add_atp_synthase_mmol_chl(
         model,
-        chl_stroma=chl_stroma,
         chl_lumen=chl_lumen,
         bh="bH",
     )
     add_b6f(
         model,
-        chl_stroma=chl_stroma,
         chl_lumen=chl_lumen,
         bh="bH",
     )
@@ -261,20 +240,16 @@ def get_matuszynska2016npq(
     add_cyclic_electron_flow(model)
     add_violaxanthin_epoxidase(model, chl_lumen=chl_lumen)
     add_zeaxanthin_epoxidase(model)
-    add_fnr_mmol_chl(
-        model,
-        chl_stroma=chl_stroma,
-    )
+    add_fnr_mmol_chl(model)
     add_ndh(model)
     add_photosystems(model, chl_lumen=chl_lumen, mehler=False)
-    add_proton_leak(model, chl_stroma=chl_stroma, chl_lumen=chl_lumen)
+    add_proton_leak(model, chl_lumen=chl_lumen)
     add_ptox(model, compartment=chl_lumen)
     add_state_transitions(model)
 
     # Misc
     add_atp_consumption(
         model,
-        compartment=chl_stroma,
         kf=static(model, n.kf(n.ex_atp()), 10.0),
     )
     add_readouts(
@@ -290,7 +265,6 @@ def get_matuszynska2016npq(
 
 def get_matuszynska2019(
     *,
-    chl_stroma: str = "",
     chl_lumen: str = "_lumen",
 ) -> Model:
     model = Model()
@@ -330,8 +304,8 @@ def get_matuszynska2019(
     )
     model.add_parameters(
         {
-            n.ph(chl_stroma): 7.9,
-            n.co2(chl_stroma): 0.2,
+            n.ph(): 7.9,
+            n.co2(): 0.2,
             n.o2(chl_lumen): 8.0,
             n.pfd(): 100.0,
             "bH": 100.0,
@@ -355,7 +329,7 @@ def get_matuszynska2019(
     add_psbs_moietry(model)
     add_lhc_moiety(model)
     add_quencher(model)
-    add_plastoquinone_keq(model, chl_stroma=chl_stroma)
+    add_plastoquinone_keq(model)
     add_plastoquinone_moiety(model)
     add_ps2_cross_section(model)
     add_nadp_moiety(
@@ -364,26 +338,22 @@ def get_matuszynska2019(
     )
     add_adenosin_moiety(
         model,
-        compartment=chl_stroma,
         total=static(model, n.total_adenosines(), value=2.55, unit="mM"),
     )
     add_orthophosphate_moiety_cbb(
         model,
-        chl_stroma=chl_stroma,
         total=static(model, n.total_orthophosphate(), 17.05),
     )
 
     # Reactions
     add_atp_synthase_mm(
         model,
-        chl_stroma=chl_stroma,
         chl_lumen=chl_lumen,
         bh="bH",
         convf="convf",
     )
     add_b6f(
         model,
-        chl_stroma=chl_stroma,
         chl_lumen=chl_lumen,
         bh="bH",
     )
@@ -394,7 +364,6 @@ def get_matuszynska2019(
     add_zeaxanthin_epoxidase(model)
     add_fnr_mm(
         model,
-        chl_stroma=chl_stroma,
         convf="convf",
     )
     add_ndh(model)
@@ -404,44 +373,39 @@ def get_matuszynska2019(
         mehler=False,
         convf="convf",
     )
-    add_proton_leak(model, chl_stroma=chl_stroma, chl_lumen=chl_lumen)
+    add_proton_leak(model, chl_lumen=chl_lumen)
     add_ptox(model, compartment=chl_lumen)
     add_state_transitions(model)
     add_rubisco_poolman(
         model,
-        chl_stroma=chl_stroma,
         e0=fcbb_regulated(model, n.e0(n.rubisco()), 1.0),
     )
-    add_phosphoglycerate_kinase_poolman(model, compartment=chl_stroma)
-    add_gadph(model, chl_stroma=chl_stroma)
-    add_triose_phosphate_isomerase(model, chl_stroma=chl_stroma)
-    add_aldolase_dhap_gap_req(model, compartment=chl_stroma)
-    add_aldolase_dhap_e4p_req(model, compartment=chl_stroma)
+    add_phosphoglycerate_kinase_poolman(model)
+    add_gadph(model)
+    add_triose_phosphate_isomerase(model)
+    add_aldolase_dhap_gap_req(model)
+    add_aldolase_dhap_e4p_req(model)
     add_fbpase(
         model,
-        chl_stroma=chl_stroma,
         e0=fcbb_regulated(model, n.e0(n.fbpase()), 1.0),
     )
-    add_transketolase_x5p_e4p_f6p_gap(model, chl_stroma=chl_stroma)
-    add_transketolase_x5p_r5p_s7p_gap(model, chl_stroma=chl_stroma)
+    add_transketolase_x5p_e4p_f6p_gap(model)
+    add_transketolase_x5p_r5p_s7p_gap(model)
     add_sbpase(
         model,
-        chl_stroma=chl_stroma,
         e0=fcbb_regulated(model, n.e0(n.sbpase()), 1.0),
     )
-    add_ribose_5_phosphate_isomerase(model, chl_stroma=chl_stroma)
-    add_ribulose_5_phosphate_3_epimerase(model, chl_stroma=chl_stroma)
+    add_ribose_5_phosphate_isomerase(model)
+    add_ribulose_5_phosphate_3_epimerase(model)
     add_phosphoribulokinase(
         model,
-        chl_stroma=chl_stroma,
         e0=fcbb_regulated(model, n.e0(n.phosphoribulokinase()), 1.0),
     )
-    add_glucose_6_phosphate_isomerase_re(model, compartment=chl_stroma)
-    add_phosphoglucomutase(model, compartment=chl_stroma)
-    add_triose_phosphate_exporters(model, chl_stroma=chl_stroma)
+    add_glucose_6_phosphate_isomerase_re(model)
+    add_phosphoglucomutase(model)
+    add_triose_phosphate_exporters(model)
     add_g1p_efflux(
         model,
-        chl_stroma=chl_stroma,
         e0=fcbb_regulated(model, n.e0(n.ex_g1p()), 1.0),
     )
 
@@ -459,7 +423,6 @@ def get_matuszynska2019(
 
 def get_saadat2021(
     *,
-    chl_stroma: str = "",
     chl_lumen: str = "_lumen",
 ) -> Model:
     model = Model()
@@ -501,10 +464,10 @@ def get_saadat2021(
     model.add_parameters(
         {
             n.pfd(): 100.0,
-            n.co2(chl_stroma): 0.2,
+            n.co2(): 0.2,
             n.o2(chl_lumen): 8.0,
-            n.ph(chl_stroma): 7.9,
-            n.h(chl_stroma): 1.2589254117941661e-05,
+            n.ph(): 7.9,
+            n.h(): 1.2589254117941661e-05,
             "bH": 100.0,
             "F": 96.485,
             "E^0_PC": 0.38,
@@ -525,7 +488,7 @@ def get_saadat2021(
     add_psbs_moietry(model)
     add_lhc_moiety(model)
     add_quencher(model)
-    add_plastoquinone_keq(model, chl_stroma=chl_stroma)
+    add_plastoquinone_keq(model)
     add_plastoquinone_moiety(model)
     add_ps2_cross_section(model)
     add_thioredoxin_moiety(model)
@@ -536,12 +499,10 @@ def get_saadat2021(
     )
     add_adenosin_moiety(
         model,
-        compartment=chl_stroma,
         total=static(model, n.total_adenosines(), value=2.55, unit="mM"),
     )
     add_orthophosphate_moiety_cbb(
         model,
-        chl_stroma=chl_stroma,
         total=static(model, n.total_orthophosphate(), 17.05),
     )
     add_thioredoxin_regulation2021(model)
@@ -552,14 +513,12 @@ def get_saadat2021(
     ## PETC
     add_atp_synthase_mm(
         model,
-        chl_stroma=chl_stroma,
         chl_lumen=chl_lumen,
         convf="convf",
         bh="bH",
     )
     add_b6f(
         model,
-        chl_stroma=chl_stroma,
         chl_lumen=chl_lumen,
         bh="bH",
     )
@@ -570,7 +529,6 @@ def get_saadat2021(
     add_zeaxanthin_epoxidase(model)
     add_fnr_mm(
         model,
-        chl_stroma=chl_stroma,
         convf="convf",
     )
     add_ndh(model)
@@ -584,46 +542,41 @@ def get_saadat2021(
         model,
         keq=n.keq(n.ferredoxin_reductase()),  # from add_photosystems
     )
-    add_proton_leak(model, chl_stroma=chl_stroma, chl_lumen=chl_lumen)
+    add_proton_leak(model, chl_lumen=chl_lumen)
     add_ptox(model, compartment=chl_lumen)
     add_state_transitions(model)
 
     ## CBB
     add_rubisco_poolman(
         model,
-        chl_stroma=chl_stroma,
         e0=thioredixon_regulated(model, n.e0(n.rubisco()), 1.0),
     )
-    add_phosphoglycerate_kinase_poolman(model, compartment=chl_stroma)
-    add_gadph(model, chl_stroma=chl_stroma)
-    add_triose_phosphate_isomerase(model, chl_stroma=chl_stroma)
-    add_aldolase_dhap_gap_req(model, compartment=chl_stroma)
-    add_aldolase_dhap_e4p_req(model, compartment=chl_stroma)
+    add_phosphoglycerate_kinase_poolman(model)
+    add_gadph(model)
+    add_triose_phosphate_isomerase(model)
+    add_aldolase_dhap_gap_req(model)
+    add_aldolase_dhap_e4p_req(model)
     add_fbpase(
         model,
-        chl_stroma=chl_stroma,
         e0=thioredixon_regulated(model, n.e0(n.fbpase()), 1.0),
     )
-    add_transketolase_x5p_e4p_f6p_gap(model, chl_stroma=chl_stroma)
-    add_transketolase_x5p_r5p_s7p_gap(model, chl_stroma=chl_stroma)
+    add_transketolase_x5p_e4p_f6p_gap(model)
+    add_transketolase_x5p_r5p_s7p_gap(model)
     add_sbpase(
         model,
-        chl_stroma=chl_stroma,
         e0=thioredixon_regulated(model, n.e0(n.sbpase()), 1.0),
     )
-    add_ribose_5_phosphate_isomerase(model, chl_stroma=chl_stroma)
-    add_ribulose_5_phosphate_3_epimerase(model, chl_stroma=chl_stroma)
+    add_ribose_5_phosphate_isomerase(model)
+    add_ribulose_5_phosphate_3_epimerase(model)
     add_phosphoribulokinase(
         model,
-        chl_stroma=chl_stroma,
         e0=thioredixon_regulated(model, n.e0(n.phosphoribulokinase()), 1.0),
     )
-    add_glucose_6_phosphate_isomerase_re(model, compartment=chl_stroma)
-    add_phosphoglucomutase(model, compartment=chl_stroma)
-    add_triose_phosphate_exporters(model, chl_stroma=chl_stroma)
+    add_glucose_6_phosphate_isomerase_re(model)
+    add_phosphoglucomutase(model)
+    add_triose_phosphate_exporters(model)
     add_g1p_efflux(
         model,
-        chl_stroma=chl_stroma,
         e0=thioredixon_regulated(model, n.e0(n.ex_g1p()), 1.0),
     )
 
@@ -636,12 +589,10 @@ def get_saadat2021(
     # Misc
     add_atp_consumption(
         model,
-        compartment=chl_stroma,
         kf=static(model, n.kf(n.ex_atp()), 0.2),
     )
     add_nadph_consumption(
         model,
-        compartment=chl_stroma,
         kf=static(model, n.kf(n.ex_nadph()), 0.2),
     )
     add_readouts(

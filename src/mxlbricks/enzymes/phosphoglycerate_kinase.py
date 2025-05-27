@@ -38,7 +38,7 @@ ENZYME = n.phosphoglycerate_kinase()
 def add_phosphoglycerate_kinase_poolman(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:
@@ -72,7 +72,7 @@ def add_phosphoglycerate_kinase_poolman(
 def add_phosphoglycerate_kinase(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

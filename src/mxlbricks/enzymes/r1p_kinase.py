@@ -23,7 +23,7 @@ ENZYME = n.r1p_kinase()
 
 def add_r1p_kinase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

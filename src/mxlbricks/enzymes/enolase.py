@@ -21,7 +21,7 @@ ENZYME = n.enolase()
 
 def add_enolase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

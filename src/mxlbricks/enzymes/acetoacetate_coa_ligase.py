@@ -30,7 +30,7 @@ ENZYME = n.acetoacetate_coa_ligase()
 
 def add_acetoacetate_coa_ligase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

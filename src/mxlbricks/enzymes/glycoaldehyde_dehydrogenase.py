@@ -23,7 +23,7 @@ ENZYME = n.glycolaldehyde_dehydrogenase()
 
 def add_glycolaldehyde_dehydrogenase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

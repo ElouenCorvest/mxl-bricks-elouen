@@ -69,7 +69,7 @@ def _rate_atp_synthase_2019(
 def add_atp_synthase_mmol_chl(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     chl_lumen: str = "_lumen",
     kf: str | None = None,
     hpr: str | None = None,
@@ -122,7 +122,7 @@ def add_atp_synthase_mmol_chl(
 def add_atp_synthase_mm(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     chl_lumen: str = "_lumen",
     kf: str | None = None,
     hpr: str | None = None,
@@ -175,7 +175,7 @@ def add_atp_synthase_mm(
 def add_atp_synthase_static_protons(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     km_adp: str | None = None,
@@ -227,7 +227,7 @@ def _rate_static_energy(
 def add_atp_synthase_energy_dependent(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     km_adp: str | None = None,
@@ -303,7 +303,7 @@ def add_atp_synthase_2024(
     model: Model,
     *,
     chl_lumen: str,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kf: str | None = None,
     hpr: str | None = None,
     bh: str | None = None,  # proton buffering

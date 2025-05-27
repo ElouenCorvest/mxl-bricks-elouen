@@ -25,7 +25,7 @@ ENZYME = n.glycolyl_coa_synthetase()
 def add_glycolyl_coa_synthetase_irrev(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
@@ -63,7 +63,7 @@ def add_glycolyl_coa_synthetase_irrev(
 def add_glycolyl_coa_synthetase(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

@@ -7,10 +7,11 @@ Equilibrator
     Keq = 0.4 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_1s_1p
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.ribose_phosphate_isomerase()
 
@@ -18,7 +19,7 @@ ENZYME = n.ribose_phosphate_isomerase()
 def add_ribose_5_phosphate_isomerase(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:

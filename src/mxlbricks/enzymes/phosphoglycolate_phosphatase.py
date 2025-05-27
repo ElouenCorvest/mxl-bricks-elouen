@@ -28,7 +28,7 @@ ENZYME = n.phosphoglycolate_phosphatase()
 def add_phosphoglycolate_influx(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kf: str | None = None,
 ) -> Model:
     kf = static(model, n.kf(ENZYME), 60.0) if kf is None else kf

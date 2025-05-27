@@ -7,10 +7,11 @@ Glycerone phosphate(aq) + D-Erythrose 4-phosphate(aq) ⇌ Sedoheptulose 1,7-bisp
 Keq = 4.8e3 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_2s_1p
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.aldolase_dhap_e4p()
 
@@ -19,7 +20,7 @@ def add_aldolase_dhap_e4p_req(
     model: Model,
     *,
     keq: str | None = None,
-    compartment: str,
+    compartment: str = "",
     kre: str | None = None,
 ) -> Model:
     kre = (

@@ -23,7 +23,7 @@ ENZYME = n.e4p_isomerase()
 
 def add_e4p_isomerase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

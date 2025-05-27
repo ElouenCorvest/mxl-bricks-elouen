@@ -25,7 +25,7 @@ ENZYME = n.malate_synthase()
 
 def add_malate_synthase(
     model: Model,
-    chl_stroma: str,
+    chl_stroma: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

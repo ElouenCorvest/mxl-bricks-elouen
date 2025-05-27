@@ -22,7 +22,7 @@ ENZYME = n.glutamate_dehydrogenase()
 def add_glutamate_dehydrogenase(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

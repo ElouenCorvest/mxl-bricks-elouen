@@ -23,7 +23,7 @@ ENZYME = n.xylulose_kinase()
 
 def add_xylulose_kinase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

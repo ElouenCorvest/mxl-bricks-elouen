@@ -24,7 +24,7 @@ ENZYME = n.glyoxylate_oxidase()
 def add_glyoxylate_oxidase(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

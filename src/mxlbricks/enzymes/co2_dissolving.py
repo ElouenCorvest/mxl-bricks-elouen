@@ -1,7 +1,8 @@
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import diffusion
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.co2_dissolving()
 
@@ -9,7 +10,7 @@ ENZYME = n.co2_dissolving()
 def add_co2_dissolving(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kf: str | None = None,
 ) -> Model:
     kf = static(model, n.kf(ENZYME), 4.5) if kf is None else kf  # FIXME: source

@@ -8,10 +8,11 @@ D-Glyceraldehyde 3-phosphate(aq) + D-Fructose 6-phosphate(aq)
 Keq = 0.02 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_2s_2p
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.transketolase_gap_f6p()
 
@@ -19,7 +20,7 @@ ENZYME = n.transketolase_gap_f6p()
 def add_transketolase_x5p_e4p_f6p_gap(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:

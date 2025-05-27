@@ -28,7 +28,7 @@ ENZYME = n.glycerate_dehydrogenase()
 def add_hpa_outflux(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

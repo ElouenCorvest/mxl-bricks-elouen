@@ -9,6 +9,8 @@ Equilibrator
 
 import math
 
+from mxlpy import Derived, Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import (
     mass_action_1s,
@@ -17,7 +19,6 @@ from mxlbricks.fns import (
     value,
 )
 from mxlbricks.utils import filter_stoichiometry, static
-from mxlpy import Derived, Model
 
 ENZYME = n.fnr()
 
@@ -82,7 +83,7 @@ def _rate_fnr_2019(
 def add_fnr_mmol_chl(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     km_fd: str | None = None,
     km_nadp: str | None = None,
@@ -137,7 +138,7 @@ def add_fnr_mmol_chl(
 def add_fnr_mm(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     km_fd: str | None = None,
     km_nadp: str | None = None,
@@ -231,7 +232,7 @@ def add_fnr_static(
 def add_fnr_energy_dependent(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

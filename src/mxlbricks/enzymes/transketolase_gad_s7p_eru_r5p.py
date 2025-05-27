@@ -24,7 +24,7 @@ ENZYME = n.transketolase_gad_s7p_r5p_eru()
 
 def add_transketolase_gad_s7p_eru_r5p(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

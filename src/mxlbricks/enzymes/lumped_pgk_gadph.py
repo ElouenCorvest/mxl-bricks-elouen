@@ -25,7 +25,7 @@ ENZYME = "pgk_gadph"
 def lumped_pgk_gadph(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

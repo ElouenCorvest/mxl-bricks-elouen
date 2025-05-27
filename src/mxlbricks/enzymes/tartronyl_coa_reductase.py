@@ -22,7 +22,7 @@ ENZYME = n.tartronyl_coa_reductase()
 def add_tartronyl_coa_reductase(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

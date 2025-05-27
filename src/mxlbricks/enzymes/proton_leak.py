@@ -5,10 +5,11 @@ EC FIXME
 Equilibrator
 """
 
+from mxlpy import Derived, Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import protons_stroma
 from mxlbricks.utils import static
-from mxlpy import Derived, Model
 
 ENZYME = n.proton_leak()
 
@@ -28,7 +29,7 @@ def _rate_leak(
 def add_proton_leak(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     chl_lumen: str,
     kf: str | None = None,
 ) -> Model:

@@ -23,7 +23,7 @@ ENZYME = n.a5p_isomerase()
 
 def add_a5p_isomerase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

@@ -8,10 +8,11 @@ Keq = 1.1e4 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
 
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_2s_1p
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.aldolase_dhap_gap()
 
@@ -19,7 +20,7 @@ ENZYME = n.aldolase_dhap_gap()
 def add_aldolase_dhap_gap_req(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:

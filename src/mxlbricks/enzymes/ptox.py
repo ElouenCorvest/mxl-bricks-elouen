@@ -3,10 +3,11 @@
 2 QH2 + O2 -> 2 Q + 2 H2O
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_2s
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.ptox()
 
@@ -14,7 +15,7 @@ ENZYME = n.ptox()
 def add_ptox(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kf: str | None = None,
 ) -> Model:
     kf = static(model, "kPTOX", 0.01) if kf is None else kf

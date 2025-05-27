@@ -23,7 +23,7 @@ ENZYME = n.glycolate_dehydrogenase()
 
 def add_glycolate_dehydrogenase(
     model: Model,
-    chl_stroma: str,
+    chl_stroma: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

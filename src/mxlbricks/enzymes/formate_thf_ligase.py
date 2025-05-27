@@ -28,7 +28,7 @@ ENZYME = n.formate_thf_ligase()
 
 def add_formate_thf_ligase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

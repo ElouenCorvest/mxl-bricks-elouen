@@ -21,7 +21,7 @@ ENZYME = n.hydroxyaspartate_aldolase()
 
 def add_hydroxyaspartate_aldolase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

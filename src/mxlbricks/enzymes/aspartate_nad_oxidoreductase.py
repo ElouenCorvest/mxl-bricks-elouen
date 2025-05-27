@@ -23,7 +23,7 @@ ENZYME = n.aspartate_oxidoreductase()
 
 def add_aspartate_oxidoreductase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

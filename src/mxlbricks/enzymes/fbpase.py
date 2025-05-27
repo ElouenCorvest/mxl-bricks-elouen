@@ -26,7 +26,7 @@ ENZYME = n.fbpase()
 def add_fbpase(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

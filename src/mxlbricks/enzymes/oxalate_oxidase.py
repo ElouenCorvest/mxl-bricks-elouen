@@ -23,7 +23,7 @@ ENZYME = n.oxalate_oxidase()
 
 def add_oxalate_oxidase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

@@ -1,10 +1,10 @@
 from typing import cast
 
 import numpy as np
+from mxlpy import Derived, Model
 
 from mxlbricks import names as n
 from mxlbricks.utils import static
-from mxlpy import Derived, Model
 
 ENZYME = n.b6f()
 
@@ -49,7 +49,7 @@ def _b6f(
 def add_b6f(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     chl_lumen: str,
     bh: str | None = None,
 ) -> Model:
@@ -119,7 +119,7 @@ def vb6f_2024(
 def add_b6f_2024(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     chl_lumen: str,
 ) -> Model:
     model.add_parameter(b6f_content := "b6f_content", 1)

@@ -1,7 +1,8 @@
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.ex_atp()
 
@@ -9,7 +10,7 @@ ENZYME = n.ex_atp()
 def add_atp_consumption(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kf: str | None = None,
 ) -> Model:
     kf = static(model, n.kms(ENZYME), 1.0) if kf is None else kf  # FIXME: source

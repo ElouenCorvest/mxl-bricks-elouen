@@ -23,7 +23,7 @@ ENZYME = n.glyoxylate_carboligase()
 
 def add_glyoxylate_carboligase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

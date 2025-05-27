@@ -24,7 +24,7 @@ ENZYME = n.transaldolase_f6p_gad_gap_xyl()
 
 def add_transaldolase_f6p_gad_xyl_gap(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

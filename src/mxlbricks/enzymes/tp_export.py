@@ -39,7 +39,7 @@ def _rate_out(
 def add_triose_phosphate_exporters(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     e0: str | None = None,
     km_pga: str | None = None,
     km_gap: str | None = None,

@@ -170,7 +170,7 @@ def _rate_witzel_5i(
 def add_rubisco_poolman(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     km_co2: str | None = None,
@@ -239,7 +239,7 @@ def add_rubisco_poolman(
 def add_rubisco(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat_carb: str | None = None,
     kcat_ox: str | None = None,
     e0: str | None = None,

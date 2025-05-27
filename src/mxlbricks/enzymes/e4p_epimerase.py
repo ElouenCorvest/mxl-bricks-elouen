@@ -23,7 +23,7 @@ ENZYME = n.e4p_epimerase()
 
 def add_e4p_epimerase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

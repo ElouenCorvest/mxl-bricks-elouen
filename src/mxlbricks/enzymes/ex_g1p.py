@@ -50,7 +50,7 @@ def _rate_starch(
 def add_g1p_efflux(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     km_g1p: str | None = None,

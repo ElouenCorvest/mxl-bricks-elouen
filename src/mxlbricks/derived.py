@@ -80,7 +80,7 @@ def add_ferredoxin_moiety(
 def add_glutamate_moiety(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     total: str | None = None,
 ) -> Model:
     total = static(model, n.total_glutamate(), 3.0) if total is None else total
@@ -124,7 +124,7 @@ def add_glutathion_moiety(
 def add_hco3_from_co2(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     factor: str | None = None,
 ) -> Model:
     factor = static(model, "CO2/HCO3 ratio", 50)
@@ -304,7 +304,11 @@ def _keq_pq_red(
     return math.exp(-dg / RT)
 
 
-def add_plastoquinone_keq(model: Model, *, chl_stroma: str) -> Model:
+def add_plastoquinone_keq(
+    model: Model,
+    *,
+    chl_stroma: str = "",
+) -> Model:
     model.add_parameter("E^0_QA", -0.14)
     model.add_parameter("E^0_PQ", 0.354)
 
@@ -443,7 +447,7 @@ def add_orthophosphate_moiety_cbb(
 def add_orthophosphate_moiety_cbb_pr(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     total: str | None = None,
 ) -> Model:
     total = static(model, n.total_orthophosphate(), 20.0) if total is None else total

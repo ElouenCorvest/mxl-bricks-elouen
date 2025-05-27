@@ -18,7 +18,7 @@ ENZYME = n.tartronate_semialdehyde_reductase()
 
 def add_tartronate_semialdehyde_reductase(
     model: Model,
-    chl_stroma: str,
+    chl_stroma: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

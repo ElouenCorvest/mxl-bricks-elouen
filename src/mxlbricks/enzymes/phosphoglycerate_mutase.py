@@ -21,7 +21,7 @@ ENZYME = n.phosphoglycerate_mutase()
 
 def add_phosphoglycerate_mutase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

@@ -25,7 +25,7 @@ ENZYME = n.sbpase()
 def add_sbpase(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,

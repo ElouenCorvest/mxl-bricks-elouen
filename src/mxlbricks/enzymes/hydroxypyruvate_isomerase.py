@@ -23,7 +23,7 @@ ENZYME = "hydroxypyruvate_isomerase"
 
 def add_hydroxypyruvate_isomerase(
     model: Model,
-    compartment: str,
+    compartment: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

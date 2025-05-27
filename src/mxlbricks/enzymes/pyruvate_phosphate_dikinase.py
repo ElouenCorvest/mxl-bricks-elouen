@@ -23,7 +23,7 @@ ENZYME = n.pyruvate_phosphate_dikinase()
 
 def add_pyruvate_phosphate_dikinase(
     model: Model,
-    chl_stroma: str,
+    chl_stroma: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

@@ -19,7 +19,7 @@ ENZYME = n.g6pi()
 def add_glucose_6_phosphate_isomerase_re(
     model: Model,
     *,
-    compartment: str,
+    compartment: str = "",
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:

@@ -51,7 +51,7 @@ def _rate_prk(
 def add_phosphoribulokinase(
     model: Model,
     *,
-    chl_stroma: str,
+    chl_stroma: str = "",
     kcat: str | None = None,
     e0: str | None = None,
     km_ru5p: str | None = None,
