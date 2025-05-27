@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="docs/assets/logo.png" width="400px" alt='mxlpy-logo'>
+    <img src="https://raw.githubusercontent.com/Computational-Biology-Aachen/mxl-bricks/refs/heads/main/docs/assets/logo.png" width="400px" alt='mxlpy-logo'>
 </p>
 
 # MxL Bricks
