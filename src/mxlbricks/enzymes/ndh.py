@@ -4,10 +4,11 @@ PQH2 -> PQ
 
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.ndh()
 

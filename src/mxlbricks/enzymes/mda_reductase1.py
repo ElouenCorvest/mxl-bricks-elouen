@@ -6,9 +6,10 @@ Equilibrator
 Monodehydroascorbate(aq) + 0.5 NAD (aq) ⇌ Dehydroascorbate(aq) + 0.5 NADH(aq)
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.mda_reductase1()
 

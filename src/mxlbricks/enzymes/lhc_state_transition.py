@@ -5,10 +5,11 @@ EC FIXME
 Equilibrator
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s
 from mxlbricks.utils import static
-from mxlpy import Model
 
 
 def _rate_state_transition_ps1_ps2(

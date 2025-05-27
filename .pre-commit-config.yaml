@@ -1,7 +1,7 @@
 repos:
   # Lint & format
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.2
+    rev: v0.11.11
     hooks:
       - id: ruff
         types_or: [python, pyi, jupyter]
@@ -11,7 +11,7 @@ repos:
 
   # Sort pyproject toml
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.23.1
+    rev: v0.24.2
     hooks:
       - id: toml-sort-fix
         args: [--in-place]
@@ -24,6 +24,16 @@ repos:
       - id: jupyter-nb-clear-output
         name: jupyter-nb-clear-output
         files: \.ipynb$
-        stages: [commit]
+        stages: [pre-commit]
         language: system
         entry: jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace
+
+  # Run Pyright
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        files: \.py$
+        stages: [pre-commit]
+        language: system
+        entry: uv run pyright

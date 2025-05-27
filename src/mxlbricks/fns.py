@@ -75,9 +75,7 @@ def mass_action_3s(s1: float, s2: float, s3: float, k_fwd: float) -> float:
     return k_fwd * s1 * s2 * s3
 
 
-def mass_action_4s(
-    s1: float, s2: float, s3: float, s4: float, k_fwd: float
-) -> float:
+def mass_action_4s(s1: float, s2: float, s3: float, s4: float, k_fwd: float) -> float:
     return k_fwd * s1 * s2 * s3 * s4
 
 
@@ -230,9 +228,7 @@ def michaelis_menten_1s_4i(
     ki3: float,
     ki4: float,
 ) -> float:
-    return (
-        vmax * s / (s + km * (1 + i1 / ki1 + i2 / ki2 + i3 / ki3 + i4 / ki4))
-    )
+    return vmax * s / (s + km * (1 + i1 / ki1 + i2 / ki2 + i3 / ki3 + i4 / ki4))
 
 
 def michaelis_menten_2s(
@@ -348,9 +344,7 @@ def reversible_michaelis_menten_1s_1p_1i(
     ki: float,
     keq: float,
 ) -> float:
-    return (vmax / kms / (1 + s1 / (kms * (1 + i1 / ki)) + p1 / kmp)) * (
-        s1 - p1 / keq
-    )
+    return (vmax / kms / (1 + s1 / (kms * (1 + i1 / ki)) + p1 / kmp)) * (s1 - p1 / keq)
 
 
 def reversible_michaelis_menten_1s_2p(
@@ -547,20 +541,15 @@ def reversible_michaelis_menten_3s_4p(
     kmp: float,
     keq: float,
 ) -> float:
-    return (
-        vmax / kms / (1 + s1 * s2 * s3 / kms + p1 * p2 * p3 * p4 / kmp)
-    ) * (s1 * s2 * s3 - p1 * p2 * p3 * p4 / keq)
+    return (vmax / kms / (1 + s1 * s2 * s3 / kms + p1 * p2 * p3 * p4 / kmp)) * (
+        s1 * s2 * s3 - p1 * p2 * p3 * p4 / keq
+    )
 
 
 def ping_pong_bi_bi(
     s1: float, s2: float, vmax: float, km_s1: float, km_s2: float
 ) -> float:
-    return (
-        vmax
-        * s1
-        * s2
-        / (1 / (km_s1 * km_s2) + s1 / km_s1 + s2 / km_s2 + s1 * s2)
-    )
+    return vmax * s1 * s2 / (1 / (km_s1 * km_s2) + s1 / km_s1 + s2 / km_s2 + s1 * s2)
 
 
 def rapid_equilibrium_1s_1p(

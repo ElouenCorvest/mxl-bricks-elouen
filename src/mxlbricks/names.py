@@ -26,7 +26,7 @@ def product(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
 ###############################################################################
 
 
-def loc(name: str, compartment: str = "", tissue: str) -> str:
+def loc(name: str, compartment: str = "", tissue: str = "") -> str:
     """Localise a component to a compartment and tissue."""
     return f"{name}{compartment}{tissue}"
 

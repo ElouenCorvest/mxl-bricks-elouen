@@ -24,7 +24,7 @@ ENZYME = n.malate_dehydrogenase()
 def add_malate_dehydrogenase(
     model: Model,
     chl_stroma: str = "",
-    per: str,
+    per: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

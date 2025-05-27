@@ -5,10 +5,11 @@ NADH + Proton + 2 Monodehydroascorbate <=> NAD + 2 ascorbate
 Equilibrator
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.mda_reductase2()
 

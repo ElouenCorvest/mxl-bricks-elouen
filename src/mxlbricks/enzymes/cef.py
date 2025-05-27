@@ -1,6 +1,7 @@
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.cyclic_electron_flow()
 

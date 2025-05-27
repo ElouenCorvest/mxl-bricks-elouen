@@ -24,7 +24,7 @@ ENZYME = n.pep_carboxylase()
 def add_pep_carboxylase(
     model: Model,
     chl_stroma: str = "",
-    per: str,
+    per: str = "",
     *,
     kcat: str | None = None,
     e0: str | None = None,

@@ -3,10 +3,11 @@ Violaxanthin + Ascorbate -> Antheraxanthin + Dehydroascorbate + H2O
 Antheraxanthin + Ascorbate -> Zeaxanthin + Dehydroascorbate + H2O
 """
 
+from mxlpy import Model
+
 from mxlbricks import names as n
 from mxlbricks.fns import protons_stroma
 from mxlbricks.utils import static
-from mxlpy import Model
 
 ENZYME = n.violaxanthin_deepoxidase()
 
