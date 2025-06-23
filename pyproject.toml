@@ -48,9 +48,9 @@ maintainers = [
 ]
 name = "mxlbricks"
 readme = "README.md"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
-  "mxlpy>=0.19.0",
+  "mxlpy>=0.22.0",
 ]
 
 [tool.bandit]

@@ -1412,7 +1412,7 @@ wheels = [
 
 [[package]]
 name = "mxlbricks"
-version = "0.1.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "mxlpy" },
@@ -1438,7 +1438,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "mxlpy", specifier = ">=0.19.0" }]
+requires-dist = [{ name = "mxlpy", specifier = ">=0.22.0" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1461,7 +1461,7 @@ dev = [
 
 [[package]]
 name = "mxlpy"
-version = "0.19.0"
+version = "0.22.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dill" },
@@ -1485,9 +1485,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e0/b0/d2ab50aa89a50e9a403b90ed2d35e33640b8b82d8bd560977a94c2d0d8f7/mxlpy-0.19.0.tar.gz", hash = "sha256:e2112124c5f747576f96dda14023d7a7a35a7faa7ec18308f55061d3a56d6e02", size = 4855307, upload-time = "2025-05-23T05:29:22.7Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/36/ef021fdba5c99361bbfaa4751dbe18a74f46a1931a1e22ce9668c10d80ed/mxlpy-0.22.0.tar.gz", hash = "sha256:22d0a8fca9016043fdfef3e59566abbf0bea3dd63e06f2f5a2633329339a149b", size = 4873650, upload-time = "2025-06-06T08:42:18.831Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/01/d8/e155706819aad2ef3ed620149ec5b7471a9e5f7b3443d59a2ed59c00accd/mxlpy-0.19.0-py3-none-any.whl", hash = "sha256:1470444f3d03a8b4f776af7c57b9ec2e15ef8e518dd31171ef5996de8af5a527", size = 112306, upload-time = "2025-05-23T05:29:20.852Z" },
+    { url = "https://files.pythonhosted.org/packages/12/61/9cd4912d3b11dd2ca4ba289fb2edef345e7098b6f8ccb7a687f5d52e5062/mxlpy-0.22.0-py3-none-any.whl", hash = "sha256:1ac973ea7001f9067622f5ec3420ce46c92e13c0966ba5704e6c7f57acad5603", size = 125059, upload-time = "2025-06-06T08:42:17.146Z" },
 ]
 
 [[package]]
