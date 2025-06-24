@@ -12,37 +12,46 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_2s_2p
-from mxlbricks.utils import static
-
-ENZYME = n.transketolase_gap_s7p()
+from mxlbricks.utils import (
+    default_keq,
+    default_kre,
+    default_name,
+)
 
 
 def add_transketolase_x5p_r5p_s7p_gap(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    gap: str | None = None,
+    s7p: str | None = None,
+    r5p: str | None = None,
+    x5p: str | None = None,
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kre = static(model, n.kre(ENZYME), 800000000.0) if kre is None else kre
-    keq = static(model, n.keq(ENZYME), 0.85) if keq is None else keq
+    rxn = default_name(rxn, n.transketolase_gap_s7p)
+    gap = default_name(gap, n.gap)
+    s7p = default_name(s7p, n.s7p)
+    r5p = default_name(r5p, n.r5p)
+    x5p = default_name(x5p, n.x5p)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=rapid_equilibrium_2s_2p,
         stoichiometry={
-            n.gap(chl_stroma): -1,
-            n.s7p(chl_stroma): -1,
-            n.r5p(chl_stroma): 1,
-            n.x5p(chl_stroma): 1,
+            gap: -1,
+            s7p: -1,
+            r5p: 1,
+            x5p: 1,
         },
         args=[
-            n.gap(chl_stroma),
-            n.s7p(chl_stroma),
-            n.r5p(chl_stroma),
-            n.x5p(chl_stroma),
-            kre,
-            keq,
+            gap,
+            s7p,
+            r5p,
+            x5p,
+            default_kre(model, par=kre, rxn=rxn, default=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, default=0.85),
         ],
     )
     return model

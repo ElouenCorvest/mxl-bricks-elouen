@@ -1,9 +1,10 @@
 from mxlpy import Model
 
 from mxlbricks import names as n
-from mxlbricks.utils import static
-
-ENZYME = n.cyclic_electron_flow()
+from mxlbricks.utils import (
+    default_kf,
+    default_name,
+)
 
 
 def _rate_cyclic_electron_flow(
@@ -16,12 +17,14 @@ def _rate_cyclic_electron_flow(
 
 def add_cyclic_electron_flow(
     model: Model,
+    *,
+    rxn: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    kf = static(model, n.kf(ENZYME), 1.0) if kf is None else kf  # FIXME: source
+    rxn = default_name(rxn, n.cyclic_electron_flow)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=_rate_cyclic_electron_flow,
         stoichiometry={
             n.pq_ox(): -1,
@@ -30,7 +33,7 @@ def add_cyclic_electron_flow(
         args=[
             n.pq_ox(),
             n.fd_red(),
-            kf,
+            default_kf(model, rxn=rxn, par=kf, default=1.0),
         ],
     )
     return model

@@ -8,13 +8,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.utils import (
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+    static,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.ex_g1p()
 
 
 def _rate_starch(
@@ -50,7 +52,15 @@ def _rate_starch(
 def add_g1p_efflux(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    g1p: str | None = None,
+    atp: str | None = None,
+    adp: str | None = None,
+    pi: str | None = None,
+    pga: str | None = None,
+    f6p: str | None = None,
+    fbp: str | None = None,
+    starch: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     km_g1p: str | None = None,
@@ -60,44 +70,53 @@ def add_g1p_efflux(
     ka_f6p: str | None = None,
     ka_fbp: str | None = None,
 ) -> Model:
-    kcat = (
-        static(model, n.kcat(ENZYME), 0.04 * 8) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.ex_g1p)
+    g1p = default_name(g1p, n.g1p)
+    atp = default_name(atp, n.atp)
+    adp = default_name(adp, n.adp)
+    pi = default_name(pi, n.pi)
+    pga = default_name(pga, n.pga)
+    f6p = default_name(f6p, n.f6p)
+    fbp = default_name(fbp, n.fbp)
+    starch = default_name(starch, n.starch)
 
-    km_g1p = static(model, n.km(ENZYME, n.g1p()), 0.08) if km_g1p is None else km_g1p
-    km_atp = static(model, n.km(ENZYME, n.atp()), 0.08) if km_atp is None else km_atp
-    ki = static(model, n.ki(ENZYME), 10.0) if ki is None else ki
-    ka_pga = static(model, n.ka(ENZYME, n.pga()), 0.1) if ka_pga is None else ka_pga
-    ka_f6p = static(model, n.ka(ENZYME, n.f6p()), 0.02) if ka_f6p is None else ka_f6p
-    ka_fbp = static(model, n.ka(ENZYME, n.fbp()), 0.02) if ka_fbp is None else ka_fbp
-
-    stoichiometry = filter_stoichiometry(
-        model,
-        {
-            n.g1p(chl_stroma): -1.0,
-            n.atp(chl_stroma): -1.0,
-            n.adp(chl_stroma): 1.0,
-        },
-        optional={
-            n.starch(chl_stroma): 1.0,
-        },
-    )
+    km_g1p = static(model, n.km(rxn, n.g1p()), 0.08) if km_g1p is None else km_g1p
+    km_atp = static(model, n.km(rxn, n.atp()), 0.08) if km_atp is None else km_atp
+    ki = static(model, n.ki(rxn), 10.0) if ki is None else ki
+    ka_pga = static(model, n.ka(rxn, n.pga()), 0.1) if ka_pga is None else ka_pga
+    ka_f6p = static(model, n.ka(rxn, n.f6p()), 0.02) if ka_f6p is None else ka_f6p
+    ka_fbp = static(model, n.ka(rxn, n.fbp()), 0.02) if ka_fbp is None else ka_fbp
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=_rate_starch,
-        stoichiometry=stoichiometry,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                n.g1p(): -1.0,
+                n.atp(): -1.0,
+                n.adp(): 1.0,
+            },
+            optional={
+                n.starch(): 1.0,
+            },
+        ),
         args=[
-            n.g1p(chl_stroma),
-            n.atp(chl_stroma),
-            n.adp(chl_stroma),
-            n.pi(chl_stroma),
-            n.pga(chl_stroma),
-            n.f6p(chl_stroma),
-            n.fbp(chl_stroma),
-            vmax,
+            n.g1p(),
+            n.atp(),
+            n.adp(),
+            n.pi(),
+            n.pga(),
+            n.f6p(),
+            n.fbp(),
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=0.04 * 8,  # Source
+            ),
             km_g1p,
             km_atp,
             ki,

@@ -8,26 +8,31 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s
-from mxlbricks.utils import static
-
-ENZYME = n.ndh()
+from mxlbricks.utils import (
+    default_kf,
+    default_name,
+)
 
 
 def add_ndh(
     model: Model,
+    *,
+    rxn: str | None = None,
+    pq_ox: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    kf = static(model, n.kf(ENZYME), 0.002) if kf is None else kf
+    rxn = default_name(rxn, n.ndh)
+    pq_ox = default_name(pq_ox, n.pq_ox)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=mass_action_1s,
         stoichiometry={
-            n.pq_ox(): -1,
+            pq_ox: -1,
         },
         args=[
-            n.pq_ox(),
-            kf,
+            pq_ox,
+            default_kf(model, par=kf, rxn=rxn, default=0.002),
         ],
     )
     return model

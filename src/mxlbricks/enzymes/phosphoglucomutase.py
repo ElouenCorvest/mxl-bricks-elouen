@@ -13,33 +13,38 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_1s_1p
-from mxlbricks.utils import static
-
-ENZYME = n.phosphoglucomutase()
+from mxlbricks.utils import (
+    default_keq,
+    default_kre,
+    default_name,
+)
 
 
 def add_phosphoglucomutase(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    g6p: str | None = None,
+    g1p: str | None = None,
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kre = static(model, n.kre(ENZYME), 800000000.0) if kre is None else kre
-    keq = static(model, n.keq(ENZYME), 0.058) if keq is None else keq
+    rxn = default_name(rxn, n.phosphoglucomutase)
+    g6p = default_name(g6p, n.g6p)
+    g1p = default_name(g1p, n.g1p)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=rapid_equilibrium_1s_1p,
         stoichiometry={
-            n.g6p(compartment): -1,
-            n.g1p(compartment): 1,
+            g6p: -1,
+            g1p: 1,
         },
         args=[
-            n.g6p(compartment),
-            n.g1p(compartment),
-            kre,
-            keq,
+            g6p,
+            g1p,
+            default_kre(model, rxn=rxn, par=kre, default=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, default=0.058),
         ],
     )
     return model

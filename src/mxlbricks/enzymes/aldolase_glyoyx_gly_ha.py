@@ -10,47 +10,60 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, reversible_michaelis_menten_2s_1p
-from mxlbricks.utils import static
+from mxlbricks.fns import reversible_michaelis_menten_2s_1p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
 
-ENZYME = n.hydroxyaspartate_aldolase()
-
 
 def add_hydroxyaspartate_aldolase(
     model: Model,
-    compartment: str = "",
+    *,
+    rxn: str | None = None,
+    s1: str | None = None,
+    s2: str | None = None,
+    p1: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.1) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 2.3) if kmp is None else kmp  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 1.0) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 4.0) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.hydroxyaspartate_aldolase)
+    s1 = default_name(s1, n.glyoxylate)
+    s2 = default_name(s2, n.glycine)
+    p1 = default_name(p1, n.hydroxyaspartate)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_1p,
         stoichiometry={
-            n.glyoxylate(compartment): -1,
-            n.glycine(compartment): -1,
-            n.hydroxyaspartate(compartment): 1,
+            s1: -1,
+            s2: -1,
+            p1: 1,
         },
         args=[
-            n.glyoxylate(compartment),
-            n.glycine(compartment),
-            n.hydroxyaspartate(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            s1,
+            s2,
+            p1,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=1.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.1),
+            default_kmp(model, rxn=rxn, par=kmp, default=2.3),
+            default_keq(model, rxn=rxn, par=keq, default=4.0),
         ],
     )
     return model

@@ -16,64 +16,76 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import (
-    mass_action_1s,
-    reversible_michaelis_menten_3s_3p,
+from mxlbricks.fns import reversible_michaelis_menten_3s_3p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
 )
-from mxlbricks.utils import filter_stoichiometry, static
 
 if TYPE_CHECKING:
     from mxlpy import Model
 
-ENZYME = n.acetoacetate_coa_ligase()
-
 
 def add_acetoacetate_coa_ligase(
     model: Model,
-    compartment: str = "",
     *,
+    rxn: str | None = None,
+    acac: str | None = None,
+    atp: str | None = None,
+    coa: str | None = None,
+    acac_coa: str | None = None,
+    amp: str | None = None,
+    ppi: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.07) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1) if kmp is None else kmp  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 5.89) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 2) if keq is None else keq
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    stoichiometry = filter_stoichiometry(
-        model,
-        {
-            n.acetoacetate(compartment): -1,
-            n.atp(compartment): -1,
-            n.coa(compartment): -1,
-            n.acetoacetyl_coa(compartment): 1,
-            n.amp(compartment): 1,
-            n.ppi(compartment): 1,
-        },
-    )
+    rxn = default_name(rxn, n.acetoacetate_coa_ligase)
+    acac = default_name(acac, n.acetoacetate)
+    atp = default_name(atp, n.atp)
+    coa = default_name(coa, n.coa)
+    acac_coa = default_name(acac_coa, n.acetoacetyl_coa)
+    amp = default_name(amp, n.amp)
+    ppi = default_name(ppi, n.ppi)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_3s_3p,
-        stoichiometry=stoichiometry,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                acac: -1,
+                atp: -1,
+                coa: -1,
+                acac_coa: 1,
+                amp: 1,
+                ppi: 1,
+            },
+        ),
         args=[
-            n.acetoacetate(compartment),
-            n.atp(compartment),
-            n.coa(compartment),
-            n.acetoacetyl_coa(compartment),
-            n.amp(compartment),
-            n.ppi(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            acac,
+            atp,
+            coa,
+            acac_coa,
+            amp,
+            ppi,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=5.89,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.07),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=2.0),
         ],
     )
 

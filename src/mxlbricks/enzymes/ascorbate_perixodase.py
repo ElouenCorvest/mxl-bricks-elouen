@@ -13,9 +13,10 @@ Ascorbate(aq) + H2O2(aq) + 0.5 NADH(aq) ⇌ Monodehydroascorbate(aq) + 2 H2O(l) 
 from mxlpy import Model
 
 from mxlbricks import names as n
-from mxlbricks.utils import filter_stoichiometry
-
-ENZYME = n.ascorbate_peroxidase()
+from mxlbricks.utils import (
+    default_name,
+    filter_stoichiometry,
+)
 
 
 def _rate_ascorbate_peroxidase(
@@ -51,7 +52,19 @@ def _rate_ascorbate_peroxidase(
     return nom / denom
 
 
-def add_ascorbate_peroxidase(model: Model) -> Model:
+def add_ascorbate_peroxidase(
+    model: Model,
+    *,
+    rxn: str | None = None,
+    s1: str | None = None,
+    s2: str | None = None,
+    p1: str | None = None,
+) -> Model:
+    rxn = default_name(rxn, n.ascorbate_peroxidase)
+    s1 = default_name(s1, n.ascorbate)
+    s2 = default_name(s2, n.h2o2)
+    p1 = default_name(p1, n.mda)
+
     model.add_parameters(
         {
             "kf1": 10000.0,
@@ -66,19 +79,19 @@ def add_ascorbate_peroxidase(model: Model) -> Model:
         }
     )
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=_rate_ascorbate_peroxidase,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.ascorbate(): -1,
-                n.h2o2(): -1,
-                n.mda(): 2,
+                s1: -1,
+                s2: -1,
+                p1: 2,
             },
         ),
         args=[
-            n.ascorbate(),
-            n.h2o2(),
+            s1,
+            s2,
             "kf1",
             "kr1",
             "kf2",

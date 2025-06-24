@@ -7,26 +7,33 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s
-from mxlbricks.utils import static
-
-ENZYME = n.zeaxanthin_epoxidase()
+from mxlbricks.utils import (
+    default_name,
+    default_par,
+)
 
 
 def add_zeaxanthin_epoxidase(
     model: Model,
+    *,
+    rxn: str | None = None,
+    vx: str | None = None,
+    zx: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    kf = static(model, n.kf(ENZYME), 0.00024) if kf is None else kf
+    rxn = default_name(rxn, n.zeaxanthin_epoxidase)
+    vx = default_name(vx, n.vx)
+    zx = default_name(zx, n.zx)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=mass_action_1s,
         stoichiometry={
-            n.vx(): 1,
+            vx: 1,
         },
         args=[
-            n.zx(),
-            kf,
+            zx,
+            default_par(model, par=kf, name=n.kf(rxn), value=0.00024),
         ],
     )
     return model

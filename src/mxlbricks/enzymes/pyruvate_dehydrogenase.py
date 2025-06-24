@@ -13,59 +13,76 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, reversible_michaelis_menten_3s_3p
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.fns import reversible_michaelis_menten_3s_3p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
 
-ENZYME = n.pyruvate_dehydrogenase()
-
 
 def add_pyruvate_dehydrogenase(
     model: Model,
-    chl_stroma: str = "",
     *,
+    rxn: str | None = None,
+    nad: str | None = None,
+    coa: str | None = None,
+    pyruvate: str | None = None,
+    nadh: str | None = None,
+    acetyl_coa: str | None = None,
+    co2: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.0124) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 0.48) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 2.6e7) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.pyruvate_dehydrogenase)
+    nad = default_name(nad, n.nad)
+    coa = default_name(coa, n.coa)
+    pyruvate = default_name(pyruvate, n.pyruvate)
+    nadh = default_name(nadh, n.nadh)
+    acetyl_coa = default_name(acetyl_coa, n.acetyl_coa)
+    co2 = default_name(co2, n.co2)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_3s_3p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.nad(chl_stroma): -1,
-                n.coa(chl_stroma): -1,
-                n.pyruvate(chl_stroma): -1,
-                n.nadh(chl_stroma): 1,
-                n.acetyl_coa(chl_stroma): 1,
-                n.co2(chl_stroma): 1,
+                nad: -1,
+                coa: -1,
+                pyruvate: -1,
+                nadh: 1,
+                acetyl_coa: 1,
+                co2: 1,
             },
         ),
         args=[
-            n.nad(chl_stroma),
-            n.coa(chl_stroma),
-            n.pyruvate(chl_stroma),
-            n.nadh(chl_stroma),
-            n.acetyl_coa(chl_stroma),
-            n.co2(chl_stroma),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            nad,
+            coa,
+            pyruvate,
+            nadh,
+            acetyl_coa,
+            co2,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=0.48,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.0124),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=2.6e7),
         ],
     )
     return model

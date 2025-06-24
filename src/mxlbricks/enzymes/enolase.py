@@ -10,51 +10,60 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, reversible_michaelis_menten_1s_1p
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.fns import reversible_michaelis_menten_1s_1p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
 
-ENZYME = n.enolase()
-
 
 def add_enolase(
     model: Model,
-    compartment: str = "",
     *,
+    rxn: str | None = None,
+    pep: str | None = None,
+    pga2: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.1) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 1.0) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 0.2) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    stoichiometry = filter_stoichiometry(
-        model,
-        {
-            n.pep(compartment): -1.0,
-            n.pga2(compartment): 1.0,
-        },
-    )
+    rxn = default_name(rxn, n.enolase)
+    pep = default_name(pep, n.pep)
+    pga2 = default_name(pga2, n.pga2)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_1s_1p,
-        stoichiometry=stoichiometry,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                pep: -1.0,
+                pga2: 1.0,
+            },
+        ),
         args=[
-            n.pep(compartment),
-            n.pga2(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            pep,
+            pga2,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=1.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.1),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=0.2),
         ],
     )
     return model

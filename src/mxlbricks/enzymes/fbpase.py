@@ -14,53 +14,58 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, michaelis_menten_1s_2i
-from mxlbricks.utils import static
+from mxlbricks.fns import michaelis_menten_1s_2i
+from mxlbricks.utils import (
+    default_kis,
+    default_kms,
+    default_name,
+    default_vmax,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.fbpase()
 
 
 def add_fbpase(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    fbp: str | None = None,
+    f6p: str | None = None,
+    pi: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     ki_f6p: str | None = None,
     ki_pi: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.03) if kms is None else kms  # FIXME: source
-    ki_f6p = (
-        static(model, n.ki(ENZYME, n.f6p()), 0.7) if ki_f6p is None else ki_f6p
-    )  # FIXME: source
-    ki_pi = (
-        static(model, n.ki(ENZYME, n.pi()), 12.0) if ki_pi is None else ki_pi
-    )  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 0.2 * 8) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.fbpase)
+    fbp = default_name(fbp, n.fbp)
+    f6p = default_name(f6p, n.f6p)
+    pi = default_name(pi, n.pi)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_1s_2i,
         stoichiometry={
-            n.fbp(chl_stroma): -1,
-            n.f6p(chl_stroma): 1,
+            fbp: -1,
+            f6p: 1,
         },
         args=[
-            n.fbp(chl_stroma),
-            n.f6p(chl_stroma),
-            n.pi(chl_stroma),
-            vmax,
-            kms,
-            ki_f6p,
-            ki_pi,
+            fbp,
+            f6p,
+            pi,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=0.2 * 8,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.03),
+            default_kis(model, par=ki_f6p, rxn=rxn, substrate=f6p, default=0.7),
+            default_kis(model, par=ki_pi, rxn=rxn, substrate=pi, default=12.0),
         ],
     )
     return model

@@ -10,55 +10,72 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, reversible_michaelis_menten_3s_2p
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.fns import reversible_michaelis_menten_3s_2p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.glutamate_dehydrogenase()
 
 
 def add_glutamate_dehydrogenase(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    nadph: str | None = None,
+    nh4: str | None = None,
+    oxoglutarate: str | None = None,
+    glutamate: str | None = None,
+    nadp: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 1.54) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 0.64) if kmp is None else kmp  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 104) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 7.2e5) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glutamate_dehydrogenase)
+    nadph = default_name(nadph, n.nadph)
+    nh4 = default_name(nh4, n.nh4)
+    oxoglutarate = default_name(oxoglutarate, n.oxoglutarate)
+    glutamate = default_name(glutamate, n.glutamate)
+    nadp = default_name(nadp, n.nadp)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_3s_2p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.nadph(compartment): -1.0,
-                n.nh4(compartment): -1.0,
-                n.oxoglutarate(compartment): -1.0,
-                n.glutamate(compartment): 1.0,
-                n.nadp(compartment): 1.0,
+                nadph: -1.0,
+                nh4: -1.0,
+                oxoglutarate: -1.0,
+                glutamate: 1.0,
+                nadp: 1.0,
             },
         ),
         args=[
-            n.nadph(compartment),
-            n.nh4(compartment),
-            n.oxoglutarate(compartment),
-            n.glutamate(compartment),
-            n.nadp(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            nadph,
+            nh4,
+            oxoglutarate,
+            glutamate,
+            nadp,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=104,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=1.54),
+            default_kmp(model, rxn=rxn, par=kmp, default=0.64),
+            default_keq(model, rxn=rxn, par=keq, default=7.2e5),
         ],
     )
     return model

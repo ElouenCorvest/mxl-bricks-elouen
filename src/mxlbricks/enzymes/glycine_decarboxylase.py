@@ -13,47 +13,60 @@ from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
 from mxlbricks.fns import (
-    mass_action_1s,
     michaelis_menten_1s,
     michaelis_menten_2s,
     reversible_michaelis_menten_2s_4p,
 )
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+    static,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.glycine_decarboxylase()
 
 
 def add_glycine_decarboxylase_yokota(
     model: Model,
     *,
+    rxn: str | None = None,
+    glycine: str | None = None,
+    serine: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 6.0) if kms is None else kms  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 100.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycine_decarboxylase)
+
+    glycine = default_name(glycine, n.glycine)
+    serine = default_name(serine, n.serine)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_1s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.glycine(): -2.0,
-                n.serine(): 1.0,
+                glycine: -2.0,
+                serine: 1.0,
             },
         ),
         args=[
-            n.glycine(),
-            vmax,
-            kms,
+            glycine,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=100.0,  # Source
+            ),
+            default_kms(model, par=kms, rxn=rxn, default=6.0),
         ],
     )
     return model
@@ -62,36 +75,51 @@ def add_glycine_decarboxylase_yokota(
 def add_glycine_decarboxylase_irreversible(
     model: Model,
     *,
+    rxn: str | None = None,
+    glycine: str | None = None,
+    nad: str | None = None,
+    serine: str | None = None,
+    nh4: str | None = None,
+    nadh: str | None = None,
+    co2: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 6.0) if kms is None else kms  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 100.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycine_decarboxylase)
+    glycine = default_name(glycine, n.glycine)
+    nad = default_name(nad, n.nad)
+    serine = default_name(serine, n.serine)
+    nh4 = default_name(nh4, n.nh4)
+    nadh = default_name(nadh, n.nadh)
+    co2 = default_name(co2, n.co2)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_2s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.glycine(): -2.0,
-                n.nad(): -1.0,
-                n.serine(): 1.0,
-                n.nh4(): 1.0,
-                n.nadh(): 1.0,
-                n.co2(): 1.0,
+                glycine: -2.0,
+                nad: -1.0,
+                serine: 1.0,
+                nh4: 1.0,
+                nadh: 1.0,
+                co2: 1.0,
             },
         ),
         args=[
-            n.glycine(),
-            n.nad(),
-            vmax,
-            kms,
+            glycine,
+            nad,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=100.0,  # Source
+            ),
+            static(model, n.kms(rxn), 6.0) if kms is None else kms,
         ],
     )
 
@@ -101,46 +129,59 @@ def add_glycine_decarboxylase_irreversible(
 def add_glycine_decarboxylase(
     model: Model,
     *,
+    rxn: str | None = None,
+    glycine: str | None = None,
+    nad: str | None = None,
+    serine: str | None = None,
+    nh4: str | None = None,
+    nadh: str | None = None,
+    co2: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 6.0) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 100.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 0.00024) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycine_decarboxylase)
+    glycine = default_name(glycine, n.glycine)
+    nad = default_name(nad, n.nad)
+    serine = default_name(serine, n.serine)
+    nh4 = default_name(nh4, n.nh4)
+    nadh = default_name(nadh, n.nadh)
+    co2 = default_name(co2, n.co2)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_4p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.glycine(): -2.0,
-                n.nad(): -1.0,
-                n.serine(): 1.0,
-                n.nh4(): 1.0,
-                n.nadh(): 1.0,
-                n.co2(): 1.0,
+                glycine: -2.0,
+                nad: -1.0,
+                serine: 1.0,
+                nh4: 1.0,
+                nadh: 1.0,
+                co2: 1.0,
             },
         ),
         args=[
-            n.glycine(),
-            n.nad(),
-            n.serine(),
-            n.nh4(),
-            n.nadh(),
-            n.co2(),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            glycine,
+            nad,
+            serine,
+            nh4,
+            nadh,
+            co2,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=100.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=6.0),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=0.00024),
         ],
     )
     return model

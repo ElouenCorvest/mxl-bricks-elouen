@@ -10,10 +10,11 @@ Equilibrator
 from mxlpy import Model
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s
-from mxlbricks.utils import static
-
-ENZYME = n.glutathion_reductase()
+from mxlbricks.utils import (
+    default_km,
+    default_name,
+    default_vmax,
+)
 
 
 def _rate_glutathion_reductase(
@@ -31,33 +32,38 @@ def _rate_glutathion_reductase(
 def add_glutathion_reductase_irrev(
     model: Model,
     *,
+    rxn: str | None = None,
+    nadph: str | None = None,
+    glutathion_ox: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     km_gssg: str | None = None,
     km_nadph: str | None = None,
 ) -> Model:
-    km_gssg = (
-        static(model, n.km(ENZYME, n.glutathion_ox()), 2e2 * 1e-3)
-        if km_gssg is None
-        else km_gssg
-    )  # FIXME: source
-    km_nadph = (
-        static(model, n.km(ENZYME, n.nadph()), 3e-3) if km_nadph is None else km_nadph
-    )  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 595) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.4e-3) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glutathion_reductase)
+    nadph = default_name(nadph, n.nadph)
+    glutathion_ox = default_name(glutathion_ox, n.glutathion_ox)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=_rate_glutathion_reductase,
-        stoichiometry={n.nadph(): -1, n.glutathion_ox(): -1},
+        stoichiometry={
+            nadph: -1,
+            glutathion_ox: -1,
+        },
         args=[
-            n.nadph(),
-            n.glutathion_ox(),
-            vmax,
-            km_nadph,
-            km_gssg,
+            nadph,
+            glutathion_ox,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.4e-3,  # Source
+                kcat_default=595,  # Source
+            ),
+            default_km(model, par=km_nadph, rxn=rxn, subs=nadph, default=3e-3),
+            default_km(model, par=km_gssg, rxn=rxn, subs=glutathion_ox, default=2e-1),
         ],
     )
     return model

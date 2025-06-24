@@ -13,61 +13,71 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import (
-    mass_action_1s,
-    reversible_michaelis_menten_2s_3p,
+from mxlbricks.fns import reversible_michaelis_menten_2s_3p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
 )
-from mxlbricks.utils import filter_stoichiometry, static
 
 if TYPE_CHECKING:
     from mxlpy import Model
 
-ENZYME = n.malonyl_coa_reductase()
-
 
 def add_malonyl_coa_reductase(
     model: Model,
-    mit: str,
     *,
+    rxn: str | None = None,
+    malonyl_coa: str | None = None,
+    nadph: str | None = None,
+    malonate_s_aldehyde: str | None = None,
+    nadp: str | None = None,
+    coa: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.03) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 50.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 0.0056) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.malonyl_coa_reductase)
+    malonyl_coa = default_name(malonyl_coa, n.malonyl_coa)
+    nadph = default_name(nadph, n.nadph)
+    malonate_s_aldehyde = default_name(malonate_s_aldehyde, n.malonate_s_aldehyde)
+    nadp = default_name(nadp, n.nadp)
+    coa = default_name(coa, n.coa)
 
-    model.add_parameter(keq := n.keq(ENZYME), 0.0056)
-    model.add_parameter(kmp := n.km(ENZYME, "p"), 1)
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_3p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.malonyl_coa(mit): -1,
-                n.nadph(mit): -1,
-                n.malonate_s_aldehyde(mit): 1,
-                n.coa(mit): 1,
+                malonyl_coa: -1,
+                nadph: -1,
+                malonate_s_aldehyde: 1,
+                coa: 1,
             },
         ),
         args=[
-            n.malonyl_coa(mit),
-            n.nadph(mit),
-            n.malonate_s_aldehyde(mit),
-            n.nadp(mit),
-            n.coa(mit),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            malonyl_coa,
+            nadph,
+            malonate_s_aldehyde,
+            nadp,
+            coa,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=50.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.03),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=0.0056),
         ],
     )
     return model

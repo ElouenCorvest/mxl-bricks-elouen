@@ -13,48 +13,59 @@ from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
 from mxlbricks.fns import (
-    mass_action_1s,
     michaelis_menten_1s,
     michaelis_menten_2s,
     reversible_michaelis_menten_2s_2p,
 )
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.glycine_transaminase()
 
 
 def add_glycine_transaminase_yokota(
     model: Model,
     *,
+    rxn: str | None = None,
+    glyoxylate: str | None = None,
+    glycine: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
 ) -> Model:
     """Yokota 1980 used reduced stoichiometry for the reaction."""
-    kms = static(model, n.kms(ENZYME), 3.0) if kms is None else kms  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 143.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycine_transaminase)
+    glyoxylate = default_name(glyoxylate, n.glyoxylate)
+    glycine = default_name(glycine, n.glycine)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_1s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.glyoxylate(): -1.0,
-                n.glycine(): 1.0,
+                glyoxylate: -1.0,
+                glycine: 1.0,
             },
         ),
         args=[
-            n.glyoxylate(),
-            vmax,
-            kms,
+            glyoxylate,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=143.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=3.0),
         ],
     )
     return model
@@ -63,34 +74,45 @@ def add_glycine_transaminase_yokota(
 def add_glycine_transaminase_irreversible(
     model: Model,
     *,
+    rxn: str | None = None,
+    glutamate: str | None = None,
+    glyoxylate: str | None = None,
+    oxoglutarate: str | None = None,
+    glycine: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 3.0) if kms is None else kms  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 143.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycine_transaminase)
+    glutamate = default_name(glutamate, n.glutamate)
+    glyoxylate = default_name(glyoxylate, n.glyoxylate)
+    oxoglutarate = default_name(oxoglutarate, n.oxoglutarate)
+    glycine = default_name(glycine, n.glycine)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_2s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.glutamate(): -1.0,
-                n.glyoxylate(): -1.0,
-                n.oxoglutarate(): 1.0,
-                n.glycine(): 1.0,
+                glutamate: -1.0,
+                glyoxylate: -1.0,
+                oxoglutarate: 1.0,
+                glycine: 1.0,
             },
         ),
         args=[
-            n.glyoxylate(),
-            n.glutamate(),
-            vmax,
-            kms,
+            glyoxylate,
+            glutamate,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=143.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=3.0),
         ],
     )
 
@@ -100,42 +122,51 @@ def add_glycine_transaminase_irreversible(
 def add_glycine_transaminase(
     model: Model,
     *,
+    rxn: str | None = None,
+    glutamate: str | None = None,
+    glyoxylate: str | None = None,
+    oxoglutarate: str | None = None,
+    glycine: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 3.0) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 143.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 30) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycine_transaminase)
+    glutamate = default_name(glutamate, n.glutamate)
+    glyoxylate = default_name(glyoxylate, n.glyoxylate)
+    oxoglutarate = default_name(oxoglutarate, n.oxoglutarate)
+    glycine = default_name(glycine, n.glycine)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_2p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.glutamate(): -1.0,
-                n.glyoxylate(): -1.0,
-                n.oxoglutarate(): 1.0,
-                n.glycine(): 1.0,
+                glutamate: -1.0,
+                glyoxylate: -1.0,
+                oxoglutarate: 1.0,
+                glycine: 1.0,
             },
         ),
         args=[
-            n.glyoxylate(),
-            n.glutamate(),
-            n.glycine(),
-            n.oxoglutarate(),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            glyoxylate,
+            glutamate,
+            glycine,
+            oxoglutarate,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=143.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=3.0),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=30),
         ],
     )
 

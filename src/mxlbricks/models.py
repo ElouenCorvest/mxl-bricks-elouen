@@ -225,26 +225,18 @@ def get_matuszynska2016npq(
     add_ps2_cross_section(model)
 
     # Reactions
-    add_atp_synthase_mmol_chl(
-        model,
-        chl_lumen=chl_lumen,
-        bh="bH",
-    )
-    add_b6f(
-        model,
-        chl_lumen=chl_lumen,
-        bh="bH",
-    )
-    add_lhc_protonation(model, chl_lumen=chl_lumen)
+    add_atp_synthase_mmol_chl(model, bh="bH")
+    add_b6f(model, bh="bH")
+    add_lhc_protonation(model)
     add_lhc_deprotonation(model)
     add_cyclic_electron_flow(model)
-    add_violaxanthin_epoxidase(model, chl_lumen=chl_lumen)
+    add_violaxanthin_epoxidase(model)
     add_zeaxanthin_epoxidase(model)
     add_fnr_mmol_chl(model)
     add_ndh(model)
-    add_photosystems(model, chl_lumen=chl_lumen, mehler=False)
-    add_proton_leak(model, chl_lumen=chl_lumen)
-    add_ptox(model, compartment=chl_lumen)
+    add_photosystems(model, mehler=False)
+    add_proton_leak(model)
+    add_ptox(model)
     add_state_transitions(model)
 
     # Misc
@@ -270,40 +262,35 @@ def get_matuszynska2019(
     model = Model()
     model.add_variables(
         {
-            n.pga(): 0.9167729479368978,
-            n.bpga(): 0.0003814495319659031,
-            n.gap(): 0.00580821050261484,
-            n.dhap(): 0.1277806166216142,
-            n.fbp(): 0.005269452472931973,
-            n.f6p(): 0.2874944558066638,
-            n.g6p(): 0.6612372482712676,
-            n.g1p(): 0.03835176039761378,
-            n.sbp(): 0.011101373736607443,
-            n.s7p(): 0.1494578301900007,
-            n.e4p(): 0.00668295494870102,
-            n.x5p(): 0.020988553174809618,
-            n.r5p(): 0.035155825913785584,
-            n.rubp(): 0.11293260727162346,
-            n.ru5p(): 0.014062330254191594,
-            n.atp(): 1.4612747767895344,
-            n.fd_ox(): 3.715702384326767,
-            n.h(chl_lumen): 0.002086128887296243,
-            n.lhc(): 0.7805901436176024,
-            n.nadph(): 0.5578718406315588,
-            n.pc_ox(): 1.8083642974980014,
-            n.pq_ox(): 10.251099271612473,
-            n.psbs_de(): 0.9667381262477079,
-            n.vx(): 0.9629870646993118,
-            n.tr_ox(): 0.9334426859846461,
-            n.e_inactive(): 3.6023635680406634,
-            n.mda(): 2.0353396709300447e-07,
-            n.h2o2(): 1.2034405327140102e-07,
-            n.dha(): 1.0296456279861962e-11,
-            n.glutathion_ox(): 4.99986167652437e-12,
+            n.pga(): 0.9928653922138561,
+            n.bpga(): 0.0005297732935310749,
+            n.gap(): 0.0062663539939955834,
+            n.dhap(): 0.13785977143668732,
+            n.fbp(): 0.006133532145409954,
+            n.f6p(): 0.31271973359685457,
+            n.g6p(): 0.719255387166192,
+            n.g1p(): 0.041716812452951633,
+            n.sbp(): 0.013123745088361893,
+            n.s7p(): 0.15890073845176905,
+            n.e4p(): 0.007322797350442026,
+            n.x5p(): 0.022478763225333428,
+            n.r5p(): 0.037651927659696716,
+            n.rubp(): 0.13184790283048484,
+            n.ru5p(): 0.015060770937455408,
+            n.atp(): 1.612922506604933,
+            n.fd_ox(): 3.8624032084329674,
+            n.h(chl_lumen): 0.002208423037307405,
+            n.lhc(): 0.80137477470646,
+            n.nadph(): 0.491395685599137,
+            n.pc_ox(): 1.885391998090184,
+            n.pq_ox(): 10.991562708096392,
+            n.psbs_de(): 0.9610220887579118,
+            n.vx(): 0.9514408605906095,
         }
     )
     model.add_parameters(
         {
+            n.h(): 1.2589254117941661e-05,
             n.ph(): 7.9,
             n.co2(): 0.2,
             n.o2(chl_lumen): 8.0,
@@ -346,35 +333,18 @@ def get_matuszynska2019(
     )
 
     # Reactions
-    add_atp_synthase_mm(
-        model,
-        chl_lumen=chl_lumen,
-        bh="bH",
-        convf="convf",
-    )
-    add_b6f(
-        model,
-        chl_lumen=chl_lumen,
-        bh="bH",
-    )
-    add_lhc_protonation(model, chl_lumen=chl_lumen)
+    add_atp_synthase_mm(model, bh="bH", convf="convf")
+    add_b6f(model, bh="bH")
+    add_lhc_protonation(model)
     add_lhc_deprotonation(model)
     add_cyclic_electron_flow(model)
-    add_violaxanthin_epoxidase(model, chl_lumen=chl_lumen)
+    add_violaxanthin_epoxidase(model)
     add_zeaxanthin_epoxidase(model)
-    add_fnr_mm(
-        model,
-        convf="convf",
-    )
+    add_fnr_mm(model, convf="convf")
     add_ndh(model)
-    add_photosystems(
-        model,
-        chl_lumen=chl_lumen,
-        mehler=False,
-        convf="convf",
-    )
-    add_proton_leak(model, chl_lumen=chl_lumen)
-    add_ptox(model, compartment=chl_lumen)
+    add_photosystems(model, mehler=False, convf="convf")
+    add_proton_leak(model)
+    add_ptox(model)
     add_state_transitions(model)
     add_rubisco_poolman(
         model,
@@ -511,21 +481,12 @@ def get_saadat2021(
 
     # Reactions
     ## PETC
-    add_atp_synthase_mm(
-        model,
-        chl_lumen=chl_lumen,
-        convf="convf",
-        bh="bH",
-    )
-    add_b6f(
-        model,
-        chl_lumen=chl_lumen,
-        bh="bH",
-    )
-    add_lhc_protonation(model, chl_lumen=chl_lumen)
+    add_atp_synthase_mm(model, convf="convf", bh="bH")
+    add_b6f(model, bh="bH")
+    add_lhc_protonation(model)
     add_lhc_deprotonation(model)
     add_cyclic_electron_flow(model)
-    add_violaxanthin_epoxidase(model, chl_lumen=chl_lumen)
+    add_violaxanthin_epoxidase(model)
     add_zeaxanthin_epoxidase(model)
     add_fnr_mm(
         model,
@@ -534,7 +495,6 @@ def get_saadat2021(
     add_ndh(model)
     add_photosystems(
         model,
-        chl_lumen=chl_lumen,
         mehler=True,
         convf="convf",
     )
@@ -542,8 +502,8 @@ def get_saadat2021(
         model,
         keq=n.keq(n.ferredoxin_reductase()),  # from add_photosystems
     )
-    add_proton_leak(model, chl_lumen=chl_lumen)
-    add_ptox(model, compartment=chl_lumen)
+    add_proton_leak(model)
+    add_ptox(model)
     add_state_transitions(model)
 
     ## CBB

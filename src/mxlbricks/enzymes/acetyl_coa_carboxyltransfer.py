@@ -20,63 +20,79 @@ from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
 from mxlbricks.fns import (
-    mass_action_1s,
     reversible_michaelis_menten_3s_3p,
     reversible_michaelis_menten_3s_3p_1i,
 )
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.utils import (
+    default_keq,
+    default_ki,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
 
-ENZYME = n.acetyl_coa_carboxyltransfer()
-
 
 def add_acetyl_coa_carboxyltransfer(
     model: Model,
-    compartment: str = "",
+    *,
+    rxn: str | None = None,
+    s1: str | None = None,
+    s2: str | None = None,
+    s3: str | None = None,
+    p1: str | None = None,
+    p2: str | None = None,
+    p3: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.0487) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 0.1) if kmp is None else kmp  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 30.1) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 40.0) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    stoichiometry = filter_stoichiometry(
-        model,
-        stoichiometry={
-            n.acetyl_coa(compartment): -1.0,
-            n.atp(compartment): -1.0,
-            n.hco3(compartment): -1.0,
-            n.adp(compartment): 1.0,
-            n.malonyl_coa(compartment): 1.0,
-            n.pi(compartment): 1.0,
-        },
-    )
+    rxn = default_name(rxn, n.acetyl_coa_carboxyltransfer)
+    s1 = default_name(s1, n.acetyl_coa)
+    s2 = default_name(s2, n.atp)
+    s3 = default_name(s3, n.hco3)
+    p1 = default_name(p1, n.adp)
+    p2 = default_name(p2, n.malonyl_coa)
+    p3 = default_name(p3, n.pi)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_3s_3p,
-        stoichiometry=stoichiometry,
+        stoichiometry=filter_stoichiometry(
+            model,
+            stoichiometry={
+                s1: -1.0,
+                s2: -1.0,
+                s3: -1.0,
+                p1: 1.0,
+                p2: 1.0,
+                p3: 1.0,
+            },
+        ),
         args=[
-            n.acetyl_coa(compartment),
-            n.atp(compartment),
-            n.hco3(compartment),
-            n.adp(compartment),
-            n.malonyl_coa(compartment),
-            n.pi(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            s1,
+            s2,
+            s3,
+            p1,
+            p2,
+            p3,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=30.1,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.0487),
+            default_kmp(model, rxn=rxn, par=kmp, default=0.1),
+            default_keq(model, rxn=rxn, par=keq, default=40.0),
         ],
     )
 
@@ -85,53 +101,65 @@ def add_acetyl_coa_carboxyltransfer(
 
 def add_acetyl_coa_carboxyltransfer_1i(
     model: Model,
-    compartment: str = "",
+    *,
+    rxn: str | None = None,
+    s1: str | None = None,
+    s2: str | None = None,
+    s3: str | None = None,
+    p1: str | None = None,
+    p2: str | None = None,
+    p3: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
+    i1: str | None = None,
     ki: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.0487) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 0.1) if kmp is None else kmp  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 30.1) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 40.0) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-    ki = static(model, n.ki(ENZYME), 0.002)  # FIXME: source
-
-    stoichiometry = filter_stoichiometry(
-        model,
-        stoichiometry={
-            n.acetyl_coa(compartment): -1.0,
-            n.atp(compartment): -1.0,
-            n.hco3(compartment): -1.0,
-            n.adp(compartment): 1.0,
-            n.malonyl_coa(compartment): 1.0,
-            n.pi(compartment): 1.0,
-        },
-    )
+    rxn = default_name(rxn, n.acetyl_coa_carboxyltransfer)
+    s1 = default_name(s1, n.acetyl_coa)
+    s2 = default_name(s2, n.atp)
+    s3 = default_name(s3, n.hco3)
+    p1 = default_name(p1, n.adp)
+    p2 = default_name(p2, n.malonyl_coa)
+    p3 = default_name(p3, n.pi)
+    i1 = default_name(i1, n.formate)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_3s_3p_1i,
-        stoichiometry=stoichiometry,
+        stoichiometry=filter_stoichiometry(
+            model,
+            stoichiometry={
+                s1: -1.0,
+                s2: -1.0,
+                s3: -1.0,
+                p1: 1.0,
+                p2: 1.0,
+                p3: 1.0,
+            },
+        ),
         args=[
-            n.acetyl_coa(compartment),
-            n.atp(compartment),
-            n.hco3(compartment),
-            n.adp(compartment),
-            n.malonyl_coa(compartment),
-            n.pi(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
-            n.formate(),
-            ki,
+            s1,
+            s2,
+            s3,
+            p1,
+            p2,
+            p3,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=30.1,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.0487),
+            default_kmp(model, rxn=rxn, par=kmp, default=0.1),
+            default_keq(model, rxn=rxn, par=keq, default=40.0),
+            default_ki(model, rxn=rxn, par=ki, default=0.002),
         ],
     )
+
     return model

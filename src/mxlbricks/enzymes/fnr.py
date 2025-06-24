@@ -1,6 +1,6 @@
-r"""Ferredoxin-NADP reductase
+"""Ferredoxin-NADP reductase
 
-2 reduced ferredoxin + NADP+ + H+ ⇌ \rightleftharpoons 2 oxidized ferredoxin + NADPH
+2 reduced ferredoxin + NADP+ + H+ ⇌ 2 oxidized ferredoxin + NADPH
 
 EC 1.18.1.2
 
@@ -13,14 +13,18 @@ from mxlpy import Derived, Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import (
-    mass_action_1s,
     michaelis_menten_1s,
     michaelis_menten_2s,
     value,
 )
-from mxlbricks.utils import filter_stoichiometry, static
-
-ENZYME = n.fnr()
+from mxlbricks.utils import (
+    default_km,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+    static,
+)
 
 
 def _keq_fnr(
@@ -38,22 +42,22 @@ def _keq_fnr(
 
 
 def _rate_fnr2016(
-    Fd_ox: float,
-    Fd_red: float,
-    NADPH: float,
-    NADP: float,
-    KM_FNR_F: float,
-    KM_FNR_N: float,
+    fd_ox: float,
+    fd_red: float,
+    nadph: float,
+    nadp: float,
     vmax: float,
-    Keq_FNR: float,
+    km_fd_red: float,
+    km_nadph: float,
+    keq: float,
 ) -> float:
-    fdred = Fd_red / KM_FNR_F
-    fdox = Fd_ox / KM_FNR_F
-    nadph = NADPH / KM_FNR_N
-    nadp = NADP / KM_FNR_N
+    fdred = fd_red / km_fd_red
+    fdox = fd_ox / km_fd_red
+    nadph = nadph / km_nadph
+    nadp = nadp / km_nadph
     return (
         vmax
-        * (fdred**2 * nadp - fdox**2 * nadph / Keq_FNR)
+        * (fdred**2 * nadp - fdox**2 * nadph / keq)
         / ((1 + fdred + fdred**2) * (1 + nadp) + (1 + fdox + fdox**2) * (1 + nadph) - 1)
     )
 
@@ -83,51 +87,58 @@ def _rate_fnr_2019(
 def add_fnr_mmol_chl(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    fd_ox: str | None = None,
+    fd_red: str | None = None,
+    nadph: str | None = None,
+    nadp: str | None = None,
+    ph: str | None = None,
     kcat: str | None = None,
-    km_fd: str | None = None,
+    km_fd_red: str | None = None,
     km_nadp: str | None = None,
     e0: str | None = None,
 ) -> Model:
-    km_fd = (
-        static(model, n.km(ENZYME, n.fd_red()), 1.56) if km_fd is None else km_fd
-    )  # FIXME: source
-    km_nadp = (
-        static(model, n.km(ENZYME, n.nadp()), 0.22) if km_nadp is None else km_nadp
-    )  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 500.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 3.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.fnr)
+    fd_ox = default_name(fd_ox, n.fd_ox)
+    fd_red = default_name(fd_red, n.fd_red)
+    nadph = default_name(nadph, n.nadph)
+    nadp = default_name(nadp, n.nadp)
+    ph = default_name(ph, n.ph)
 
     model.add_derived(
-        keq := n.keq(ENZYME),
+        keq := n.keq(rxn),
         fn=_keq_fnr,
         args=[
             "E^0_Fd",
             "F",
             "E^0_NADP",
-            n.ph(chl_stroma),
+            ph,
             "dG_pH",
             "RT",
         ],
     )
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=_rate_fnr2016,
         stoichiometry={
-            n.fd_ox(): 2,
+            fd_ox: 2,
         },
         args=[
-            n.fd_ox(),
-            n.fd_red(),
-            n.nadph(),
-            n.nadp(),
-            km_fd,
-            km_nadp,
-            vmax,
+            fd_ox,
+            fd_red,
+            nadph,
+            nadp,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=3.0,  # Source
+                kcat_default=500.0,  # Source
+            ),
+            default_km(model, par=km_fd_red, rxn=rxn, subs=fd_red, default=1.56),
+            default_km(model, par=km_nadp, rxn=rxn, subs=nadp, default=0.22),
             keq,
         ],
     )
@@ -138,55 +149,63 @@ def add_fnr_mmol_chl(
 def add_fnr_mm(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    fd_ox: str | None = None,
+    fd_red: str | None = None,
+    nadph: str | None = None,
+    nadp: str | None = None,
+    ph: str | None = None,
     kcat: str | None = None,
     km_fd: str | None = None,
     km_nadp: str | None = None,
     e0: str | None = None,
     convf: str | None = None,
 ) -> Model:
-    km_fd = (
-        static(model, n.km(ENZYME, n.fd_red()), 1.56) if km_fd is None else km_fd
-    )  # FIXME: source
-    km_nadp = (
-        static(model, n.km(ENZYME, n.nadp()), 0.22) if km_nadp is None else km_nadp
-    )  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 500.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 3.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.fnr)
+    fd_ox = default_name(fd_ox, n.fd_ox)
+    fd_red = default_name(fd_red, n.fd_red)
+    nadph = default_name(nadph, n.nadph)
+    nadp = default_name(nadp, n.nadp)
+    ph = default_name(ph, n.ph)
+
     convf = static(model, n.convf(), 3.2e-2) if convf is None else convf
 
     model.add_derived(
-        n.keq(ENZYME),
+        n.keq(rxn),
         fn=_keq_fnr,
         args=[
             "E^0_Fd",
             "F",
             "E^0_NADP",
-            n.ph(chl_stroma),
+            ph,
             "dG_pH",
             "RT",
         ],
     )
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=_rate_fnr_2019,
         stoichiometry={
-            n.fd_ox(): 2,
-            n.nadph(): Derived(fn=value, args=[convf]),
+            fd_ox: 2,
+            nadph: Derived(fn=value, args=[convf]),
         },
         args=[
-            n.fd_ox(),
-            n.fd_red(),
-            n.nadph(),
-            n.nadp(),
-            km_fd,
-            km_nadp,
-            vmax,
-            n.keq(ENZYME),
+            fd_ox,
+            fd_red,
+            nadph,
+            nadp,
+            static(model, n.km(rxn, n.fd_red()), 1.56) if km_fd is None else km_fd,
+            static(model, n.km(rxn, n.nadp()), 0.22) if km_nadp is None else km_nadp,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=3.0,  # Source
+                kcat_default=500.0,  # Source
+            ),
+            n.keq(rxn),
             convf,
         ],
     )
@@ -196,33 +215,39 @@ def add_fnr_mm(
 def add_fnr_static(
     model: Model,
     *,
+    rxn: str | None = None,
+    nadp: str | None = None,
+    nadph: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
 ) -> Model:
     """Saadat version to put into Poolman model"""
-    kms = static(model, n.kms(ENZYME), 0.19) if kms is None else kms  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 2.816) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.fnr)
+    nadp = default_name(nadp, n.nadp)
+    nadph = default_name(nadph, n.nadph)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_1s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.nadp(): -1.0,
-                n.nadph(): 1.0,
+                nadp: -1.0,
+                nadph: 1.0,
             },
         ),
         args=[
-            n.nadp(),
-            vmax,
-            kms,
+            nadp,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=2.816,  # Source
+            ),
+            default_kms(model, par=kms, rxn=rxn, default=0.19),
         ],
     )
 
@@ -232,36 +257,44 @@ def add_fnr_static(
 def add_fnr_energy_dependent(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    nadp: str | None = None,
+    nadph: str | None = None,
+    energy: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.19) if kms is None else kms  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 2.816) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.fnr)
+    nadp = default_name(nadp, n.nadp)
+    nadph = default_name(nadph, n.nadph)
+    energy = default_name(energy, n.energy)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_2s,
         stoichiometry=filter_stoichiometry(
             model,
             {
                 # Substrates
-                n.nadp(compartment): -1.0,
-                n.energy(compartment): -1.0,
+                nadp: -1.0,
+                energy: -1.0,
                 # Products
-                n.nadph(compartment): 1.0,
+                nadph: 1.0,
             },
         ),
         args=[
-            n.nadp(),
-            n.energy(),
-            vmax,
-            kms,
+            nadp,
+            energy,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=2.816,  # Source
+            ),
+            default_kms(model, par=kms, rxn=rxn, default=0.19),
         ],
     )
 

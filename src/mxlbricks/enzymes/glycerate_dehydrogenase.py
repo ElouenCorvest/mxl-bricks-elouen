@@ -13,43 +13,52 @@ from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
 from mxlbricks.fns import (
-    mass_action_1s,
     michaelis_menten_1s,
     reversible_michaelis_menten_2s_2p,
 )
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+    static,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.glycerate_dehydrogenase()
 
 
 def add_hpa_outflux(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    hydroxypyruvate: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.12) if kms is None else kms  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 398.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycerate_dehydrogenase)
+    hydroxypyruvate = default_name(hydroxypyruvate, n.hydroxypyruvate)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_1s,
         stoichiometry={
-            n.hydroxypyruvate(compartment): -1.0,
+            hydroxypyruvate: -1.0,
         },
         args=[
-            n.hydroxypyruvate(compartment),
-            vmax,
-            kms,
+            hydroxypyruvate,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=398.0,  # Source
+            ),
+            static(model, n.kms(rxn), 0.12) if kms is None else kms,
         ],
     )
 
@@ -59,42 +68,51 @@ def add_hpa_outflux(
 def add_glycerate_dehydrogenase(
     model: Model,
     *,
+    rxn: str | None = None,
+    hydroxypyruvate: str | None = None,
+    nadh: str | None = None,
+    glycerate: str | None = None,
+    nad: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.12) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 398.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 87000.0) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycerate_dehydrogenase)
+    hydroxypyruvate = default_name(hydroxypyruvate, n.hydroxypyruvate)
+    nadh = default_name(nadh, n.nadh)
+    glycerate = default_name(glycerate, n.glycerate)
+    nad = default_name(nad, n.nad)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_2p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.nadh(): -1.0,
-                n.hydroxypyruvate(): -1.0,
-                n.nad(): 1.0,
-                n.glycerate(): 1.0,
+                nadh: -1.0,
+                hydroxypyruvate: -1.0,
+                nad: 1.0,
+                glycerate: 1.0,
             },
         ),
         args=[
-            n.hydroxypyruvate(),
-            n.nadh(),
-            n.glycerate(),
-            n.nad(),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            hydroxypyruvate,
+            nadh,
+            glycerate,
+            nad,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=398.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.12),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=87000.0),
         ],
     )
 

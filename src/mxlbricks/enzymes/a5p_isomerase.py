@@ -12,56 +12,60 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, reversible_michaelis_menten_1s_1p
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.fns import reversible_michaelis_menten_1s_1p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
 
-ENZYME = n.a5p_isomerase()
-
 
 def add_a5p_isomerase(
     model: Model,
-    compartment: str = "",
+    *,
+    rxn: str | None = None,
+    a5p: str | None = None,
+    ru5p: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = (
-        static(model, n.kms(ENZYME), 1.89) if kms is None else kms
-    )  # Clostridium tetani
-    kmp = (
-        static(model, n.kmp(ENZYME), 6.65) if kmp is None else kmp
-    )  # Clostridium tetani
-    kcat = (
-        static(model, n.kcat(ENZYME), 102) if kcat is None else kcat
-    )  # Clostridium tetani
-    e0 = static(model, n.e0(ENZYME), 1) if e0 is None else e0  # Clostridium tetani
-    keq = static(model, n.keq(ENZYME), 0.4) if keq is None else keq
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    stoichiometry = filter_stoichiometry(
-        model,
-        {
-            n.arabinose_5_phosphate(compartment): -1.0,
-            n.ru5p(compartment): 1.0,
-        },
-    )
+    rxn = default_name(rxn, n.a5p_isomerase)
+    a5p = default_name(a5p, n.arabinose_5_phosphate)
+    ru5p = default_name(ru5p, n.ru5p)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_1s_1p,
-        stoichiometry=stoichiometry,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                a5p: -1.0,
+                ru5p: 1.0,
+            },
+        ),
         args=[
-            n.arabinose_5_phosphate(compartment),
-            n.ru5p(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            a5p,
+            ru5p,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Clostridium tetani
+                kcat_default=102,  # Clostridium tetani
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=1.89),
+            default_kmp(model, rxn=rxn, par=kmp, default=6.65),
+            default_keq(model, rxn=rxn, par=keq, default=0.4),
         ],
     )
     return model

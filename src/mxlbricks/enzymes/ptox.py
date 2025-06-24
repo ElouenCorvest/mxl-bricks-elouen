@@ -7,27 +7,36 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_2s
-from mxlbricks.utils import static
-
-ENZYME = n.ptox()
+from mxlbricks.utils import (
+    default_name,
+    static,
+)
 
 
 def add_ptox(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    pq_ox: str | None = None,
+    pq_red: str | None = None,
+    o2: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    kf = static(model, "kPTOX", 0.01) if kf is None else kf
+    rxn = default_name(rxn, n.ptox)
+    pq_ox = default_name(pq_ox, n.pq_ox)
+    pq_red = default_name(pq_red, n.pq_red)
+    o2 = default_name(o2, lambda: n.o2("_lumen"))
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=mass_action_2s,
-        stoichiometry={n.pq_ox(): 1},
+        stoichiometry={
+            pq_ox: 1,
+        },
         args=[
-            n.pq_red(),
-            n.o2(compartment),
-            kf,
+            pq_red,
+            o2,
+            static(model, "kPTOX", 0.01) if kf is None else kf,
         ],
     )
     return model

@@ -12,35 +12,40 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import (
-    mass_action_1s,
-    reversible_michaelis_menten_1s_1p_1i,
-    value,
+from mxlbricks.fns import reversible_michaelis_menten_1s_1p_1i, value
+from mxlbricks.utils import (
+    default_keq,
+    default_kf,
+    default_kis,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
 )
-from mxlbricks.utils import filter_stoichiometry, static
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.phosphoglycolate_phosphatase()
 
 
 def add_phosphoglycolate_influx(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    glycolate: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    kf = static(model, n.kf(ENZYME), 60.0) if kf is None else kf
+    rxn = default_name(rxn, n.phosphoglycolate_phosphatase)
+    glycolate = default_name(glycolate, n.glycolate)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=value,
         stoichiometry={
-            n.glycolate(chl_stroma): 1,
+            glycolate: 1,
         },
         args=[
-            kf,
+            default_kf(model, par=kf, rxn=rxn, default=60.0),
         ],
     )
     return model
@@ -49,6 +54,10 @@ def add_phosphoglycolate_influx(
 def add_phosphoglycolate_phosphatase(
     model: Model,
     *,
+    rxn: str | None = None,
+    pgo: str | None = None,
+    glycolate: str | None = None,
+    pi: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
@@ -56,38 +65,38 @@ def add_phosphoglycolate_phosphatase(
     keq: str | None = None,
     ki_pi: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.029) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    ki_pi = static(model, n.ki(ENZYME, n.pi()), 12.0)
-    kcat = (
-        static(model, n.kcat(ENZYME), 292.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = (
-        static(model, n.keq(ENZYME), 310000.0) if keq is None else keq
-    )  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.phosphoglycolate_phosphatase)
+    pgo = default_name(pgo, n.pgo)
+    glycolate = default_name(glycolate, n.glycolate)
+    pi = default_name(pi, n.pi)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_1s_1p_1i,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.pgo(): -1.0,
-                n.glycolate(): 1.0,
-                n.pi(): 1.0,
+                pgo: -1.0,
+                glycolate: 1.0,
+                pi: 1.0,
             },
         ),
         args=[
-            n.pgo(),
-            n.glycolate(),
-            n.pi(),
-            vmax,
-            kms,
-            kmp,
-            ki_pi,
-            keq,
+            pgo,
+            glycolate,
+            pi,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=292.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.029),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_kis(model, rxn=rxn, par=ki_pi, substrate=pi, default=12.0),
+            default_keq(model, rxn=rxn, par=keq, default=310000.0),
         ],
     )
     return model

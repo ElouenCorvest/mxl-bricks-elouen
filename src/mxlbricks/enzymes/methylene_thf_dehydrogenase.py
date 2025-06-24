@@ -13,58 +13,68 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import (
-    mass_action_1s,
-    reversible_michaelis_menten_2s_2p,
+from mxlbricks.fns import reversible_michaelis_menten_2s_2p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
 )
-from mxlbricks.utils import filter_stoichiometry, static
 
 if TYPE_CHECKING:
     from mxlpy import Model
 
-ENZYME = n.methylene_thf_dehydrogenase()
-
 
 def add_methylene_thf_dehydrogenase(
     model: Model,
-    mit: str,
     *,
+    rxn: str | None = None,
+    methenyl_thf: str | None = None,
+    nadph: str | None = None,
+    methylene_thf: str | None = None,
+    nadp: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.12) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 0.302) if kmp is None else kmp  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 14.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 10.0) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.methylene_thf_dehydrogenase)
+    methenyl_thf = default_name(methenyl_thf, n.methenyl_thf)
+    nadph = default_name(nadph, n.nadph)
+    methylene_thf = default_name(methylene_thf, n.methylene_thf)
+    nadp = default_name(nadp, n.nadp)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_2p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.methenyl_thf(mit): -1,
-                n.nadph(mit): -1,
-                n.methylene_thf(mit): 1,
-                n.nadp(mit): 1,
+                methenyl_thf: -1,
+                nadph: -1,
+                methylene_thf: 1,
+                nadp: 1,
             },
         ),
         args=[
-            n.methenyl_thf(mit),
-            n.nadph(mit),
-            n.methylene_thf(mit),
-            n.nadp(mit),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            methenyl_thf,
+            nadph,
+            methylene_thf,
+            nadp,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=14.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.12),
+            default_kmp(model, rxn=rxn, par=kmp, default=0.302),
+            default_keq(model, rxn=rxn, par=keq, default=10.0),
         ],
     )
 

@@ -4,9 +4,10 @@ import numpy as np
 from mxlpy import Derived, Model
 
 from mxlbricks import names as n
-from mxlbricks.utils import static
-
-ENZYME = n.b6f()
+from mxlbricks.utils import (
+    default_name,
+    static,
+)
 
 
 def _four_div_by(x: float) -> float:
@@ -46,50 +47,7 @@ def _b6f(
     )
 
 
-def add_b6f(
-    model: Model,
-    *,
-    chl_stroma: str = "",
-    chl_lumen: str,
-    bh: str | None = None,
-) -> Model:
-    bh = static(model, "bH", 100.0) if bh is None else bh
-
-    model.add_parameter(n.kcat(ENZYME), 2.5)
-    model.add_derived(
-        name=n.keq(ENZYME),
-        fn=_keq_cytb6f,
-        args=[
-            n.ph(chl_lumen),
-            "F",
-            "E^0_PQ",
-            "E^0_PC",
-            n.ph(chl_stroma),
-            "RT",
-            "dG_pH",
-        ],
-    )
-    model.add_reaction(
-        name=ENZYME,
-        fn=_b6f,
-        stoichiometry={
-            n.pc_ox(): -2,
-            n.pq_ox(): 1,
-            n.h(chl_lumen): Derived(fn=_four_div_by, args=[bh]),
-        },
-        args=[
-            n.pc_ox(),
-            n.pq_ox(),
-            n.pq_red(),
-            n.pc_red(),
-            n.keq(ENZYME),
-            n.kcat(ENZYME),
-        ],
-    )
-    return model
-
-
-def k_b6f(
+def _k_b6f(
     pH: float,
     pKreg: float,
     b6f_content: float,
@@ -100,7 +58,7 @@ def k_b6f(
     return b6f_deprot * max_b6f
 
 
-def vb6f_2024(
+def _b6f_2024(
     PC: float,
     PCred: float,
     PQ: float,
@@ -116,51 +74,129 @@ def vb6f_2024(
     return f_PQH2 * PC * k_b6f - f_PQ * PCred * k_b6f_reverse
 
 
+def add_b6f(
+    model: Model,
+    *,
+    rxn: str | None = None,
+    ph_stroma: str | None = None,
+    ph_lumen: str | None = None,
+    h_lumen: str | None = None,
+    pc_ox: str | None = None,
+    pq_ox: str | None = None,
+    pq_red: str | None = None,
+    pc_red: str | None = None,
+    bh: str | None = None,
+) -> Model:
+    rxn = default_name(rxn, n.b6f)
+    ph_stroma = default_name(ph_stroma, n.ph)
+    ph_lumen = default_name(ph_lumen, lambda: n.ph("_lumen"))
+    h_lumen = default_name(h_lumen, lambda: n.h("_lumen"))
+    pc_ox = default_name(pc_ox, n.pc_ox)
+    pq_ox = default_name(pq_ox, n.pq_ox)
+    pq_red = default_name(pq_red, n.pq_red)
+    pc_red = default_name(pc_red, n.pc_red)
+
+    bh = static(model, "bH", 100.0) if bh is None else bh
+
+    model.add_parameter(n.kcat(rxn), 2.5)
+    model.add_derived(
+        name=n.keq(rxn),
+        fn=_keq_cytb6f,
+        args=[
+            ph_lumen,
+            "F",
+            "E^0_PQ",
+            "E^0_PC",
+            ph_stroma,
+            "RT",
+            "dG_pH",
+        ],
+    )
+    model.add_reaction(
+        name=rxn,
+        fn=_b6f,
+        stoichiometry={
+            pc_ox: -2,
+            pq_ox: 1,
+            h_lumen: Derived(fn=_four_div_by, args=[bh]),
+        },
+        args=[
+            pc_ox,
+            pq_ox,
+            pq_red,
+            pc_red,
+            n.keq(rxn),
+            n.kcat(rxn),
+        ],
+    )
+    return model
+
+
 def add_b6f_2024(
     model: Model,
     *,
-    chl_stroma: str = "",
-    chl_lumen: str,
+    rxn: str | None = None,
+    ph_stroma: str | None = None,
+    ph_lumen: str | None = None,
+    h_lumen: str | None = None,
+    pc_ox: str | None = None,
+    pq_ox: str | None = None,
+    pq_red: str | None = None,
+    pc_red: str | None = None,
 ) -> Model:
+    rxn = default_name(rxn, n.b6f)
+    ph_stroma = default_name(ph_stroma, n.ph)
+    ph_lumen = default_name(ph_lumen, lambda: n.ph("_lumen"))
+    h_lumen = default_name(h_lumen, lambda: n.h("_lumen"))
+    pc_ox = default_name(pc_ox, n.pc_ox)
+    pq_ox = default_name(pq_ox, n.pq_ox)
+    pq_red = default_name(pq_red, n.pq_red)
+    pc_red = default_name(pc_red, n.pc_red)
+
     model.add_parameter(b6f_content := "b6f_content", 1)
     model.add_parameter(max_b6f := "max_b6f", 500)
     model.add_parameter(pKreg := "pKreg", 6.5)
 
     model.add_derived(
-        name=n.keq(ENZYME),
+        name=n.keq(rxn),
         fn=_keq_cytb6f,
         args=[
-            n.ph(chl_lumen),
+            ph_lumen,
             "F",
             "E^0_PQ",
             "E^0_PC",
-            n.ph(chl_stroma),
+            ph_stroma,
             "RT",
             "dG_pH",
         ],
     )
 
     model.add_derived(
-        name=n.keq(ENZYME + "_dyn"),
-        fn=k_b6f,
-        args=[n.ph(chl_lumen), pKreg, b6f_content, max_b6f],
+        name=n.keq(rxn + "_dyn"),
+        fn=_k_b6f,
+        args=[
+            ph_lumen,
+            pKreg,
+            b6f_content,
+            max_b6f,
+        ],
     )
 
     model.add_reaction(
-        name=ENZYME,
-        fn=vb6f_2024,
+        name=rxn,
+        fn=_b6f_2024,
         stoichiometry={
-            n.pc_ox(): -2,
-            n.pq_ox(): 1,
-            n.h(chl_lumen): Derived(fn=_four_div_by, args=["bH"]),
+            pc_ox: -2,
+            pq_ox: 1,
+            h_lumen: Derived(fn=_four_div_by, args=["bH"]),
         },
         args=[
-            n.pc_ox(),
-            n.pc_red(),
-            n.pq_ox(),
-            n.pq_red(),
-            n.keq(ENZYME + "_dyn"),
-            n.keq(ENZYME),
+            pc_ox,
+            pc_red,
+            pq_ox,
+            pq_red,
+            n.keq(rxn + "_dyn"),
+            n.keq(rxn),
         ],
     )
 

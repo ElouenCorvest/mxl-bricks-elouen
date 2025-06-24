@@ -373,6 +373,18 @@ def ru5p(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
     return loc("RU5P", compartment, tissue)
 
 
+def o8p(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    # octulose 8-phosphate
+    # D-glycero-D-altro-octulose 8-phosphate
+    return loc("O8P", compartment, tissue)
+
+
+def obp(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    # octose 1,8-bisphosphate
+    # D-erythro-D-gluco-octose α-1,8-bisphosphate  # noqa: RUF003
+    return loc("OBP", compartment, tissue)
+
+
 def starch(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
     return loc("starch", compartment, tissue)
 
@@ -715,6 +727,14 @@ def oxidative_phosphorylation(compartment: str = EMPTY, tissue: str = EMPTY) -> 
 
 def oxalate_oxidase(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
     return loc("oxalate_oxidase", compartment, tissue)
+
+
+def hydroxypyruvate_isomerase(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    return loc("hydroxypyruvate_isomerase", compartment, tissue)
+
+
+def pgk_gadph(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    return loc("pgk_gadph", compartment, tissue)
 
 
 def glycolaldehyde_dehydrogenase(compartment: str = EMPTY, tissue: str = EMPTY) -> str:

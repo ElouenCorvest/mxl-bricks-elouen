@@ -23,47 +23,59 @@ from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
 from mxlbricks.fns import (
-    mass_action_1s,
     rapid_equilibrium_2s_2p,
     reversible_michaelis_menten_2s_2p,
 )
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_kre,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.phosphoglycerate_kinase()
 
 
 def add_phosphoglycerate_kinase_poolman(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    pga: str | None = None,
+    atp: str | None = None,
+    bpga: str | None = None,
+    adp: str | None = None,
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kre = static(model, n.kre(ENZYME), 800000000.0) if kre is None else kre
-    keq = static(model, n.keq(ENZYME), 0.00031) if keq is None else keq
+    rxn = default_name(rxn, n.phosphoglycerate_kinase)
+    pga = default_name(pga, n.pga)
+    atp = default_name(atp, n.atp)
+    bpga = default_name(bpga, n.bpga)
+    adp = default_name(adp, n.adp)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=rapid_equilibrium_2s_2p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.pga(compartment): -1.0,
-                n.atp(compartment): -1.0,
-                n.bpga(compartment): 1.0,
-                n.adp(compartment): 1.0,
+                pga: -1.0,
+                atp: -1.0,
+                bpga: 1.0,
+                adp: 1.0,
             },
         ),
         args=[
-            n.pga(compartment),
-            n.atp(compartment),
-            n.bpga(compartment),
-            n.adp(compartment),
-            kre,
-            keq,
+            pga,
+            atp,
+            bpga,
+            adp,
+            default_kre(model, rxn=rxn, par=kre, default=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, default=0.00031),
         ],
     )
     return model
@@ -72,41 +84,51 @@ def add_phosphoglycerate_kinase_poolman(
 def add_phosphoglycerate_kinase(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    pga: str | None = None,
+    atp: str | None = None,
+    bpga: str | None = None,
+    adp: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.18) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 0.27) if kmp is None else kmp  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 537) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 3.7e-4) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.phosphoglycerate_kinase)
+    pga = default_name(pga, n.pga)
+    atp = default_name(atp, n.atp)
+    bpga = default_name(bpga, n.bpga)
+    adp = default_name(adp, n.adp)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_2p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.pga(compartment): -1.0,
-                n.atp(compartment): -1.0,
-                n.bpga(compartment): 1.0,
-                n.adp(compartment): 1.0,
+                pga: -1.0,
+                atp: -1.0,
+                bpga: 1.0,
+                adp: 1.0,
             },
         ),
         args=[
-            n.pga(compartment),
-            n.atp(compartment),
-            n.bpga(compartment),
-            n.adp(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            pga,
+            atp,
+            bpga,
+            adp,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=537,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.18),
+            default_kmp(model, rxn=rxn, par=kmp, default=0.27),
+            default_keq(model, rxn=rxn, par=keq, default=3.7e-4),
         ],
     )
     return model

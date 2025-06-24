@@ -11,35 +11,38 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_1s_1p
-from mxlbricks.utils import static
-
-ENZYME = n.g6pi()
+from mxlbricks.utils import (
+    default_keq,
+    default_kre,
+    default_name,
+)
 
 
 def add_glucose_6_phosphate_isomerase_re(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    f6p: str | None = None,
+    g6p: str | None = None,
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kre = (
-        static(model, n.kre(ENZYME), 800000000.0) if kre is None else kre
-    )  # Poolman 2000
-    keq = static(model, n.keq(ENZYME), 2.3) if keq is None else keq  # Poolman 2000
+    rxn = default_name(rxn, n.g6pi)
+    f6p = default_name(f6p, n.f6p)
+    g6p = default_name(g6p, n.g6p)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=rapid_equilibrium_1s_1p,
         stoichiometry={
-            n.f6p(compartment): -1,
-            n.g6p(compartment): 1,
+            f6p: -1,
+            g6p: 1,
         },
         args=[
-            n.f6p(compartment),
-            n.g6p(compartment),
-            kre,
-            keq,
+            f6p,
+            g6p,
+            default_kre(model, par=kre, rxn=rxn, default=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, default=2.3),
         ],
     )
     return model

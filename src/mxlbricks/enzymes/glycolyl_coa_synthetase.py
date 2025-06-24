@@ -10,51 +10,71 @@ from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
 from mxlbricks.fns import (
-    mass_action_1s,
     michaelis_menten_3s,
     reversible_michaelis_menten_3s_3p,
 )
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.glycolyl_coa_synthetase()
 
 
 def add_glycolyl_coa_synthetase_irrev(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    atp: str | None = None,
+    coa: str | None = None,
+    glycolate: str | None = None,
+    glycolyl_coa: str | None = None,
+    ppi: str | None = None,
+    amp: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 13) if kms is None else kms  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 4.0) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycolyl_coa_synthetase)
+    atp = default_name(atp, n.atp)
+    coa = default_name(coa, n.coa)
+    glycolate = default_name(glycolate, n.glycolate)
+    glycolyl_coa = default_name(glycolyl_coa, n.glycolyl_coa)
+    ppi = default_name(ppi, n.ppi)
+    amp = default_name(amp, n.amp)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_3s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.atp(chl_stroma): -1,
-                n.coa(chl_stroma): -1,
-                n.glycolate(chl_stroma): -1,
-                n.glycolyl_coa(chl_stroma): 1,
-                n.ppi(chl_stroma): 1,
-                n.amp(chl_stroma): 1,
+                atp: -1,
+                coa: -1,
+                glycolate: -1,
+                glycolyl_coa: 1,
+                ppi: 1,
+                amp: 1,
             },
         ),
         args=[
-            n.atp(chl_stroma),
-            n.coa(chl_stroma),
-            n.glycolate(chl_stroma),
-            vmax,
-            kms,
+            atp,
+            coa,
+            glycolate,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=4.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=13.0),
         ],
     )
     return model
@@ -63,45 +83,59 @@ def add_glycolyl_coa_synthetase_irrev(
 def add_glycolyl_coa_synthetase(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    atp: str | None = None,
+    coa: str | None = None,
+    glycolate: str | None = None,
+    glycolyl_coa: str | None = None,
+    ppi: str | None = None,
+    amp: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 13) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 4.0) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 0.024) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycolyl_coa_synthetase)
+    atp = default_name(atp, n.atp)
+    coa = default_name(coa, n.coa)
+    glycolate = default_name(glycolate, n.glycolate)
+    glycolyl_coa = default_name(glycolyl_coa, n.glycolyl_coa)
+    ppi = default_name(ppi, n.ppi)
+    amp = default_name(amp, n.amp)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_3s_3p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.atp(chl_stroma): -1,
-                n.coa(chl_stroma): -1,
-                n.glycolate(chl_stroma): -1,
-                n.glycolyl_coa(chl_stroma): 1,
-                n.ppi(chl_stroma): 1,
-                n.amp(chl_stroma): 1,
+                atp: -1,
+                coa: -1,
+                glycolate: -1,
+                glycolyl_coa: 1,
+                ppi: 1,
+                amp: 1,
             },
         ),
         args=[
-            n.atp(chl_stroma),
-            n.coa(chl_stroma),
-            n.glycolate(chl_stroma),
-            n.glycolyl_coa(chl_stroma),
-            n.ppi(chl_stroma),
-            n.amp(chl_stroma),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            atp,
+            coa,
+            glycolate,
+            glycolyl_coa,
+            ppi,
+            amp,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=4.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=13.0),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=0.024),
         ],
     )
     return model

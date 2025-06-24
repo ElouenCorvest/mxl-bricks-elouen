@@ -10,58 +10,76 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, reversible_michaelis_menten_2s_3p
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.fns import reversible_michaelis_menten_2s_3p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.tartronyl_coa_reductase()
 
 
 def add_tartronyl_coa_reductase(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    nadph: str | None = None,
+    tartronyl_coa: str | None = None,
+    nadp: str | None = None,
+    tartronate_semialdehyde: str | None = None,
+    coa: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.03) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 1.4) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = (
-        static(model, n.keq(ENZYME), 6.06e-06) if keq is None else keq
-    )  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.tartronyl_coa_reductase)
+    nadph = default_name(nadph, n.nadph)
+    tartronyl_coa = default_name(tartronyl_coa, n.tartronyl_coa)
+    nadp = default_name(nadp, n.nadp)
+    tartronate_semialdehyde = default_name(
+        tartronate_semialdehyde, n.tartronate_semialdehyde
+    )
+    coa = default_name(coa, n.coa)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_3p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.nadph(chl_stroma): -1,
-                n.tartronyl_coa(chl_stroma): -1,
-                n.nadp(chl_stroma): 1,
-                n.tartronate_semialdehyde(chl_stroma): 1,
+                nadph: -1,
+                tartronyl_coa: -1,
+                nadp: 1,
+                tartronate_semialdehyde: 1,
+                coa: 1,
             },
         ),
         args=[
             # substrates
-            n.tartronyl_coa(chl_stroma),
-            n.nadph(chl_stroma),
+            tartronyl_coa,
+            nadph,
             # products
-            n.tartronate_semialdehyde(chl_stroma),
-            n.nadp(chl_stroma),
-            n.coa(chl_stroma),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            tartronate_semialdehyde,
+            nadp,
+            coa,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=1.4,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.03),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=6.06e-06),
         ],
     )
     return model

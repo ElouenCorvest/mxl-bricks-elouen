@@ -2,28 +2,31 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s
-from mxlbricks.utils import static
-
-ENZYME = n.ex_atp()
+from mxlbricks.utils import (
+    default_kf,
+    default_name,
+)
 
 
 def add_atp_consumption(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    atp: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    kf = static(model, n.kms(ENZYME), 1.0) if kf is None else kf  # FIXME: source
+    rxn = default_name(rxn, n.ex_atp)
+    atp = default_name(atp, n.atp)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=mass_action_1s,
         stoichiometry={
-            n.atp(compartment): -1,
+            atp: -1,
         },
         args=[
-            n.atp(compartment),
-            kf,
+            atp,
+            default_kf(model, rxn=rxn, par=kf, default=1.0),
         ],
     )
     return model

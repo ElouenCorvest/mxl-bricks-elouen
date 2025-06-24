@@ -11,33 +11,38 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_1s_1p
-from mxlbricks.utils import static
-
-ENZYME = n.triose_phosphate_isomerase()
+from mxlbricks.utils import (
+    default_keq,
+    default_kre,
+    default_name,
+)
 
 
 def add_triose_phosphate_isomerase(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    gap: str | None = None,
+    dhap: str | None = None,
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kre = static(model, n.kre(ENZYME), 800000000.0) if kre is None else kre
-    keq = static(model, n.keq(ENZYME), 22.0) if keq is None else keq
+    rxn = default_name(rxn, n.triose_phosphate_isomerase)
+    gap = default_name(gap, n.gap)
+    dhap = default_name(dhap, n.dhap)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=rapid_equilibrium_1s_1p,
         stoichiometry={
-            n.gap(chl_stroma): -1,
-            n.dhap(chl_stroma): 1,
+            gap: -1,
+            dhap: 1,
         },
         args=[
-            n.gap(chl_stroma),
-            n.dhap(chl_stroma),
-            kre,
-            keq,
+            gap,
+            dhap,
+            default_kre(model, par=kre, rxn=rxn, default=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, default=22.0),
         ],
     )
     return model

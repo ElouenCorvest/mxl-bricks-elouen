@@ -15,55 +15,65 @@ from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
 from mxlbricks.fns import (
-    mass_action_1s,
     ping_pong_bi_bi,
     reversible_michaelis_menten_2s_2p,
 )
-from mxlbricks.utils import static
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    static,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.serine_glyoxylate_transaminase()
 
 
 def add_serine_glyoxylate_transaminase_irreversible(
     model: Model,
     *,
+    rxn: str | None = None,
+    glyoxylate: str | None = None,
+    serine: str | None = None,
+    glycine: str | None = None,
+    hydroxypyruvate: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     km_gox: str | None = None,
     km_ser: str | None = None,
 ) -> Model:
-    km_gox = (
-        static(model, n.km(ENZYME, n.glyoxylate()), 0.15) if km_gox is None else km_gox
-    )  # FIXME: source
-    km_ser = (
-        static(model, n.km(ENZYME, n.serine()), 2.72) if km_ser is None else km_ser
-    )  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 159.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    stoichiometry = {
-        n.glyoxylate(): -1.0,
-        n.serine(): -1.0,
-        n.glycine(): 1.0,
-        n.hydroxypyruvate(): 1.0,
-    }
+    rxn = default_name(rxn, n.serine_glyoxylate_transaminase)
+    glyoxylate = default_name(glyoxylate, n.glyoxylate)
+    serine = default_name(serine, n.serine)
+    glycine = default_name(glycine, n.glycine)
+    hydroxypyruvate = default_name(hydroxypyruvate, n.hydroxypyruvate)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=ping_pong_bi_bi,
-        stoichiometry=stoichiometry,
+        stoichiometry={
+            glyoxylate: -1.0,
+            serine: -1.0,
+            glycine: 1.0,
+            hydroxypyruvate: 1.0,
+        },
         args=[
-            n.glyoxylate(),
-            n.serine(),
-            vmax,
-            km_gox,
-            km_ser,
+            glyoxylate,
+            serine,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=159.0,  # Source
+            ),
+            static(model, n.km(rxn, n.glyoxylate()), 0.15)
+            if km_gox is None
+            else km_gox,
+            static(model, n.km(rxn, n.serine()), 2.72) if km_ser is None else km_ser,
         ],
     )
 
@@ -73,45 +83,49 @@ def add_serine_glyoxylate_transaminase_irreversible(
 def add_serine_glyoxylate_transaminase(
     model: Model,
     *,
+    rxn: str | None = None,
+    glyoxylate: str | None = None,
+    serine: str | None = None,
+    glycine: str | None = None,
+    hydroxypyruvate: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     km_gox: str | None = None,
-    km_ser: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    km_gox = (
-        static(model, n.km(ENZYME, n.glyoxylate()), 0.15) if km_gox is None else km_gox
-    )  # FIXME: source
-    km_ser = (
-        static(model, n.km(ENZYME, n.serine()), 2.72) if km_ser is None else km_ser
-    )  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1)
-    keq = static(model, n.keq(ENZYME), 6)
-    kcat = (
-        static(model, n.kcat(ENZYME), 159.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.serine_glyoxylate_transaminase)
+    glyoxylate = default_name(glyoxylate, n.glyoxylate)
+    serine = default_name(serine, n.serine)
+    glycine = default_name(glycine, n.glycine)
+    hydroxypyruvate = default_name(hydroxypyruvate, n.hydroxypyruvate)
 
+    # FIXME: kms2 missing
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_2p,
         stoichiometry={
-            n.glyoxylate(): -1.0,
-            n.serine(): -1.0,
-            n.glycine(): 1.0,
-            n.hydroxypyruvate(): 1.0,
+            glyoxylate: -1.0,
+            serine: -1.0,
+            glycine: 1.0,
+            hydroxypyruvate: 1.0,
         },
         args=[
-            n.glyoxylate(),
-            n.serine(),
-            n.glycine(),
-            n.hydroxypyruvate(),
-            vmax,
-            km_gox,  # FIXME: kms2 missing
-            kmp,
-            keq,
+            glyoxylate,
+            serine,
+            glycine,
+            hydroxypyruvate,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=159.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=km_gox, default=0.15),
+            default_kmp(model, rxn=rxn, par=kmp, default=2.72),
+            default_keq(model, rxn=rxn, par=keq, default=6.0),
         ],
     )
     return model

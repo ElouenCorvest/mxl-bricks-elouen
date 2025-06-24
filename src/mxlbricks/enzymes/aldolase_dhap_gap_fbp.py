@@ -12,37 +12,41 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_2s_1p
-from mxlbricks.utils import static
-
-ENZYME = n.aldolase_dhap_gap()
+from mxlbricks.utils import (
+    default_keq,
+    default_kre,
+    default_name,
+)
 
 
 def add_aldolase_dhap_gap_req(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    gap: str | None = None,
+    dhap: str | None = None,
+    fbp: str | None = None,
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kre = (
-        static(model, n.kre(ENZYME), 800000000.0) if keq is None else keq
-    )  # Poolman 2000
-    keq = static(model, n.keq(ENZYME), 7.1) if keq is None else keq  # Poolman 2000
-
+    rxn = default_name(rxn, n.aldolase_dhap_gap)
+    gap = default_name(gap, n.gap)
+    dhap = default_name(dhap, n.dhap)
+    fbp = default_name(fbp, n.fbp)
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=rapid_equilibrium_2s_1p,
         stoichiometry={
-            n.gap(compartment): -1,
-            n.dhap(compartment): -1,
-            n.fbp(compartment): 1,
+            gap: -1,
+            dhap: -1,
+            fbp: 1,
         },
         args=[
-            n.gap(compartment),
-            n.dhap(compartment),
-            n.fbp(compartment),
-            kre,
-            keq,
+            gap,
+            dhap,
+            fbp,
+            default_kre(model, rxn=rxn, par=kre, default=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, default=7.1),
         ],
     )
     return model

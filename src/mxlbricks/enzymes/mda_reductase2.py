@@ -8,10 +8,11 @@ Equilibrator
 from mxlpy import Model
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s
-from mxlbricks.utils import static
-
-ENZYME = n.mda_reductase2()
+from mxlbricks.utils import (
+    default_km,
+    default_name,
+    default_vmax,
+)
 
 
 def _rate_mda_reductase(
@@ -30,36 +31,38 @@ def _rate_mda_reductase(
 def add_mda_reductase2(
     model: Model,
     *,
+    rxn: str | None = None,
+    nadph: str | None = None,
+    mda: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     km_mda: str | None = None,
     km_nadph: str | None = None,
 ) -> Model:
-    km_mda = (
-        static(model, n.km(ENZYME, n.mda()), 1.4e-3) if km_mda is None else km_mda
-    )  # FIXME: source
-    km_nadph = (
-        static(model, n.km(ENZYME, n.nadph()), 23e-3) if km_nadph is None else km_nadph
-    )  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 1080000 / (60 * 60)) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 2e-3) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.mda_reductase2)
+    nadph = default_name(nadph, n.nadph)
+    mda = default_name(mda, n.mda)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=_rate_mda_reductase,
         stoichiometry={
-            n.nadph(): -1,
-            n.mda(): -2,
+            nadph: -1,
+            mda: -2,
         },
         args=[
-            n.nadph(),
-            n.mda(),
-            vmax,
-            km_nadph,
-            km_mda,
+            nadph,
+            mda,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=2e-3,  # Source
+                kcat_default=1080000 / (60 * 60),  # Source
+            ),
+            default_km(model, par=km_nadph, rxn=rxn, subs=nadph, default=23e-3),
+            default_km(model, par=km_mda, rxn=rxn, subs=mda, default=1.4e-3),
         ],
     )
     return model

@@ -7,9 +7,10 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import protons_stroma
-from mxlbricks.utils import static
-
-ENZYME = n.violaxanthin_deepoxidase()
+from mxlbricks.utils import (
+    default_name,
+    static,
+)
 
 
 def _rate_protonation_hill(
@@ -25,27 +26,29 @@ def _rate_protonation_hill(
 def add_violaxanthin_epoxidase(
     model: Model,
     *,
-    chl_lumen: str,
+    rxn: str | None = None,
+    vx: str | None = None,
+    h_lumen: str | None = None,
     kf: str | None = None,
     kh_zx: str | None = None,
     kphsat: str | None = None,
 ) -> Model:
-    kf = static(model, n.kf(ENZYME), 0.0024)
-    kh_zx = static(model, n.kh(ENZYME), 5.0)
-    kphsat = static(model, n.ksat(ENZYME), 5.8)
+    rxn = default_name(rxn, n.violaxanthin_deepoxidase)
+    vx = default_name(vx, n.vx)
+    h_lumen = default_name(h_lumen, lambda: n.h("_lumen"))
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=_rate_protonation_hill,
         stoichiometry={
-            n.vx(): -1,
+            vx: -1,
         },
         args=[
-            n.vx(),
-            n.h(chl_lumen),
-            kf,
-            kh_zx,
-            kphsat,
+            vx,
+            h_lumen,
+            static(model, n.kf(rxn), 0.0024) if kf is None else kf,
+            static(model, n.kh(rxn), 5.0) if kh_zx is None else kh_zx,
+            static(model, n.ksat(rxn), 5.8) if kphsat is None else kphsat,
         ],
     )
     return model

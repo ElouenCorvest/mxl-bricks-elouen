@@ -12,39 +12,46 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, michaelis_menten_1s
-from mxlbricks.utils import static
+from mxlbricks.fns import michaelis_menten_1s
+from mxlbricks.utils import (
+    default_kms,
+    default_name,
+    default_vmax,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.catalase()
 
 
 def add_catalase(
     model: Model,
     *,
+    rxn: str | None = None,
+    h2o2: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 137.9) if kms is None else kms  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 760500.0) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.catalase)
+    h2o2 = default_name(h2o2, n.h2o2)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_1s,
         stoichiometry={
-            n.h2o2(): -1,
+            h2o2: -1,
         },
         args=[
-            n.h2o2(),
-            vmax,
-            kms,
+            h2o2,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=760500.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=137.9),
         ],
     )
     return model

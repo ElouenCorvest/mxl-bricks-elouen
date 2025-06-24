@@ -7,28 +7,31 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s
-from mxlbricks.utils import static
-
-ENZYME = n.ex_nadph()
+from mxlbricks.utils import (
+    default_kf,
+    default_name,
+)
 
 
 def add_nadph_consumption(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    nadph: str | None = None,
     kf: str,
 ) -> Model:
-    kf = static(model, n.kf(ENZYME), 1.0) if kf is None else kf  # FIXME: source
+    rxn = default_name(rxn, n.ex_nadph)
+    nadph = default_name(nadph, n.nadph)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=mass_action_1s,
         stoichiometry={
-            n.nadph(compartment): -1,
+            nadph: -1,
         },
         args=[
-            n.nadph(compartment),
-            kf,
+            nadph,
+            default_kf(model, rxn=rxn, par=kf, default=1.0),
         ],
     )
     return model

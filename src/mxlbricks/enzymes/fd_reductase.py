@@ -1,10 +1,11 @@
 from mxlpy import Model
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s
-from mxlbricks.utils import filter_stoichiometry, static
-
-ENZYME = n.ferredoxin_reductase()
+from mxlbricks.utils import (
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 
 def _rate_ferredoxin_reductase(
@@ -26,31 +27,45 @@ def _rate_ferredoxin_reductase(
 def add_ferredoxin_reductase(
     model: Model,
     *,
-    keq: str,  # derived from PSI
-    kf: str | None = None,
+    rxn: str | None = None,
+    fd_ox: str | None = None,
+    fd_red: str | None = None,
+    a1: str | None = None,
+    a2: str | None = None,
+    kcat: str | None = None,
     e0: str | None = None,
+    keq: str,  # derived from PSI
 ) -> Model:
-    kf = static(model, n.kf(ENZYME), 2.5e5) if kf is None else kf  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kf, e0])
+    rxn = default_name(rxn, n.ferredoxin_reductase)
+    fd_ox = default_name(fd_ox, n.fd_ox)
+    fd_red = default_name(fd_red, n.fd_red)
+    a1 = default_name(a1, n.a1)
+    a2 = default_name(a2, n.a2)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=_rate_ferredoxin_reductase,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.fd_ox(): -1,
-                n.fd_red(): 1,
+                fd_ox: -1,
+                fd_red: 1,
             },
         ),
         args=[
-            n.fd_ox(),
-            n.fd_red(),
-            n.a1(),
-            n.a2(),
-            vmax,
-            keq,
+            fd_ox,
+            fd_red,
+            a1,
+            a2,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=2.5e5,  # Source
+            ),
+            keq,  # no default value, derived from PSI
         ],
     )
     return model

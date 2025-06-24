@@ -2,38 +2,50 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import reversible_mass_action_keq_2s_2p
-from mxlbricks.utils import filter_stoichiometry, static
-
-ENZYME = n.oxidative_phosphorylation()
+from mxlbricks.utils import (
+    default_keq,
+    default_kf,
+    default_name,
+    filter_stoichiometry,
+)
 
 
 def add_oxidative_phosphorylation(
     model: Model,
+    *,
+    rxn: str | None = None,
+    nadph: str | None = None,
+    adp: str | None = None,
+    nadp: str | None = None,
+    atp: str | None = None,
     kf: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kf = static(model, n.kf(ENZYME), 1) if kf is None else kf
-    keq = static(model, n.keq(ENZYME), 3 / 2) if keq is None else keq
+    rxn = default_name(rxn, n.oxidative_phosphorylation)
+    nadph = default_name(nadph, n.nadph)
+    adp = default_name(adp, n.adp)
+    nadp = default_name(nadp, n.nadp)
+    atp = default_name(atp, n.atp)
 
     model.add_reaction(
-        ENZYME,
+        rxn,
         reversible_mass_action_keq_2s_2p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.nadph(): -1,
-                n.adp(): -1,
-                n.nadp(): 1,
-                n.atp(): 1,
+                nadph: -1,
+                adp: -1,
+                nadp: 1,
+                atp: 1,
             },
         ),
         args=[
-            n.nadph(),
-            n.adp(),
-            n.nadp(),
-            n.atp(),
-            kf,
-            keq,
+            nadph,
+            adp,
+            nadp,
+            atp,
+            default_kf(model, rxn=rxn, par=kf, default=1),
+            default_keq(model, rxn=rxn, par=keq, default=3 / 2),
         ],
     )
     return model

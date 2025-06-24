@@ -12,53 +12,68 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, reversible_michaelis_menten_2s_2p
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.fns import reversible_michaelis_menten_2s_2p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
 
-ENZYME = n.xylulose_kinase()
-
 
 def add_xylulose_kinase(
     model: Model,
-    compartment: str = "",
     *,
+    rxn: str | None = None,
+    xylulose: str | None = None,
+    atp: str | None = None,
+    x5p: str | None = None,
+    adp: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.1) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 1.0) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 2.2e4) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.xylulose_kinase)
+    xylulose = default_name(xylulose, n.xylulose)
+    atp = default_name(atp, n.atp)
+    x5p = default_name(x5p, n.x5p)
+    adp = default_name(adp, n.adp)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_2p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.xylulose(compartment): -1.0,
-                n.atp(compartment): -1.0,
-                n.x5p(compartment): 1.0,
-                n.adp(compartment): 1.0,
+                xylulose: -1.0,
+                atp: -1.0,
+                x5p: 1.0,
+                adp: 1.0,
             },
         ),
         args=[
-            n.xylulose(compartment),
-            n.atp(compartment),
-            n.x5p(compartment),
-            n.adp(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            xylulose,
+            atp,
+            x5p,
+            adp,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=1.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.1),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=2.2e4),
         ],
     )
     return model

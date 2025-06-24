@@ -8,28 +8,32 @@ Equilibrator
 from mxlpy import Model
 
 from mxlbricks import names as n
-from mxlbricks.fns import (
-    mass_action_1s,
-    mass_action_2s,
-    michaelis_menten_1s,
+from mxlbricks.fns import mass_action_1s, mass_action_2s, michaelis_menten_1s
+from mxlbricks.utils import (
+    default_name,
+    default_par,
+    filter_stoichiometry,
 )
-from mxlbricks.utils import filter_stoichiometry, static
 
 
 def add_cbb_pfd_speedup(
     model: Model,
+    *,
+    rxn: str | None = None,
+    pfd: str | None = None,
     km: str | None = None,
     vmax: str | None = None,
 ) -> Model:
-    km = static(model, n.km(n.light_speedup()), 150.0)
-    vmax = static(model, n.vmax(n.light_speedup()), 6.0)
+    rxn = default_name(rxn, n.light_speedup)
+    pfd = default_name(pfd, n.pfd)
+
     model.add_derived(
-        n.light_speedup(),
-        michaelis_menten_1s,
+        rxn,
+        fn=michaelis_menten_1s,
         args=[
-            n.pfd(),
-            vmax,
-            km,
+            pfd,
+            default_par(model, par=vmax, name=n.vmax(rxn), value=6.0),
+            default_par(model, par=km, name=n.km(rxn), value=150.0),
         ],
     )
     return model
@@ -37,31 +41,40 @@ def add_cbb_pfd_speedup(
 
 def add_fd_tr_reductase_2021(
     model: Model,
+    *,
+    rxn: str | None = None,
+    tr_ox: str | None = None,
+    fd_red: str | None = None,
+    tr_red: str | None = None,
+    fd_ox: str | None = None,
     kf: str | None = None,
 ) -> Model:
     """Equilibrator
     Thioredoxin(ox)(aq) + 2 ferredoxin(red)(aq) ⇌ Thioredoxin(red)(aq) + 2 ferredoxin(ox)(aq)
     Keq = 4.9e3 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
     """
-    enzyme_name = n.ferredoxin_thioredoxin_reductase()
-    kf = static(model, n.kf(enzyme_name), 1)
+    rxn = default_name(rxn, n.ferredoxin_thioredoxin_reductase)
+    tr_ox = default_name(tr_ox, n.tr_ox)
+    fd_red = default_name(fd_red, n.fd_red)
+    tr_red = default_name(tr_red, n.tr_red)
+    fd_ox = default_name(fd_ox, n.fd_ox)
 
     model.add_reaction(
-        name=enzyme_name,
+        name=rxn,
         fn=mass_action_2s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.tr_ox(): -1,
-                n.fd_red(): -1,
-                n.tr_red(): 1,
-                n.fd_ox(): 1,
+                tr_ox: -1,
+                fd_red: -1,
+                tr_red: 1,
+                fd_ox: 1,
             },
         ),
         args=[
-            n.tr_ox(),
-            n.fd_red(),
-            kf,
+            tr_ox,
+            fd_red,
+            default_par(model, par=kf, name=n.kf(rxn), value=1.0),
         ],
     )
     return model
@@ -69,31 +82,40 @@ def add_fd_tr_reductase_2021(
 
 def add_fd_tr_reductase(
     model: Model,
+    *,
+    rxn: str | None = None,
+    tr_ox: str | None = None,
+    fd_red: str | None = None,
+    tr_red: str | None = None,
+    fd_ox: str | None = None,
     kf: str | None = None,
 ) -> Model:
     """Equilibrator
     Thioredoxin(ox)(aq) + 2 ferredoxin(red)(aq) ⇌ Thioredoxin(red)(aq) + 2 ferredoxin(ox)(aq)
     Keq = 4.9e3 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
     """
-    enzyme_name = n.ferredoxin_thioredoxin_reductase()
-    kf = static(model, n.kf(enzyme_name), 1)
+    rxn = default_name(rxn, n.ferredoxin_thioredoxin_reductase)
+    tr_ox = default_name(tr_ox, n.tr_ox)
+    fd_red = default_name(fd_red, n.fd_red)
+    tr_red = default_name(tr_red, n.tr_red)
+    fd_ox = default_name(fd_ox, n.fd_ox)
 
     model.add_reaction(
-        name=enzyme_name,
+        name=rxn,
         fn=mass_action_2s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.tr_ox(): -1,
-                n.fd_red(): -2,
-                n.tr_red(): 1,
-                n.fd_ox(): 2,
+                tr_ox: -1,
+                fd_red: -2,
+                tr_red: 1,
+                fd_ox: 2,
             },
         ),
         args=[
-            n.tr_ox(),
-            n.fd_red(),
-            kf,
+            tr_ox,
+            fd_red,
+            default_par(model, par=kf, name=n.kf(rxn), value=1.0),
         ],
     )
     return model
@@ -101,31 +123,40 @@ def add_fd_tr_reductase(
 
 def add_nadph_tr_reductase(
     model: Model,
+    *,
+    rxn: str | None = None,
+    tr_ox: str | None = None,
+    nadph: str | None = None,
+    tr_red: str | None = None,
+    nadp: str | None = None,
     kf: str | None = None,
 ) -> Model:
     """Equilibrator
     Thioredoxin(ox)(aq) + NADPH(aq) ⇌ Thioredoxin(red)(aq) + NADP(aq)
     Keq = 2e1 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
     """
-    enzyme_name = n.nadph_thioredoxin_reductase()
-    kf = static(model, n.kf(enzyme_name), 1)
+    rxn = default_name(rxn, n.ferredoxin_thioredoxin_reductase)
+    tr_ox = default_name(tr_ox, n.tr_ox)
+    nadph = default_name(nadph, n.nadph)
+    tr_red = default_name(tr_red, n.tr_red)
+    nadp = default_name(nadp, n.nadp)
 
     model.add_reaction(
-        name=enzyme_name,
+        name=rxn,
         fn=mass_action_2s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.tr_ox(): -1,
-                n.nadph(): -1,
-                n.tr_red(): 1,
-                n.nadp(): 1,
+                tr_ox: -1,
+                nadph: -1,
+                tr_red: 1,
+                nadp: 1,
             },
         ),
         args=[
-            n.tr_ox(),
-            n.nadph(),
-            kf,
+            tr_ox,
+            nadph,
+            default_par(model, par=kf, name=n.kf(rxn), value=1.0),
         ],
     )
     return model
@@ -133,26 +164,36 @@ def add_nadph_tr_reductase(
 
 def add_tr_e_activation(
     model: Model,
+    *,
+    rxn: str | None = None,
+    e_inactive: str | None = None,
+    tr_red: str | None = None,
+    e_active: str | None = None,
+    tr_ox: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    enzyme_name = n.tr_activation()
-    kf = static(model, n.kf(enzyme_name), 1)
+    rxn = default_name(rxn, n.tr_activation)
+    e_inactive = default_name(e_inactive, n.e_inactive)
+    tr_red = default_name(tr_red, n.tr_red)
+    e_active = default_name(e_active, n.e_active)
+    tr_ox = default_name(tr_ox, n.tr_ox)
+
     model.add_reaction(
-        name=enzyme_name,
+        name=rxn,
         fn=mass_action_2s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.e_inactive(): -1,
-                n.tr_red(): -1,
-                n.e_active(): 1,
-                n.tr_ox(): 1,
+                e_inactive: -1,
+                tr_red: -1,
+                e_active: 1,
+                tr_ox: 1,
             },
         ),
         args=[
-            n.e_inactive(),
-            n.tr_red(),
-            kf,
+            e_inactive,
+            tr_red,
+            default_par(model, par=kf, name=n.kf(rxn), value=1.0),
         ],
     )
     return model
@@ -160,26 +201,36 @@ def add_tr_e_activation(
 
 def add_tr_e_activation2021(
     model: Model,
+    *,
+    rxn: str | None = None,
+    e_inactive: str | None = None,
+    tr_red: str | None = None,
+    e_active: str | None = None,
+    tr_ox: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    enzyme_name = n.tr_activation()
-    kf = static(model, n.kf(enzyme_name), 1)
+    rxn = default_name(rxn, n.tr_activation)
+    e_inactive = default_name(e_inactive, n.e_inactive)
+    tr_red = default_name(tr_red, n.tr_red)
+    e_active = default_name(e_active, n.e_active)
+    tr_ox = default_name(tr_ox, n.tr_ox)
+
     model.add_reaction(
-        name=enzyme_name,
+        name=rxn,
         fn=mass_action_2s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.e_inactive(): -5,
-                n.tr_red(): -5,
-                n.e_active(): 5,
-                n.tr_ox(): 5,
+                e_inactive: -5,
+                tr_red: -5,
+                e_active: 5,
+                tr_ox: 5,
             },
         ),
         args=[
-            n.e_inactive(),
-            n.tr_red(),
-            kf,
+            e_inactive,
+            tr_red,
+            default_par(model, par=kf, name=n.kf(rxn), value=1.0),
         ],
     )
     return model
@@ -187,24 +238,29 @@ def add_tr_e_activation2021(
 
 def add_e_relaxation(
     model: Model,
+    *,
+    rxn: str | None = None,
+    e_active: str | None = None,
+    e_inactive: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    enzyme_name = n.tr_inactivation()
-    kf = static(model, n.kf(enzyme_name), 0.1)
+    rxn = default_name(rxn, n.tr_inactivation)
+    e_active = default_name(e_active, n.e_active)
+    e_inactive = default_name(e_inactive, n.e_inactive)
 
     model.add_reaction(
-        name=enzyme_name,
+        name=rxn,
         fn=mass_action_1s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.e_active(): -1,
-                n.e_inactive(): 1,
+                e_active: -1,
+                e_inactive: 1,
             },
         ),
         args=[
-            n.e_active(),
-            kf,
+            e_active,
+            default_par(model, par=kf, name=n.kf(rxn), value=0.1),
         ],
     )
     return model
@@ -212,24 +268,29 @@ def add_e_relaxation(
 
 def add_e_relaxation_2021(
     model: Model,
+    *,
+    rxn: str | None = None,
+    e_active: str | None = None,
+    e_inactive: str | None = None,
     kf: str | None = None,
 ) -> Model:
-    enzyme_name = n.tr_inactivation()
-    kf = static(model, n.kf(enzyme_name), 0.1)
+    rxn = default_name(rxn, n.tr_inactivation)
+    e_active = default_name(e_active, n.e_active)
+    e_inactive = default_name(e_inactive, n.e_inactive)
 
     model.add_reaction(
-        name=enzyme_name,
+        name=rxn,
         fn=mass_action_1s,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.e_active(): -5,
-                n.e_inactive(): 5,
+                e_active: -5,
+                e_inactive: 5,
             },
         ),
         args=[
-            n.e_active(),
-            kf,
+            e_active,
+            default_par(model, par=kf, name=n.kf(rxn), value=0.1),
         ],
     )
     return model

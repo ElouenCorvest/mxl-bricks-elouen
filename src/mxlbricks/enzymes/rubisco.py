@@ -48,32 +48,17 @@ from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
 from mxlbricks.fns import div, mass_action_1s, mul, one_div
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.utils import (
+    default_km,
+    default_name,
+    default_par,
+    default_vmax,
+    filter_stoichiometry,
+    static,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-
-def _rate_poolman_0i(
-    rubp: float, co2: float, vmax: float, kms_rubp: float, kms_co2: float
-) -> float:
-    return vmax * rubp * co2 / ((rubp + kms_rubp) * (co2 + kms_co2))
-
-
-def _rate_poolman_1i() -> float:
-    raise NotImplementedError
-
-
-def _rate_poolman_2i() -> float:
-    raise NotImplementedError
-
-
-def _rate_poolman_3i() -> float:
-    raise NotImplementedError
-
-
-def _rate_poolman_4i() -> float:
-    raise NotImplementedError
 
 
 def _rate_poolman_5i(
@@ -108,22 +93,6 @@ def _rate_poolman_5i(
         )
     ) * (co2 + kms_co2)
     return top / btm
-
-
-def _rate_witzel_1i() -> float:
-    raise NotImplementedError
-
-
-def _rate_witzel_2i() -> float:
-    raise NotImplementedError
-
-
-def _rate_witzel_3i() -> float:
-    raise NotImplementedError
-
-
-def _rate_witzel_4i() -> float:
-    raise NotImplementedError
 
 
 def _rate_witzel_5i(
@@ -170,7 +139,14 @@ def _rate_witzel_5i(
 def add_rubisco_poolman(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    rubp: str | None = None,
+    pga: str | None = None,
+    co2: str | None = None,
+    fbp: str | None = None,
+    sbp: str | None = None,
+    pi: str | None = None,
+    nadph: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     km_co2: str | None = None,
@@ -181,27 +157,14 @@ def add_rubisco_poolman(
     ki_pi: str | None = None,
     ki_nadph: str | None = None,
 ) -> Model:
-    ENZYME = n.rubisco_carboxylase()
-
-    km_co2 = (
-        static(model, n.km(ENZYME, n.co2()), 0.0107) if km_co2 is None else km_co2
-    )  # FIXME: source
-    km_rubp = (
-        static(model, n.km(ENZYME, n.rubp()), 0.02) if km_rubp is None else km_rubp
-    )  # FIXME: source
-    kcat = (
-        static(model, n.kcat(ENZYME), 0.34 * 8) if kcat is None else kcat
-    )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    ki_pga = static(model, n.ki(ENZYME, n.pga()), 0.04) if ki_pga is None else ki_pga
-    ki_fbp = static(model, n.ki(ENZYME, n.fbp()), 0.04) if ki_fbp is None else ki_fbp
-    ki_sbp = static(model, n.ki(ENZYME, n.sbp()), 0.075) if ki_sbp is None else ki_sbp
-    ki_pi = static(model, n.ki(ENZYME, n.pi()), 0.9) if ki_pi is None else ki_pi
-    ki_nadph = (
-        static(model, n.ki(ENZYME, n.nadph()), 0.07) if ki_nadph is None else ki_nadph
-    )
+    rxn = default_name(rxn, n.rubisco_carboxylase)
+    rubp = default_name(rubp, n.rubp)
+    pga = default_name(pga, n.pga)
+    co2 = default_name(co2, n.co2)
+    fbp = default_name(fbp, n.fbp)
+    sbp = default_name(sbp, n.sbp)
+    pi = default_name(pi, n.pi)
+    nadph = default_name(nadph, n.nadph)
 
     model.add_reaction(
         name=n.rubisco_carboxylase(),
@@ -209,37 +172,48 @@ def add_rubisco_poolman(
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.rubp(chl_stroma): -1.0,
-                n.pga(chl_stroma): 2.0,
-                n.co2(chl_stroma): -1,
+                rubp: -1.0,
+                pga: 2.0,
+                co2: -1,
             },
         ),
         args=[
-            n.rubp(chl_stroma),
-            n.pga(chl_stroma),
-            n.co2(chl_stroma),
-            vmax,
-            km_rubp,
-            km_co2,
-            ki_pga,
-            n.fbp(chl_stroma),
-            ki_fbp,
-            n.sbp(chl_stroma),
-            ki_sbp,
-            n.pi(chl_stroma),
-            ki_pi,
-            n.nadph(chl_stroma),
-            ki_nadph,
+            rubp,
+            pga,
+            co2,
+            default_vmax(
+                model, e0=e0, kcat=kcat, rxn=rxn, e0_default=1.0, kcat_default=0.34 * 8
+            ),
+            default_km(model, par=km_rubp, rxn=rxn, subs=rubp, default=0.02),
+            default_km(model, par=km_co2, rxn=rxn, subs=co2, default=0.0107),
+            default_par(model, par=ki_pga, name=n.ki(rxn, n.pga()), value=0.04),
+            fbp,
+            default_par(model, par=ki_fbp, name=n.ki(rxn, n.fbp()), value=0.04),
+            sbp,
+            default_par(model, par=ki_sbp, name=n.ki(rxn, n.sbp()), value=0.075),
+            pi,
+            default_par(model, par=ki_pi, name=n.ki(rxn, n.pi()), value=0.9),
+            nadph,
+            default_par(model, par=ki_nadph, name=n.ki(rxn, n.nadph()), value=0.07),
         ],
     )
-
     return model
 
 
 def add_rubisco(
     model: Model,
     *,
-    chl_stroma: str = "",
+    rxn_carb: str | None = None,
+    rxn_ox: str | None = None,
+    rubp: str | None = None,
+    co2: str | None = None,
+    o2: str | None = None,
+    pga: str | None = None,
+    pgo: str | None = None,
+    fbp: str | None = None,
+    sbp: str | None = None,
+    pi: str | None = None,
+    nadph: str | None = None,
     kcat_carb: str | None = None,
     kcat_ox: str | None = None,
     e0: str | None = None,
@@ -254,37 +228,47 @@ def add_rubisco(
     ki_pi: str | None = None,
     ki_nadph: str | None = None,
 ) -> Model:
-    ENZYME = n.rubisco()
+    enzyme = n.rubisco()
+    rxn_carb = default_name(rxn_carb, n.rubisco_carboxylase)
+    rxn_ox = default_name(rxn_ox, n.rubisco_oxygenase)
+    rubp = default_name(rubp, n.rubp)
+    co2 = default_name(co2, n.co2)
+    o2 = default_name(o2, n.o2)
+    pga = default_name(pga, n.pga)
+    pgo = default_name(pgo, n.pgo)
+    fbp = default_name(fbp, n.fbp)
+    sbp = default_name(sbp, n.sbp)
+    pi = default_name(pi, n.pi)
+    nadph = default_name(nadph, n.nadph)
 
-    km_co2 = (
-        static(model, n.km(ENZYME, n.co2()), 10.7 / 1000) if km_co2 is None else km_co2
-    )  # FIXME: source
-    km_o2 = (
-        static(model, n.km(ENZYME, n.o2()), 295 / 1000) if km_o2 is None else km_o2
-    )  # FIXME: source
-
-    km_rubp = (
-        static(model, n.km(ENZYME, n.rubp()), 0.02) if km_rubp is None else km_rubp
-    )  # FIXME: source
     kcat_carb = (
-        static(model, n.kcat(ENZYME), 3.1) if kcat_carb is None else kcat_carb
+        static(model, n.kcat(rxn_carb), 3.1) if kcat_carb is None else kcat_carb
     )  # FIXME: source
     kcat_ox = (
-        static(model, n.kcat(ENZYME), 1.125) if kcat_carb is None else kcat_carb
+        static(model, n.kcat(rxn_ox), 1.125) if kcat_carb is None else kcat_carb
     )  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 0.16) if e0 is None else e0  # FIXME: source
+    km_co2 = (
+        static(model, n.km(enzyme, co2), 10.7 / 1000) if km_co2 is None else km_co2
+    )  # FIXME: source
+    km_o2 = (
+        static(model, n.km(enzyme, o2), 295 / 1000) if km_o2 is None else km_o2
+    )  # FIXME: source
+    km_rubp = (
+        static(model, n.km(enzyme, rubp), 0.02) if km_rubp is None else km_rubp
+    )  # FIXME: source
+    e0 = static(model, n.e0(enzyme), 0.16) if e0 is None else e0  # FIXME: source
 
     model.add_derived(
-        vmax_carb := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat_carb, e0]
+        vmax_carb := n.vmax(rxn_carb), fn=mass_action_1s, args=[kcat_carb, e0]
     )
-    model.add_derived(vmax_ox := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat_ox, e0])
+    model.add_derived(vmax_ox := n.vmax(rxn_ox), fn=mass_action_1s, args=[kcat_ox, e0])
 
-    ki_pga = static(model, n.ki(ENZYME, n.pga()), 0.04) if ki_pga is None else ki_pga
-    ki_fbp = static(model, n.ki(ENZYME, n.fbp()), 0.04) if ki_fbp is None else ki_fbp
-    ki_sbp = static(model, n.ki(ENZYME, n.sbp()), 0.075) if ki_sbp is None else ki_sbp
-    ki_pi = static(model, n.ki(ENZYME, n.pi()), 0.9) if ki_pi is None else ki_pi
+    ki_pga = static(model, n.ki(enzyme, n.pga()), 0.04) if ki_pga is None else ki_pga
+    ki_fbp = static(model, n.ki(enzyme, n.fbp()), 0.04) if ki_fbp is None else ki_fbp
+    ki_sbp = static(model, n.ki(enzyme, n.sbp()), 0.075) if ki_sbp is None else ki_sbp
+    ki_pi = static(model, n.ki(enzyme, n.pi()), 0.9) if ki_pi is None else ki_pi
     ki_nadph = (
-        static(model, n.ki(ENZYME, n.nadph()), 0.07) if ki_nadph is None else ki_nadph
+        static(model, n.ki(enzyme, n.nadph()), 0.07) if ki_nadph is None else ki_nadph
     )
 
     k_er_plus = (
@@ -317,32 +301,32 @@ def add_rubisco(
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.rubp(chl_stroma): -1.0,
-                n.pga(chl_stroma): 2.0,
-                n.co2(chl_stroma): -1,
+                rubp: -1.0,
+                pga: 2.0,
+                co2: -1,
             },
         ),
         args=[
-            n.rubp(),
-            n.co2(chl_stroma),
+            rubp,
+            co2,
             vmax_carb,
             gamma,  # 1 / km_co2
-            n.co2(chl_stroma),
-            n.o2(chl_stroma),
+            co2,
+            o2,
             lr,
             lc,
             lo,
             lrc,
             lro,
-            n.pga(),
+            pga,
             ki_pga,
-            n.fbp(),
+            fbp,
             ki_fbp,
-            n.sbp(),
+            sbp,
             ki_sbp,
-            n.pi(),
+            pi,
             ki_pi,
-            n.nadph(),
+            nadph,
             ki_nadph,
         ],
     )
@@ -352,33 +336,33 @@ def add_rubisco(
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.rubp(): -1.0,
-                n.o2(): -1.0,
-                n.pga(): 1.0,
-                n.pgo(): 1.0,
+                rubp: -1.0,
+                o2: -1.0,
+                pga: 1.0,
+                pgo: 1.0,
             },
         ),
         args=[
-            n.rubp(chl_stroma),
-            n.o2(chl_stroma),
+            rubp,
+            o2,
             vmax_ox,
             omega,  # 1 / km_o2
-            n.co2(chl_stroma),
-            n.o2(chl_stroma),
+            co2,
+            o2,
             lr,
             lc,
             lo,
             lrc,
             lro,
-            n.pga(),
+            pga,
             ki_pga,
-            n.fbp(),
+            fbp,
             ki_fbp,
-            n.sbp(),
+            sbp,
             ki_sbp,
-            n.pi(),
+            pi,
             ki_pi,
-            n.nadph(),
+            nadph,
             ki_nadph,
         ],
     )

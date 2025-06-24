@@ -1,6 +1,6 @@
 """glycolate oxidase
 
-O2(per) + Glycolate(chl) <=> H2O2(per) + Glyoxylate(per)
+O2 + Glycolate(chl) <=> H2O2 + Glyoxylate
 
 Equilibrator
 O2(aq) + Glycolate(aq) ⇌ H2O2(aq) + Glyoxylate(aq)
@@ -12,50 +12,24 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, michaelis_menten_1s, michaelis_menten_2s
-from mxlbricks.utils import static
+from mxlbricks.fns import michaelis_menten_1s, michaelis_menten_2s
+from mxlbricks.utils import (
+    default_kms,
+    default_name,
+    default_vmax,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.glycolate_oxidase()
-
-
-def add_glycolate_oxidase(
-    model: Model,
-    *,
-    compartment: str = "",
-    kcat: str | None = None,
-    e0: str | None = None,
-    kms: str | None = None,
-) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.06) if kms is None else kms  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 100) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    model.add_reaction(
-        name=ENZYME,
-        fn=michaelis_menten_2s,
-        stoichiometry={
-            n.glycolate(compartment): -1,
-            n.glyoxylate(compartment): 1,
-            n.h2o2(compartment): 1,
-        },
-        args=[
-            n.glycolate(compartment),
-            n.o2(compartment),
-            vmax,
-            kms,
-        ],
-    )
-    return model
 
 
 def add_glycolate_oxidase_yokota(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    glycolate: str | None = None,
+    glyoxylate: str | None = None,
+    h2o2: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
@@ -64,23 +38,73 @@ def add_glycolate_oxidase_yokota(
 
     This variant doesn't actually include the oxygen concentration
     """
-    kms = static(model, n.kms(ENZYME), 0.06) if kms is None else kms  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 100) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
+    rxn = default_name(rxn, n.glycolate_oxidase)
+    glycolate = default_name(glycolate, n.glycolate)
+    glyoxylate = default_name(glyoxylate, n.glyoxylate)
+    h2o2 = default_name(h2o2, n.h2o2)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=michaelis_menten_1s,
         stoichiometry={
-            n.glycolate(compartment): -1,
-            n.glyoxylate(compartment): 1,
-            n.h2o2(compartment): 1,
+            glycolate: -1,
+            glyoxylate: 1,
+            h2o2: 1,
         },
         args=[
-            n.glycolate(compartment),
-            vmax,
-            kms,
+            glycolate,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=100,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.06),
+        ],
+    )
+    return model
+
+
+def add_glycolate_oxidase(
+    model: Model,
+    *,
+    rxn: str | None = None,
+    glycolate: str | None = None,
+    glyoxylate: str | None = None,
+    h2o2: str | None = None,
+    o2: str | None = None,
+    kcat: str | None = None,
+    e0: str | None = None,
+    kms: str | None = None,
+) -> Model:
+    rxn = default_name(rxn, n.glycolate_oxidase)
+    glycolate = default_name(glycolate, n.glycolate)
+    glyoxylate = default_name(glyoxylate, n.glyoxylate)
+    h2o2 = default_name(h2o2, n.h2o2)
+    o2 = default_name(o2, n.o2)
+
+    model.add_reaction(
+        name=rxn,
+        fn=michaelis_menten_2s,
+        stoichiometry={
+            glycolate: -1,
+            glyoxylate: 1,
+            h2o2: 1,
+        },
+        args=[
+            glycolate,
+            o2,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=100,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.06),
         ],
     )
     return model

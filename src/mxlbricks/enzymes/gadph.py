@@ -14,47 +14,57 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_3s_3p
-from mxlbricks.utils import filter_stoichiometry, static
-
-ENZYME = n.gadph()
+from mxlbricks.utils import (
+    default_keq,
+    default_kre,
+    default_name,
+    filter_stoichiometry,
+)
 
 
 def add_gadph(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    bpga: str | None = None,
+    nadph: str | None = None,
+    h: str | None = None,
+    gap: str | None = None,
+    nadp: str | None = None,
+    pi: str | None = None,
     kre: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kre = (
-        static(model, n.kre(ENZYME), 800000000.0) if kre is None else kre
-    )  # Poolman 2000
-    keq = (
-        static(model, n.keq(ENZYME), 16000000.0) if keq is None else keq
-    )  # Poolman 2000
+    rxn = default_name(rxn, n.gadph)
+    bpga = default_name(bpga, n.bpga)
+    nadph = default_name(nadph, n.nadph)
+    h = default_name(h, n.h)
+    gap = default_name(gap, n.gap)
+    nadp = default_name(nadp, n.nadp)
+    pi = default_name(pi, n.pi)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=rapid_equilibrium_3s_3p,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.nadph(): -1.0,
-                n.bpga(compartment): -1.0,
-                n.nadp(): 1.0,
-                n.pi(): 1.0,
-                n.gap(compartment): 1.0,
+                nadph: -1.0,
+                bpga: -1.0,
+                nadp: 1.0,
+                pi: 1.0,
+                gap: 1.0,
             },
         ),
         args=[
-            n.bpga(compartment),
-            n.nadph(compartment),
-            n.h(compartment),
-            n.gap(compartment),
-            n.nadp(compartment),
-            n.pi(compartment),
-            kre,
-            keq,
+            bpga,
+            nadph,
+            h,
+            gap,
+            nadp,
+            pi,
+            default_kre(model, par=kre, rxn=rxn, default=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, default=16000000.0),
         ],
     )
     return model

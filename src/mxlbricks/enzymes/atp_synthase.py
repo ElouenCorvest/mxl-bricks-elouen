@@ -12,16 +12,16 @@ Keq = 6.4e-6 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
 from __future__ import annotations
 
 import math
-from typing import cast
 
-import numpy as np
 from mxlpy import Derived, Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s, neg_div, value
-from mxlbricks.utils import filter_stoichiometry, static
-
-ENZYME = n.atp_synthase()
+from mxlbricks.utils import (
+    default_name,
+    filter_stoichiometry,
+    static,
+)
 
 
 def _keq_atp(
@@ -66,153 +66,6 @@ def _rate_atp_synthase_2019(
     return kATPsynth * (ADP / convf - ATP / convf / Keq_ATPsynthase)
 
 
-def add_atp_synthase_mmol_chl(
-    model: Model,
-    *,
-    chl_stroma: str = "",
-    chl_lumen: str = "_lumen",
-    kf: str | None = None,
-    hpr: str | None = None,
-    bh: str | None = None,  # proton buffering
-) -> Model:
-    kf = static(model, n.kf(ENZYME), 20.0) if kf is None else kf
-    hpr = static(model, "HPR", 14.0 / 3.0) if hpr is None else hpr
-    bh = static(model, "bH", 100.0) if bh is None else bh
-
-    model.add_parameter("Pi_mol", 0.01)
-    model.add_parameter("DeltaG0_ATP", 30.6)
-
-    model.add_derived(
-        name=n.keq(ENZYME),
-        fn=_keq_atp,
-        args=[
-            n.ph(chl_lumen),
-            "DeltaG0_ATP",
-            "dG_pH",
-            hpr,
-            n.ph(chl_stroma),
-            "Pi_mol",
-            "RT",
-        ],
-    )
-
-    model.add_reaction(
-        name=ENZYME,
-        fn=_rate_atp_synthase_2016,
-        stoichiometry={
-            n.atp(chl_stroma): 1.0,
-            n.h(chl_lumen): Derived(
-                fn=neg_div,
-                args=[
-                    "HPR",
-                    bh,
-                ],
-            ),
-        },
-        args=[
-            n.atp(chl_stroma),
-            n.adp(chl_stroma),
-            n.keq(ENZYME),
-            kf,
-        ],
-    )
-    return model
-
-
-def add_atp_synthase_mm(
-    model: Model,
-    *,
-    chl_stroma: str = "",
-    chl_lumen: str = "_lumen",
-    kf: str | None = None,
-    hpr: str | None = None,
-    bh: str | None = None,  # proton buffering
-    convf: str | None = None,
-) -> Model:
-    kf = static(model, n.kf(ENZYME), 20.0) if kf is None else kf
-    hpr = static(model, "HPR", 14.0 / 3.0) if hpr is None else hpr
-    bh = static(model, "bH", 100.0) if bh is None else bh
-    convf = static(model, n.convf(), 3.2e-2) if convf is None else convf
-
-    model.add_parameter("Pi_mol", 0.01)
-    model.add_parameter("DeltaG0_ATP", 30.6)
-
-    model.add_derived(
-        name=n.keq(ENZYME),
-        fn=_keq_atp,
-        args=[
-            n.ph(chl_lumen),
-            "DeltaG0_ATP",
-            "dG_pH",
-            hpr,
-            n.ph(chl_stroma),
-            "Pi_mol",
-            "RT",
-        ],
-    )
-
-    model.add_reaction(
-        name=ENZYME,
-        fn=_rate_atp_synthase_2019,
-        stoichiometry={
-            n.h(chl_lumen): Derived(
-                fn=neg_div,
-                args=[hpr, bh],
-            ),
-            n.atp(chl_stroma): Derived(fn=value, args=[convf]),
-        },
-        args=[
-            n.atp(chl_stroma),
-            n.adp(chl_stroma),
-            n.keq(ENZYME),
-            kf,
-            convf,
-        ],
-    )
-    return model
-
-
-def add_atp_synthase_static_protons(
-    model: Model,
-    *,
-    chl_stroma: str = "",
-    kcat: str | None = None,
-    e0: str | None = None,
-    km_adp: str | None = None,
-    km_pi: str | None = None,
-) -> Model:
-    """Used by Poolman 2000"""
-    km_adp = (
-        static(model, n.km(ENZYME, n.adp()), 0.014) if km_adp is None else km_adp
-    )  # FIXME: source
-    km_pi = (
-        static(model, n.km(ENZYME, n.pi()), 0.3) if km_pi is None else km_pi
-    )  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 2.8) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    model.add_reaction(
-        name=ENZYME,
-        fn=_rate_atp_synthase_2000,
-        stoichiometry=filter_stoichiometry(
-            model,
-            {
-                n.adp(chl_stroma): -1.0,
-                n.atp(chl_stroma): 1.0,
-            },
-        ),
-        args=[
-            n.adp(chl_stroma),
-            n.pi(chl_stroma),
-            vmax,
-            km_adp,
-            km_pi,
-        ],
-    )
-    return model
-
-
 def _rate_static_energy(
     adp: float,
     pi: float,
@@ -222,50 +75,6 @@ def _rate_static_energy(
     km162: float,
 ) -> float:
     return adp * pi * energy * v16 / ((adp + km161) * (pi + km162))
-
-
-def add_atp_synthase_energy_dependent(
-    model: Model,
-    *,
-    chl_stroma: str = "",
-    kcat: str | None = None,
-    e0: str | None = None,
-    km_adp: str | None = None,
-    km_pi: str | None = None,
-) -> Model:
-    km_adp = (
-        static(model, n.km(ENZYME, n.adp()), 0.014) if km_adp is None else km_adp
-    )  # FIXME: source
-    km_pi = (
-        static(model, n.km(ENZYME, n.pi()), 0.3) if km_pi is None else km_pi
-    )  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 2.8) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    model.add_reaction(
-        name=ENZYME,
-        fn=_rate_static_energy,
-        stoichiometry=filter_stoichiometry(
-            model,
-            {
-                # Substrates
-                n.adp(chl_stroma): -1.0,
-                n.energy(chl_stroma): -1.0,
-                # Products
-                n.atp(chl_stroma): 1.0,
-            },
-        ),
-        args=[
-            n.adp(chl_stroma),
-            n.pi(chl_stroma),
-            n.energy(chl_stroma),
-            vmax,
-            km_adp,
-            km_pi,
-        ],
-    )
-    return model
 
 
 def _atp_gamma(
@@ -286,10 +95,7 @@ def _delta_g_atp_synthase(
     pHstroma: float,
     RT: float,
 ) -> float:
-    return cast(
-        float,
-        DeltaG0_ATP - dG_pH * HPR * (pHstroma - pH) + RT * np.log(gammaATP),
-    )
+    return DeltaG0_ATP - dG_pH * HPR * (pHstroma - pH) + RT * math.log(gammaATP)
 
 
 def _atp_synthase2(
@@ -299,17 +105,265 @@ def _atp_synthase2(
     return -DeltaGATPsyn * ATPturnover
 
 
-def add_atp_synthase_2024(
+def add_atp_synthase_mmol_chl(
     model: Model,
     *,
-    chl_lumen: str,
-    chl_stroma: str = "",
+    rxn: str | None = None,
+    atp: str | None = None,
+    adp: str | None = None,
+    h_stroma: str | None = None,
+    h_lumen: str | None = None,
+    ph_stroma: str | None = None,
+    ph_lumen: str | None = None,
+    kf: str | None = None,
+    hpr: str | None = None,
+    bh: str | None = None,  # proton buffering
+) -> Model:
+    rxn = default_name(rxn, n.atp_synthase)
+    atp = default_name(atp, n.atp)
+    adp = default_name(adp, n.adp)
+    h_stroma = default_name(h_stroma, n.h)
+    h_lumen = default_name(h_lumen, lambda: n.h("_lumen"))
+    ph_stroma = default_name(ph_stroma, n.ph)
+    ph_lumen = default_name(ph_lumen, lambda: n.ph("_lumen"))
+
+    kf = static(model, n.kf(rxn), 20.0) if kf is None else kf
+    hpr = static(model, "HPR", 14.0 / 3.0) if hpr is None else hpr
+    bh = static(model, "bH", 100.0) if bh is None else bh
+
+    model.add_parameter("Pi_mol", 0.01)
+    model.add_parameter("DeltaG0_ATP", 30.6)
+
+    model.add_derived(
+        name=n.keq(rxn),
+        fn=_keq_atp,
+        args=[
+            ph_lumen,
+            "DeltaG0_ATP",
+            "dG_pH",
+            hpr,
+            ph_stroma,
+            "Pi_mol",
+            "RT",
+        ],
+    )
+
+    model.add_reaction(
+        name=rxn,
+        fn=_rate_atp_synthase_2016,
+        stoichiometry={
+            atp: 1.0,
+            h_lumen: Derived(
+                fn=neg_div,
+                args=[
+                    "HPR",
+                    bh,
+                ],
+            ),
+        },
+        args=[
+            atp,
+            adp,
+            n.keq(rxn),
+            kf,
+        ],
+    )
+    return model
+
+
+def add_atp_synthase_mm(
+    model: Model,
+    *,
+    rxn: str | None = None,
+    atp: str | None = None,
+    adp: str | None = None,
+    h_stroma: str | None = None,
+    h_lumen: str | None = None,
+    ph_stroma: str | None = None,
+    ph_lumen: str | None = None,
     kf: str | None = None,
     hpr: str | None = None,
     bh: str | None = None,  # proton buffering
     convf: str | None = None,
 ) -> Model:
-    kf = static(model, n.kf(ENZYME), 20.0) if kf is None else kf
+    rxn = default_name(rxn, n.atp_synthase)
+    atp = default_name(atp, n.atp)
+    adp = default_name(adp, n.adp)
+    h_stroma = default_name(h_stroma, n.h)
+    h_lumen = default_name(h_lumen, lambda: n.h("_lumen"))
+    ph_stroma = default_name(ph_stroma, n.ph)
+    ph_lumen = default_name(ph_lumen, lambda: n.ph("_lumen"))
+
+    kf = static(model, n.kf(rxn), 20.0) if kf is None else kf
+    hpr = static(model, "HPR", 14.0 / 3.0) if hpr is None else hpr
+    bh = static(model, "bH", 100.0) if bh is None else bh
+    convf = static(model, n.convf(), 3.2e-2) if convf is None else convf
+
+    model.add_parameter("Pi_mol", 0.01)
+    model.add_parameter("DeltaG0_ATP", 30.6)
+
+    model.add_derived(
+        name=n.keq(rxn),
+        fn=_keq_atp,
+        args=[
+            ph_lumen,
+            "DeltaG0_ATP",
+            "dG_pH",
+            hpr,
+            ph_stroma,
+            "Pi_mol",
+            "RT",
+        ],
+    )
+
+    model.add_reaction(
+        name=rxn,
+        fn=_rate_atp_synthase_2019,
+        stoichiometry={
+            h_lumen: Derived(
+                fn=neg_div,
+                args=[hpr, bh],
+            ),
+            atp: Derived(fn=value, args=[convf]),
+        },
+        args=[
+            atp,
+            adp,
+            n.keq(rxn),
+            kf,
+            convf,
+        ],
+    )
+    return model
+
+
+def add_atp_synthase_static_protons(
+    model: Model,
+    *,
+    rxn: str | None = None,
+    atp: str | None = None,
+    adp: str | None = None,
+    pi: str | None = None,
+    kcat: str | None = None,
+    e0: str | None = None,
+    km_adp: str | None = None,
+    km_pi: str | None = None,
+) -> Model:
+    """Used by Poolman 2000"""
+    rxn = default_name(rxn, n.atp_synthase)
+    atp = default_name(atp, n.atp)
+    adp = default_name(adp, n.adp)
+    pi = default_name(pi, n.pi)
+
+    km_adp = (
+        static(model, n.km(rxn, adp), 0.014) if km_adp is None else km_adp
+    )  # FIXME: source
+    km_pi = (
+        static(model, n.km(rxn, pi), 0.3) if km_pi is None else km_pi
+    )  # FIXME: source
+    kcat = static(model, n.kcat(rxn), 2.8) if kcat is None else kcat  # FIXME: source
+    e0 = static(model, n.e0(rxn), 1.0) if e0 is None else e0  # FIXME: source
+    model.add_derived(vmax := n.vmax(rxn), fn=mass_action_1s, args=[kcat, e0])
+
+    model.add_reaction(
+        name=rxn,
+        fn=_rate_atp_synthase_2000,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                adp: -1.0,
+                atp: 1.0,
+            },
+        ),
+        args=[
+            adp,
+            pi,
+            vmax,
+            km_adp,
+            km_pi,
+        ],
+    )
+    return model
+
+
+def add_atp_synthase_energy_dependent(
+    model: Model,
+    *,
+    rxn: str | None = None,
+    atp: str | None = None,
+    adp: str | None = None,
+    pi: str | None = None,
+    energy: str | None = None,
+    kcat: str | None = None,
+    e0: str | None = None,
+    km_adp: str | None = None,
+    km_pi: str | None = None,
+) -> Model:
+    rxn = default_name(rxn, n.atp_synthase)
+    atp = default_name(atp, n.atp)
+    adp = default_name(adp, n.adp)
+    pi = default_name(pi, n.pi)
+    energy = default_name(energy, n.energy)
+
+    km_adp = (
+        static(model, n.km(rxn, adp), 0.014) if km_adp is None else km_adp
+    )  # FIXME: source
+    km_pi = (
+        static(model, n.km(rxn, pi), 0.3) if km_pi is None else km_pi
+    )  # FIXME: source
+    kcat = static(model, n.kcat(rxn), 2.8) if kcat is None else kcat  # FIXME: source
+    e0 = static(model, n.e0(rxn), 1.0) if e0 is None else e0  # FIXME: source
+    model.add_derived(vmax := n.vmax(rxn), fn=mass_action_1s, args=[kcat, e0])
+
+    model.add_reaction(
+        name=rxn,
+        fn=_rate_static_energy,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                # Substrates
+                adp: -1.0,
+                energy: -1.0,
+                # Products
+                atp: 1.0,
+            },
+        ),
+        args=[
+            adp,
+            pi,
+            energy,
+            vmax,
+            km_adp,
+            km_pi,
+        ],
+    )
+    return model
+
+
+def add_atp_synthase_2024(
+    model: Model,
+    *,
+    rxn: str | None = None,
+    atp: str | None = None,
+    adp: str | None = None,
+    h_lumen: str | None = None,
+    ph_stroma: str | None = None,
+    ph_lumen: str | None = None,
+    pi: str | None = None,
+    kf: str | None = None,
+    hpr: str | None = None,
+    bh: str | None = None,  # proton buffering
+    convf: str | None = None,
+) -> Model:
+    rxn = default_name(rxn, n.atp_synthase)
+    atp = default_name(atp, n.atp)
+    adp = default_name(adp, n.adp)
+    h_lumen = default_name(h_lumen, lambda: n.h("_lumen"))
+    ph_stroma = default_name(ph_stroma, n.ph)
+    ph_lumen = default_name(ph_lumen, lambda: n.ph("_lumen"))
+    pi = default_name(pi, n.pi)
+
+    kf = static(model, n.kf(rxn), 20.0) if kf is None else kf
     hpr = static(model, "HPR", 14.0 / 3.0) if hpr is None else hpr
     bh = static(model, "bH", 100.0) if bh is None else bh
     convf = static(model, n.convf(), 3.2e-2) if convf is None else convf
@@ -321,9 +375,9 @@ def add_atp_synthase_2024(
         name="ATP_gamma",
         fn=_atp_gamma,
         args=[
-            n.pi(),
-            n.atp(),
-            n.adp(),
+            pi,
+            atp,
+            adp,
             convf,
         ],
     )
@@ -332,12 +386,12 @@ def add_atp_synthase_2024(
         name="DeltaGATPsyn",
         fn=_delta_g_atp_synthase,
         args=[
-            n.ph(chl_lumen),
+            ph_lumen,
             "ATP_gamma",
             delta_g,
             "dG_pH",
             hpr,
-            n.ph(chl_stroma),
+            ph_stroma,
             "RT",
         ],
     )
@@ -346,8 +400,8 @@ def add_atp_synthase_2024(
         name="vATPsynthase",
         fn=_atp_synthase2,
         stoichiometry={
-            n.h(chl_lumen): Derived(fn=neg_div, args=[hpr, bh]),
-            n.atp(chl_stroma): Derived(fn=value, args=[convf]),
+            h_lumen: Derived(fn=neg_div, args=[hpr, bh]),
+            atp: Derived(fn=value, args=[convf]),
         },
         args=[
             "DeltaGATPsyn",

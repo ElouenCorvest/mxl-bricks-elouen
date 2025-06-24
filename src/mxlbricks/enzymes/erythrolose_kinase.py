@@ -12,55 +12,68 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, reversible_michaelis_menten_2s_2p
-from mxlbricks.utils import filter_stoichiometry, static
+from mxlbricks.fns import reversible_michaelis_menten_2s_2p
+from mxlbricks.utils import (
+    default_keq,
+    default_kmp,
+    default_kms,
+    default_name,
+    default_vmax,
+    filter_stoichiometry,
+)
 
 if TYPE_CHECKING:
     from mxlpy import Model
-
-ENZYME = n.erythrulose_kinase()
 
 
 def add_erythrulose_kinase(
     model: Model,
     *,
-    compartment: str = "",
+    rxn: str | None = None,
+    s1: str | None = None,
+    s2: str | None = None,
+    p1: str | None = None,
+    p2: str | None = None,
     kcat: str | None = None,
     e0: str | None = None,
     kms: str | None = None,
     kmp: str | None = None,
     keq: str | None = None,
 ) -> Model:
-    kms = static(model, n.kms(ENZYME), 0.1) if kms is None else kms  # FIXME: source
-    kmp = static(model, n.kmp(ENZYME), 1.0) if kmp is None else kmp  # FIXME: source
-    kcat = static(model, n.kcat(ENZYME), 1.0) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(ENZYME), 1.0) if e0 is None else e0  # FIXME: source
-    keq = static(model, n.keq(ENZYME), 6.0) if keq is None else keq  # FIXME: source
-    model.add_derived(vmax := n.vmax(ENZYME), fn=mass_action_1s, args=[kcat, e0])
-
-    stoichiometry = filter_stoichiometry(
-        model,
-        {
-            n.erythrulose(compartment): -1.0,
-            n.atp(compartment): -1.0,
-            n.erythrulose_1p(compartment): 1.0,
-            n.adp(compartment): 1.0,
-        },
-    )
+    rxn = default_name(rxn, n.erythrulose_kinase)
+    s1 = default_name(s1, n.erythrulose)
+    s2 = default_name(s2, n.atp)
+    p1 = default_name(p1, n.erythrulose_1p)
+    p2 = default_name(p2, n.adp)
 
     model.add_reaction(
-        name=ENZYME,
+        name=rxn,
         fn=reversible_michaelis_menten_2s_2p,
-        stoichiometry=stoichiometry,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                s1: -1.0,
+                s2: -1.0,
+                p1: 1.0,
+                p2: 1.0,
+            },
+        ),
         args=[
-            n.erythrulose(compartment),
-            n.atp(compartment),
-            n.erythrulose_1p(compartment),
-            n.adp(compartment),
-            vmax,
-            kms,
-            kmp,
-            keq,
+            s1,
+            s2,
+            p1,
+            p2,
+            default_vmax(
+                model,
+                rxn=rxn,
+                e0=e0,
+                kcat=kcat,
+                e0_default=1.0,  # Source
+                kcat_default=1.0,  # Source
+            ),
+            default_kms(model, rxn=rxn, par=kms, default=0.1),
+            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
+            default_keq(model, rxn=rxn, par=keq, default=6.0),
         ],
     )
     return model
