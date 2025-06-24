@@ -4248,8 +4248,8 @@ packages:
   requires_python: '>=3.8'
 - pypi: ./
   name: mxlbricks
-  version: 0.2.0
-  sha256: 0f93839ce11fb2a466f8c398d4e3b3813ac5ee83e4e6baf8c99ab508edd549f0
+  version: 0.3.0
+  sha256: 8c28c03cfa1398f5769410869b9380096db836b4e0074b48aad35ce516af2470
   requires_dist:
   - mxlpy>=0.22.0
   requires_python: '>=3.12'
