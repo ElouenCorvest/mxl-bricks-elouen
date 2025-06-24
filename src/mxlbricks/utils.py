@@ -1,5 +1,6 @@
 from collections.abc import Callable, Mapping
 
+import sympy
 from mxlpy import Derived, Model
 from mxlpy.fns import mul
 
@@ -11,9 +12,10 @@ def static(
     model: Model,
     name: str,
     value: float,
-    unit: str | None = None,  # noqa: ARG001
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
 ) -> str:
-    model.add_parameter(name, value)
+    model.add_parameter(name, value, unit=unit, source=source)
     return name
 
 
@@ -59,85 +61,240 @@ def default_name(name: str | None, name_fn: Callable[[], str]) -> str:
     return name
 
 
-def default_par(model: Model, *, par: str | None, name: str, value: float) -> str:
+def default_par(
+    model: Model,
+    *,
+    par: str | None,
+    name: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
     if par is not None:
         return par
-    return static(model=model, name=name, value=value)
+    return static(model=model, name=name, value=value, unit=unit, source=source)
 
 
-def default_keq(model: Model, *, par: str | None, rxn: str, default: float) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.keq(rxn), value=default)
+def default_keq(
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.keq(rxn),
+    )
 
 
-def default_kf(model: Model, *, par: str | None, rxn: str, default: float) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.kf(rxn), value=default)
+def default_kf(
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.kf(rxn),
+    )
 
 
 def default_km(
-    model: Model, *, par: str | None, rxn: str, subs: str, default: float
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    subs: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
 ) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.km(rxn, subs), value=default)
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.km(rxn, subs),
+    )
 
 
-def default_kms(model: Model, *, par: str | None, rxn: str, default: float) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.kms(rxn), value=default)
+def default_kms(
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.kms(rxn),
+    )
 
 
-def default_kmp(model: Model, *, par: str | None, rxn: str, default: float) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.kmp(rxn), value=default)
+def default_kmp(
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.kmp(rxn),
+    )
 
 
-def default_ki(model: Model, *, par: str | None, rxn: str, default: float) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.ki(rxn), value=default)
+def default_ki(
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.ki(rxn),
+    )
 
 
 def default_kis(
-    model: Model, *, par: str | None, rxn: str, substrate: str, default: float
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    substrate: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
 ) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.ki(rxn, substrate), value=default)
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.ki(rxn, substrate),
+    )
 
 
-def default_kre(model: Model, *, par: str | None, rxn: str, default: float) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.kre(rxn), value=default)
+def default_kre(
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.kre(rxn),
+    )
 
 
-def default_e0(model: Model, *, par: str | None, rxn: str, default: float) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.e0(rxn), value=default)
+def default_e0(
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.e0(rxn),
+    )
 
 
-def default_kcat(model: Model, *, par: str | None, rxn: str, default: float) -> str:
-    if par is not None:
-        return par
-    return static(model=model, name=n.kcat(rxn), value=default)
+def default_kcat(
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.kcat(rxn),
+    )
 
 
 def default_vmax(
     model: Model,
+    *,
     e0: str | None,
     kcat: str | None,
     rxn: str,
-    e0_default: float,
-    kcat_default: float,
+    e0_value: float,
+    e0_unit: sympy.Expr | None = None,
+    e0_source: str | None = None,
+    kcat_value: float,
+    kcat_unit: sympy.Expr | None = None,
+    kcat_source: str | None = None,
 ) -> str:
-    e0 = default_e0(model=model, par=e0, rxn=rxn, default=e0_default)
-    kcat = default_kcat(model=model, par=kcat, rxn=rxn, default=kcat_default)
+    e0 = default_e0(
+        model=model,
+        par=e0,
+        rxn=rxn,
+        value=e0_value,
+        unit=e0_unit,
+        source=e0_source,
+    )
+    kcat = default_kcat(
+        model=model,
+        par=kcat,
+        rxn=rxn,
+        value=kcat_value,
+        unit=kcat_unit,
+        source=kcat_source,
+    )
     model.add_derived(vmax := n.vmax(rxn), fn=mass_action_1s, args=[kcat, e0])
     return vmax
