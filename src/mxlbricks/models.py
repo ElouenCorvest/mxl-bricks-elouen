@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from mxlpy import Model
+from mxlpy import Model, Parameter, Variable, units
+from sympy.physics.units.quantities import Quantity
 
 from mxlbricks import names as n
 from mxlbricks.enzymes.rubisco import add_rubisco_poolman
@@ -78,6 +79,9 @@ from .enzymes import (
     add_zeaxanthin_epoxidase,
 )
 
+mol_chl = Quantity("mol_chl", abbrev="mol_chl")
+mmol_mol_chl = units.mmol / mol_chl
+
 
 def get_yokota1985() -> Model:
     model = Model()
@@ -109,29 +113,29 @@ def get_poolman2000() -> Model:
     model = Model()
     model.add_variables(
         {
-            n.pga(): 0.6387788347932627,
-            n.bpga(): 0.0013570885908749779,
-            n.gap(): 0.011259431827358068,
-            n.dhap(): 0.24770748227012374,
-            n.fbp(): 0.01980222074817044,
-            n.f6p(): 1.093666906864421,
-            n.g6p(): 2.5154338857582377,
-            n.g1p(): 0.14589516537322303,
-            n.sbp(): 0.09132688566151095,
-            n.s7p(): 0.23281380022778891,
-            n.e4p(): 0.02836065066520614,
-            n.x5p(): 0.03647242425941113,
-            n.r5p(): 0.06109130988031577,
-            n.rubp(): 0.2672164362349537,
-            n.ru5p(): 0.0244365238237522,
-            n.atp(): 0.43633201706180874,
+            n.pga(): Variable(0.6387788347932627, unit=units.mmol),
+            n.bpga(): Variable(0.0013570885908749779, unit=units.mmol),
+            n.gap(): Variable(0.011259431827358068, unit=units.mmol),
+            n.dhap(): Variable(0.24770748227012374, unit=units.mmol),
+            n.fbp(): Variable(0.01980222074817044, unit=units.mmol),
+            n.f6p(): Variable(1.093666906864421, unit=units.mmol),
+            n.g6p(): Variable(2.5154338857582377, unit=units.mmol),
+            n.g1p(): Variable(0.14589516537322303, unit=units.mmol),
+            n.sbp(): Variable(0.09132688566151095, unit=units.mmol),
+            n.s7p(): Variable(0.23281380022778891, unit=units.mmol),
+            n.e4p(): Variable(0.02836065066520614, unit=units.mmol),
+            n.x5p(): Variable(0.03647242425941113, unit=units.mmol),
+            n.r5p(): Variable(0.06109130988031577, unit=units.mmol),
+            n.rubp(): Variable(0.2672164362349537, unit=units.mmol),
+            n.ru5p(): Variable(0.0244365238237522, unit=units.mmol),
+            n.atp(): Variable(0.43633201706180874, unit=units.mmol),
         }
     )
     model.add_parameters(
         {
-            n.co2(): 0.2,
-            n.nadph(): 0.21,
-            n.h(): 1.2589254117941661e-05,
+            n.co2(): Parameter(0.2, unit=units.mmol),
+            n.nadph(): Parameter(0.21, unit=units.mmol),
+            n.h(): Parameter(1.2589254117941661e-05, unit=units.mmol),
         }
     )
 
@@ -211,7 +215,7 @@ def get_matuszynska2016npq(
     add_rt(model)
     add_adenosin_moiety(
         model,
-        total=static(model, n.total_adenosines(), value=2.55, unit="mmol / mol Chl"),
+        total=static(model, n.total_adenosines(), value=2.55, unit=mmol_mol_chl),
     )
     add_ph_lumen(model, chl_lumen=chl_lumen)
     add_carotenoid_moiety(model)
@@ -325,7 +329,7 @@ def get_matuszynska2019(
     )
     add_adenosin_moiety(
         model,
-        total=static(model, n.total_adenosines(), value=2.55, unit="mM"),
+        total=static(model, n.total_adenosines(), value=2.55, unit=units.mmol),
     )
     add_orthophosphate_moiety_cbb(
         model,
@@ -469,7 +473,7 @@ def get_saadat2021(
     )
     add_adenosin_moiety(
         model,
-        total=static(model, n.total_adenosines(), value=2.55, unit="mM"),
+        total=static(model, n.total_adenosines(), value=2.55, unit=units.mmol),
     )
     add_orthophosphate_moiety_cbb(
         model,
