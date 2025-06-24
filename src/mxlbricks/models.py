@@ -217,7 +217,7 @@ def get_matuszynska2016npq(
         model,
         total=static(model, n.total_adenosines(), value=2.55, unit=mmol_mol_chl),
     )
-    add_ph_lumen(model, chl_lumen=chl_lumen)
+    add_ph_lumen(model)
     add_carotenoid_moiety(model)
     add_ferredoxin_moiety(model)
     add_plastocyanin_moiety(model)
@@ -313,7 +313,7 @@ def get_matuszynska2019(
 
     # Moieties / derived compounds
     add_rt(model)
-    add_ph_lumen(model, chl_lumen=chl_lumen)
+    add_ph_lumen(model)
     add_carotenoid_moiety(model)
     add_ferredoxin_moiety(model)
     add_plastocyanin_moiety(model)
@@ -455,7 +455,7 @@ def get_saadat2021(
 
     # Moieties / derived compounds
     add_rt(model)
-    add_ph_lumen(model, chl_lumen=chl_lumen)
+    add_ph_lumen(model)
     add_carotenoid_moiety(model)
     add_ferredoxin_moiety(model)
     add_plastocyanin_moiety(model)

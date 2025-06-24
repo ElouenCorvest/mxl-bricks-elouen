@@ -4,20 +4,25 @@ from mxlpy import Model
 
 from mxlbricks import names as n
 from mxlbricks.fns import div, mass_action_1s, moiety_1, moiety_2
-from mxlbricks.utils import static
+from mxlbricks.utils import default_name, default_par
 
 
 def add_ascorbate_moiety(
     model: Model,
     *,
+    name: str | None = None,
+    mda: str | None = None,
+    dha: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_ascorbate(), 10) if total is None else total
-
     model.add_derived(
-        name=n.ascorbate(),
+        name=default_name(name, n.ascorbate),
         fn=moiety_2,
-        args=[n.mda(), n.dha(), total],
+        args=[
+            default_name(mda, n.mda),
+            default_name(dha, n.dha),
+            default_par(model, par=total, name=n.total_ascorbate(), value=10),
+        ],
     )
     return model
 
@@ -25,17 +30,16 @@ def add_ascorbate_moiety(
 def add_adenosin_moiety(
     model: Model,
     *,
-    compartment: str = "",
+    name: str | None = None,
+    atp: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_ascorbate(), 0.5) if total is None else total
-
     model.add_derived(
-        name=n.adp(compartment),
+        name=default_name(name, n.adp),
         fn=moiety_1,
         args=[
-            n.atp(compartment),
-            n.total_adenosines(),
+            default_name(atp, n.atp),
+            default_par(model, par=total, name=n.total_adenosines(), value=0.5),
         ],
     )
     return model
@@ -44,16 +48,16 @@ def add_adenosin_moiety(
 def add_enzyme_moiety(
     model: Model,
     *,
+    name: str | None = None,
+    e_inactive: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.e_total(), 6) if total is None else total
-
     model.add_derived(
-        name=n.e_active(),
+        name=default_name(name, n.e_active),
         fn=moiety_1,
         args=[
-            n.e_inactive(),
-            total,
+            default_name(e_inactive, n.e_inactive),
+            default_par(model, par=total, name=n.e_total(), value=6.0),
         ],
     )
     return model
@@ -62,16 +66,16 @@ def add_enzyme_moiety(
 def add_ferredoxin_moiety(
     model: Model,
     *,
+    name: str | None = None,
+    fd_ox: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_ferredoxin(), 5.0) if total is None else total
-
     model.add_derived(
-        name=n.fd_red(),
+        name=default_name(name, n.fd_red),
         fn=moiety_1,
         args=[
-            n.fd_ox(),
-            total,
+            default_name(fd_ox, n.fd_ox),
+            default_par(model, par=total, name=n.total_ferredoxin(), value=5.0),
         ],
     )
     return model
@@ -80,17 +84,16 @@ def add_ferredoxin_moiety(
 def add_glutamate_moiety(
     model: Model,
     *,
-    chl_stroma: str = "",
+    name: str | None = None,
+    glutamate: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_glutamate(), 3.0) if total is None else total
-
     model.add_derived(
-        name=n.oxoglutarate(chl_stroma),
+        name=default_name(name, n.oxoglutarate),
         fn=moiety_1,
         args=[
-            n.glutamate(),
-            total,
+            default_name(glutamate, n.glutamate),
+            default_par(model, par=total, name=n.total_glutamate(), value=3.0),
         ],
     )
     return model
@@ -106,16 +109,16 @@ def _glutathion_moiety(
 def add_glutathion_moiety(
     model: Model,
     *,
+    name: str | None = None,
+    glutathion_ox: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_glutathion(), 10.0) if total is None else total
-
     model.add_derived(
-        name=n.glutathion_red(),
+        name=default_name(name, n.glutathion_red),
         fn=_glutathion_moiety,
         args=[
-            n.glutathion_ox(),
-            total,
+            default_name(glutathion_ox, n.glutathion_ox),
+            default_par(model, par=total, name=n.total_glutathion(), value=10.0),
         ],
     )
     return model
@@ -124,17 +127,16 @@ def add_glutathion_moiety(
 def add_hco3_from_co2(
     model: Model,
     *,
-    compartment: str = "",
+    name: str | None = None,
+    co2: str | None = None,
     factor: str | None = None,
 ) -> Model:
-    factor = static(model, "CO2/HCO3 ratio", 50)
-
     return model.add_derived(
-        n.hco3(compartment),
+        name=default_name(name, n.hco3),
         fn=mass_action_1s,
         args=[
-            n.co2(),
-            factor,
+            default_name(co2, n.co2),
+            default_par(model, par=factor, name="CO2/HCO3 ratio", value=50),
         ],
     )
 
@@ -142,16 +144,16 @@ def add_hco3_from_co2(
 def add_lhc_moiety(
     model: Model,
     *,
+    name: str | None = None,
+    lhc: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_lhc(), 1.0) if total is None else total
-
     model.add_derived(
-        name=n.lhcp(),
+        name=default_name(name, n.lhcp),
         fn=moiety_1,
         args=[
-            n.lhc(),
-            total,
+            default_name(lhc, n.lhc),
+            default_par(model, par=total, name=n.total_lhc(), value=1.0),
         ],
     )
     return model
@@ -160,16 +162,16 @@ def add_lhc_moiety(
 def add_nad_moiety(
     model: Model,
     *,
+    name: str | None = None,
+    nadh: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_nad(), 0.86) if total is None else total
-
     model.add_derived(
-        name=n.nad(),
+        name=default_name(name, n.nad),
         fn=moiety_1,
         args=[
-            n.nadh(),
-            total,
+            default_name(nadh, n.nadh),
+            default_par(model, par=total, name=n.total_nad(), value=0.86),
         ],
     )
     return model
@@ -178,14 +180,17 @@ def add_nad_moiety(
 def add_nadp_moiety(
     model: Model,
     *,
+    name: str | None = None,
+    nadph: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_nadp(), 0.5) if total is None else total
-
     model.add_derived(
-        name=n.nadp(),
+        name=default_name(name, n.nadp),
         fn=moiety_1,
-        args=[n.nadph(), total],
+        args=[
+            default_name(nadph, n.nadph),
+            default_par(model, par=total, name=n.total_nadp(), value=0.5),
+        ],
     )
     return model
 
@@ -193,14 +198,17 @@ def add_nadp_moiety(
 def add_plastocyanin_moiety(
     model: Model,
     *,
+    name: str | None = None,
+    pc_ox: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_pc(), 4.0) if total is None else total
-
     model.add_derived(
-        name=n.pc_red(),
+        name=default_name(name, n.pc_red),
         fn=moiety_1,
-        args=[n.pc_ox(), total],
+        args=[
+            default_name(pc_ox, n.pc_ox),
+            default_par(model, par=total, name=n.total_pc(), value=4.0),
+        ],
     )
     return model
 
@@ -208,14 +216,17 @@ def add_plastocyanin_moiety(
 def add_plastoquinone_moiety(
     model: Model,
     *,
+    name: str | None = None,
+    pq_ox: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_pq(), 17.5) if total is None else total
-
     model.add_derived(
-        name=n.pq_red(),
+        name=default_name(name, n.pq_red),
         fn=moiety_1,
-        args=[n.pq_ox(), total],
+        args=[
+            default_name(pq_ox, n.pq_ox),
+            default_par(model, par=total, name=n.total_pq(), value=17.5),
+        ],
     )
     return model
 
@@ -223,15 +234,17 @@ def add_plastoquinone_moiety(
 def add_carotenoid_moiety(
     model: Model,
     *,
-    compartment: str = "",
+    name: str | None = None,
+    vx: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_carotenoids(), 1.0) if total is None else total
-
     model.add_derived(
-        name=n.zx(compartment),
+        name=default_name(name, n.zx),
         fn=moiety_1,
-        args=[n.vx(compartment), total],
+        args=[
+            default_name(vx, n.vx),
+            default_par(model, par=total, name=n.total_carotenoids(), value=1.0),
+        ],
     )
     return model
 
@@ -239,17 +252,17 @@ def add_carotenoid_moiety(
 def add_thioredoxin_moiety(
     model: Model,
     *,
-    compartment: str = "",
+    name: str | None = None,
+    tr_ox: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = (
-        static(model, n.total_thioredoxin(compartment), 1.0) if total is None else total
-    )
-
     model.add_derived(
-        name=n.tr_red(compartment),
+        name=default_name(name, n.tr_red),
         fn=moiety_1,
-        args=[n.tr_ox(compartment), total],
+        args=[
+            default_name(tr_ox, n.tr_ox),
+            default_par(model, par=total, name=n.total_thioredoxin(), value=1.0),
+        ],
     )
     return model
 
@@ -257,17 +270,17 @@ def add_thioredoxin_moiety(
 def add_psbs_moietry(
     model: Model,
     *,
+    name: str | None = None,
+    psbs_de: str | None = None,
     total: str | None = None,
 ) -> Model:
     """Derive protonated form from deprotonated form"""
-    total = static(model, n.total_psbs(), 1.0) if total is None else total
-
     model.add_derived(
-        name=n.psbs_pr(),
+        name=default_name(name, n.psbs_pr),
         fn=moiety_1,
         args=[
-            n.psbs_de(),
-            total,
+            default_name(psbs_de, n.psbs_de),
+            default_par(model, par=total, name=n.total_psbs(), value=1.0),
         ],
     )
     return model
@@ -275,16 +288,17 @@ def add_psbs_moietry(
 
 def add_rt(
     model: Model,
+    name: str | None = None,
     r: str | None = None,
     t: str | None = None,
 ) -> Model:
-    r = static(model, "R", 0.0083) if r is None else r
-    t = static(model, "T", 298.0) if t is None else t
-
     model.add_derived(
-        "RT",
-        mass_action_1s,
-        args=[r, t],
+        name=default_name(name, n.rt),
+        fn=mass_action_1s,
+        args=[
+            default_par(model, par=r, name="R", value=0.0083),
+            default_par(model, par=t, name="T", value=298.0),
+        ],
     )
     return model
 
@@ -307,21 +321,110 @@ def _keq_pq_red(
 def add_plastoquinone_keq(
     model: Model,
     *,
-    chl_stroma: str = "",
+    pq_red: str | None = None,
+    ph: str | None = None,
 ) -> Model:
     model.add_parameter("E^0_QA", -0.14)
     model.add_parameter("E^0_PQ", 0.354)
 
     model.add_derived(
-        n.keq(n.pq_red()),
+        n.keq(default_name(pq_red, n.pq_red)),
         _keq_pq_red,
         args=[
             "E^0_QA",
             "F",
             "E^0_PQ",
-            n.ph(chl_stroma),
+            default_name(ph, n.ph),
             "dG_pH",
             "RT",
+        ],
+    )
+    return model
+
+
+def _quencher(
+    Psbs: float,
+    Vx: float,
+    Psbsp: float,
+    Zx: float,
+    y0: float,
+    y1: float,
+    y2: float,
+    y3: float,
+    kZSat: float,
+) -> float:
+    """co-operative 4-state quenching mechanism
+    gamma0: slow quenching of (Vx - protonation)
+    gamma1: fast quenching (Vx + protonation)
+    gamma2: fastest possible quenching (Zx + protonation)
+    gamma3: slow quenching of Zx present (Zx - protonation)
+    """
+    ZAnt = Zx / (Zx + kZSat)
+    return y0 * Vx * Psbs + y1 * Vx * Psbsp + y2 * ZAnt * Psbsp + y3 * ZAnt * Psbs
+
+
+def add_quencher(
+    model: Model,
+    *,
+    quencher: str | None = None,
+    psbs_de: str | None = None,
+    vx: str | None = None,
+    psbs_pr: str | None = None,
+    zx: str | None = None,
+) -> Model:
+    model.add_parameter("gamma0", 0.1)
+    model.add_parameter("gamma1", 0.25)
+    model.add_parameter("gamma2", 0.6)
+    model.add_parameter("gamma3", 0.15)
+    model.add_parameter("kZSat", 0.12)
+    model.add_derived(
+        name=default_name(quencher, n.quencher),
+        fn=_quencher,
+        args=[
+            default_name(psbs_de, n.psbs_de),
+            default_name(vx, n.vx),
+            default_name(psbs_pr, n.psbs_pr),
+            default_name(zx, n.zx),
+            "gamma0",
+            "gamma1",
+            "gamma2",
+            "gamma3",
+            "kZSat",
+        ],
+    )
+    return model
+
+
+def _ph_lumen(protons: float) -> float:
+    return -math.log10(protons * 0.00025)
+
+
+def _dg_ph(r: float, t: float) -> float:
+    return math.log(10) * r * t
+
+
+def add_ph_lumen(
+    model: Model,
+    *,
+    ph: str | None = None,
+    r: str | None = None,
+    t: str | None = None,
+    h: str | None = None,
+) -> Model:
+    model.add_derived(
+        "dG_pH",
+        _dg_ph,
+        args=[
+            default_name(r, lambda: "R"),
+            default_name(t, lambda: "T"),
+        ],
+    )
+
+    model.add_derived(
+        name=default_name(ph, lambda: n.ph("_lumen")),
+        fn=_ph_lumen,
+        args=[
+            default_name(h, lambda: n.h("_lumen")),
         ],
     )
     return model
@@ -410,35 +513,53 @@ def _pi_cbb_pr(
 def add_orthophosphate_moiety_cbb(
     model: Model,
     *,
-    chl_stroma: str = "",
+    pi: str | None = None,
+    total_pi: str | None = None,
+    pga: str | None = None,
+    bpga: str | None = None,
+    gap: str | None = None,
+    dhap: str | None = None,
+    fbp: str | None = None,
+    f6p: str | None = None,
+    g6p: str | None = None,
+    g1p: str | None = None,
+    sbp: str | None = None,
+    s7p: str | None = None,
+    e4p: str | None = None,
+    x5p: str | None = None,
+    r5p: str | None = None,
+    rubp: str | None = None,
+    ru5p: str | None = None,
+    atp: str | None = None,
     total: str | None = None,
 ) -> Model:
-    total = static(model, n.total_orthophosphate(), 15.0) if total is None else total
-
-    args = [
-        total,
-        n.pga(chl_stroma),
-        n.bpga(chl_stroma),
-        n.gap(chl_stroma),
-        n.dhap(chl_stroma),
-        n.fbp(chl_stroma),
-        n.f6p(chl_stroma),
-        n.g6p(chl_stroma),
-        n.g1p(chl_stroma),
-        n.sbp(chl_stroma),
-        n.s7p(chl_stroma),
-        n.e4p(chl_stroma),
-        n.x5p(chl_stroma),
-        n.r5p(chl_stroma),
-        n.rubp(chl_stroma),
-        n.ru5p(chl_stroma),
-        n.atp(chl_stroma),
-    ]
-
     model.add_derived(
-        name=n.pi(chl_stroma),
+        name=default_name(pi, n.pi),
         fn=_pi_cbb,
-        args=args,
+        args=[
+            default_par(
+                model,
+                par=total,
+                name=default_name(total_pi, n.total_orthophosphate),
+                value=15.0,
+            ),
+            default_name(pga, n.pga),
+            default_name(bpga, n.bpga),
+            default_name(gap, n.gap),
+            default_name(dhap, n.dhap),
+            default_name(fbp, n.fbp),
+            default_name(f6p, n.f6p),
+            default_name(g6p, n.g6p),
+            default_name(g1p, n.g1p),
+            default_name(sbp, n.sbp),
+            default_name(s7p, n.s7p),
+            default_name(e4p, n.e4p),
+            default_name(x5p, n.x5p),
+            default_name(r5p, n.r5p),
+            default_name(rubp, n.rubp),
+            default_name(ru5p, n.ru5p),
+            default_name(atp, n.atp),
+        ],
     )
 
     return model
@@ -447,36 +568,55 @@ def add_orthophosphate_moiety_cbb(
 def add_orthophosphate_moiety_cbb_pr(
     model: Model,
     *,
-    chl_stroma: str = "",
+    pi: str | None = None,
+    total_pi: str | None = None,
+    pga: str | None = None,
+    bpga: str | None = None,
+    gap: str | None = None,
+    dhap: str | None = None,
+    fbp: str | None = None,
+    f6p: str | None = None,
+    g6p: str | None = None,
+    g1p: str | None = None,
+    sbp: str | None = None,
+    s7p: str | None = None,
+    e4p: str | None = None,
+    x5p: str | None = None,
+    r5p: str | None = None,
+    rubp: str | None = None,
+    ru5p: str | None = None,
+    atp: str | None = None,
     total: str | None = None,
+    pgo: str | None = None,
 ) -> Model:
-    total = static(model, n.total_orthophosphate(), 20.0) if total is None else total
-
-    args = [
-        total,
-        n.pga(chl_stroma),
-        n.bpga(chl_stroma),
-        n.gap(chl_stroma),
-        n.dhap(chl_stroma),
-        n.fbp(chl_stroma),
-        n.f6p(chl_stroma),
-        n.g6p(chl_stroma),
-        n.g1p(chl_stroma),
-        n.sbp(chl_stroma),
-        n.s7p(chl_stroma),
-        n.e4p(chl_stroma),
-        n.x5p(chl_stroma),
-        n.r5p(chl_stroma),
-        n.rubp(chl_stroma),
-        n.ru5p(chl_stroma),
-        n.atp(chl_stroma),
-        n.pgo(chl_stroma),
-    ]
-
     model.add_derived(
-        name=n.pi(chl_stroma),
+        name=default_name(pi, n.pi),
         fn=_pi_cbb,
-        args=args,
+        args=[
+            default_par(
+                model,
+                par=total,
+                name=default_name(total_pi, n.total_orthophosphate),
+                value=20.0,
+            ),
+            default_name(pga, n.pga),
+            default_name(bpga, n.bpga),
+            default_name(gap, n.gap),
+            default_name(dhap, n.dhap),
+            default_name(fbp, n.fbp),
+            default_name(f6p, n.f6p),
+            default_name(g6p, n.g6p),
+            default_name(g1p, n.g1p),
+            default_name(sbp, n.sbp),
+            default_name(s7p, n.s7p),
+            default_name(e4p, n.e4p),
+            default_name(x5p, n.x5p),
+            default_name(r5p, n.r5p),
+            default_name(rubp, n.rubp),
+            default_name(ru5p, n.ru5p),
+            default_name(atp, n.atp),
+            default_name(pgo, n.pgo),
+        ],
     )
 
     return model
@@ -548,70 +688,4 @@ def add_readouts(
                 "kH",
             ],
         )
-    return model
-
-
-def _quencher(
-    Psbs: float,
-    Vx: float,
-    Psbsp: float,
-    Zx: float,
-    y0: float,
-    y1: float,
-    y2: float,
-    y3: float,
-    kZSat: float,
-) -> float:
-    """co-operative 4-state quenching mechanism
-    gamma0: slow quenching of (Vx - protonation)
-    gamma1: fast quenching (Vx + protonation)
-    gamma2: fastest possible quenching (Zx + protonation)
-    gamma3: slow quenching of Zx present (Zx - protonation)
-    """
-    ZAnt = Zx / (Zx + kZSat)
-    return y0 * Vx * Psbs + y1 * Vx * Psbsp + y2 * ZAnt * Psbsp + y3 * ZAnt * Psbs
-
-
-def add_quencher(model: Model) -> Model:
-    model.add_parameter("gamma0", 0.1)
-    model.add_parameter("gamma1", 0.25)
-    model.add_parameter("gamma2", 0.6)
-    model.add_parameter("gamma3", 0.15)
-    model.add_parameter("kZSat", 0.12)
-    model.add_derived(
-        name=n.quencher(),
-        fn=_quencher,
-        args=[
-            n.psbs_de(),
-            n.vx(),
-            n.psbs_pr(),
-            n.zx(),
-            "gamma0",
-            "gamma1",
-            "gamma2",
-            "gamma3",
-            "kZSat",
-        ],
-    )
-    return model
-
-
-def _ph_lumen(protons: float) -> float:
-    return -math.log10(protons * 0.00025)
-
-
-def _dg_ph(r: float, t: float) -> float:
-    return math.log(10) * r * t
-
-
-def add_ph_lumen(model: Model, *, chl_lumen: str) -> Model:
-    model.add_derived("dG_pH", _dg_ph, args=["R", "T"])
-
-    model.add_derived(
-        name=n.ph(chl_lumen),
-        fn=_ph_lumen,
-        args=[
-            n.h(chl_lumen),
-        ],
-    )
     return model

@@ -99,6 +99,11 @@ def ka(enzyme: str, substrate: str | None = None) -> str:
 ###############################################################################
 
 
+def rt(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    """dummy variable for energy state"""
+    return loc("RT", compartment, tissue)
+
+
 def energy(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
     """dummy variable for energy state"""
     return loc("energy", compartment, tissue)
