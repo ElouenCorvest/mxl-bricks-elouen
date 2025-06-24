@@ -50,8 +50,8 @@ def add_transketolase_x5p_r5p_s7p_gap(
             s7p,
             r5p,
             x5p,
-            default_kre(model, par=kre, rxn=rxn, default=800000000.0),
-            default_keq(model, rxn=rxn, par=keq, default=0.85),
+            default_kre(model, par=kre, rxn=rxn, value=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, value=0.85),
         ],
     )
     return model

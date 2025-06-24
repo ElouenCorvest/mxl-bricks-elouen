@@ -67,8 +67,8 @@ def add_serine_glyoxylate_transaminase_irreversible(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=159.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=159.0,  # Source
             ),
             static(model, n.km(rxn, n.glyoxylate()), 0.15)
             if km_gox is None
@@ -120,12 +120,12 @@ def add_serine_glyoxylate_transaminase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=159.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=159.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=km_gox, default=0.15),
-            default_kmp(model, rxn=rxn, par=kmp, default=2.72),
-            default_keq(model, rxn=rxn, par=keq, default=6.0),
+            default_kms(model, rxn=rxn, par=km_gox, value=0.15),
+            default_kmp(model, rxn=rxn, par=kmp, value=2.72),
+            default_keq(model, rxn=rxn, par=keq, value=6.0),
         ],
     )
     return model

@@ -68,12 +68,12 @@ def add_aspartate_aminotransferase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=84,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=84,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=2.53),
-            default_kmp(model, rxn=rxn, par=kmp, default=3.88),
-            default_keq(model, rxn=rxn, par=keq, default=0.3),
+            default_kms(model, rxn=rxn, par=kms, value=2.53),
+            default_kmp(model, rxn=rxn, par=kmp, value=3.88),
+            default_keq(model, rxn=rxn, par=keq, value=0.3),
         ],
     )
     return model

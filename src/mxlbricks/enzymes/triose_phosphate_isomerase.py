@@ -41,8 +41,8 @@ def add_triose_phosphate_isomerase(
         args=[
             gap,
             dhap,
-            default_kre(model, par=kre, rxn=rxn, default=800000000.0),
-            default_keq(model, rxn=rxn, par=keq, default=22.0),
+            default_kre(model, par=kre, rxn=rxn, value=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, value=22.0),
         ],
     )
     return model

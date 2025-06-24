@@ -41,8 +41,8 @@ def add_glucose_6_phosphate_isomerase_re(
         args=[
             f6p,
             g6p,
-            default_kre(model, par=kre, rxn=rxn, default=800000000.0),
-            default_keq(model, rxn=rxn, par=keq, default=2.3),
+            default_kre(model, par=kre, rxn=rxn, value=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, value=2.3),
         ],
     )
     return model

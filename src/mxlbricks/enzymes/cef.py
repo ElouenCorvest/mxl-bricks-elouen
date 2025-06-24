@@ -33,7 +33,7 @@ def add_cyclic_electron_flow(
         args=[
             n.pq_ox(),
             n.fd_red(),
-            default_kf(model, rxn=rxn, par=kf, default=1.0),
+            default_kf(model, rxn=rxn, par=kf, value=1.0),
         ],
     )
     return model

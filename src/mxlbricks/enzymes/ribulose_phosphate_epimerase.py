@@ -41,7 +41,7 @@ def add_ribulose_5_phosphate_3_epimerase(
         args=[
             x5p,
             ru5p,
-            default_kre(model, par=kre, rxn=rxn, default=800000000.0),
+            default_kre(model, par=kre, rxn=rxn, value=800000000.0),
             static(model, n.keq(rxn), 0.67) if keq is None else keq,
         ],
     )

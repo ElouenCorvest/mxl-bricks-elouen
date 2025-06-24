@@ -44,8 +44,8 @@ def add_aldolase_dhap_a5p_req(
             dhap,
             a5p,
             obp,
-            default_kre(model, rxn=rxn, par=kre, default=800000000.0),
-            default_keq(model, rxn=rxn, par=keq, default=0.0509),
+            default_kre(model, rxn=rxn, par=kre, value=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, value=0.0509),
         ],
     )
     return model

@@ -59,11 +59,11 @@ def add_glutathion_reductase_irrev(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.4e-3,  # Source
-                kcat_default=595,  # Source
+                e0_value=1.4e-3,  # Source
+                kcat_value=595,  # Source
             ),
-            default_km(model, par=km_nadph, rxn=rxn, subs=nadph, default=3e-3),
-            default_km(model, par=km_gssg, rxn=rxn, subs=glutathion_ox, default=2e-1),
+            default_km(model, par=km_nadph, rxn=rxn, subs=nadph, value=3e-3),
+            default_km(model, par=km_gssg, rxn=rxn, subs=glutathion_ox, value=2e-1),
         ],
     )
     return model

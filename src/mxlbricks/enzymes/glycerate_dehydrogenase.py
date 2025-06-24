@@ -55,8 +55,8 @@ def add_hpa_outflux(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=398.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=398.0,  # Source
             ),
             static(model, n.kms(rxn), 0.12) if kms is None else kms,
         ],
@@ -107,12 +107,12 @@ def add_glycerate_dehydrogenase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=398.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=398.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.12),
-            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
-            default_keq(model, rxn=rxn, par=keq, default=87000.0),
+            default_kms(model, rxn=rxn, par=kms, value=0.12),
+            default_kmp(model, rxn=rxn, par=kmp, value=1.0),
+            default_keq(model, rxn=rxn, par=keq, value=87000.0),
         ],
     )
 

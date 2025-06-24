@@ -102,8 +102,8 @@ def add_phosphoribulokinase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=0.9999 * 8,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=0.9999 * 8,  # Source
             ),
             static(model, n.km(rxn, n.ru5p()), 0.05) if km_ru5p is None else km_ru5p,
             static(model, n.km(rxn, n.atp()), 0.05) if km_atp is None else km_atp,

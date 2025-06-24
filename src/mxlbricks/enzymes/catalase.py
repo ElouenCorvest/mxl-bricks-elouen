@@ -48,10 +48,10 @@ def add_catalase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=760500.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=760500.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=137.9),
+            default_kms(model, rxn=rxn, par=kms, value=137.9),
         ],
     )
     return model

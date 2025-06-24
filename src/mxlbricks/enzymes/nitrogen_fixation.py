@@ -74,7 +74,7 @@ def add_nitrogen_metabolism(
             atp,
             fd_red,
             nh4,
-            default_kf(model, par=kf, rxn=rxn, default=1.0),
+            default_kf(model, par=kf, rxn=rxn, value=1.0),
             convf,
         ],
     )

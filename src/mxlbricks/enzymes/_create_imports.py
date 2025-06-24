@@ -1,4 +1,3 @@
-# %%
 from __future__ import annotations
 
 import ast
@@ -46,5 +45,3 @@ if __name__ == "__main__":
                 mode=black.Mode(),  # type: ignore
             )
         )
-
-# %%

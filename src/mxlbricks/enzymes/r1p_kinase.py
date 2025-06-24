@@ -62,10 +62,10 @@ def add_r1p_kinase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=1.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=1.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.1),
+            default_kms(model, rxn=rxn, par=kms, value=0.1),
         ],
     )
     return model

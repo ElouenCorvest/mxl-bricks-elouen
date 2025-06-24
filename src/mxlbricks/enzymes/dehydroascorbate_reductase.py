@@ -71,8 +71,8 @@ def add_dehydroascorbate_reductase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.7e-3,  # Source
-                kcat_default=142,  # Source
+                e0_value=1.7e-3,  # Source
+                kcat_value=142,  # Source
             ),
             km_dha,
             km_gsh,

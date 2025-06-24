@@ -58,10 +58,10 @@ def add_glycolate_oxidase_yokota(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=100,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=100,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.06),
+            default_kms(model, rxn=rxn, par=kms, value=0.06),
         ],
     )
     return model
@@ -101,10 +101,10 @@ def add_glycolate_oxidase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=100,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=100,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.06),
+            default_kms(model, rxn=rxn, par=kms, value=0.06),
         ],
     )
     return model

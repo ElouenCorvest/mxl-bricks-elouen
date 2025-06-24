@@ -74,8 +74,8 @@ def add_phosphoglycerate_kinase_poolman(
             atp,
             bpga,
             adp,
-            default_kre(model, rxn=rxn, par=kre, default=800000000.0),
-            default_keq(model, rxn=rxn, par=keq, default=0.00031),
+            default_kre(model, rxn=rxn, par=kre, value=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, value=0.00031),
         ],
     )
     return model
@@ -123,12 +123,12 @@ def add_phosphoglycerate_kinase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=537,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=537,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.18),
-            default_kmp(model, rxn=rxn, par=kmp, default=0.27),
-            default_keq(model, rxn=rxn, par=keq, default=3.7e-4),
+            default_kms(model, rxn=rxn, par=kms, value=0.18),
+            default_kmp(model, rxn=rxn, par=kmp, value=0.27),
+            default_keq(model, rxn=rxn, par=keq, value=3.7e-4),
         ],
     )
     return model

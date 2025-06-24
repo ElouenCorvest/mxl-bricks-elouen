@@ -63,8 +63,8 @@ def add_gadph(
             gap,
             nadp,
             pi,
-            default_kre(model, par=kre, rxn=rxn, default=800000000.0),
-            default_keq(model, rxn=rxn, par=keq, default=16000000.0),
+            default_kre(model, par=kre, rxn=rxn, value=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, value=16000000.0),
         ],
     )
     return model

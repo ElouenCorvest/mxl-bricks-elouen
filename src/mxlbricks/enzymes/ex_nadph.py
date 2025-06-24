@@ -31,7 +31,7 @@ def add_nadph_consumption(
         },
         args=[
             nadph,
-            default_kf(model, rxn=rxn, par=kf, default=1.0),
+            default_kf(model, rxn=rxn, par=kf, value=1.0),
         ],
     )
     return model

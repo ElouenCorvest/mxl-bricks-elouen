@@ -60,12 +60,12 @@ def add_a5p_isomerase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Clostridium tetani
-                kcat_default=102,  # Clostridium tetani
+                e0_value=1.0,  # Clostridium tetani
+                kcat_value=102,  # Clostridium tetani
             ),
-            default_kms(model, rxn=rxn, par=kms, default=1.89),
-            default_kmp(model, rxn=rxn, par=kmp, default=6.65),
-            default_keq(model, rxn=rxn, par=keq, default=0.4),
+            default_kms(model, rxn=rxn, par=kms, value=1.89),
+            default_kmp(model, rxn=rxn, par=kmp, value=6.65),
+            default_keq(model, rxn=rxn, par=keq, value=0.4),
         ],
     )
     return model

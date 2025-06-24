@@ -70,12 +70,12 @@ def add_malate_synthase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=27.8,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=27.8,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.098),
-            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
-            default_keq(model, rxn=rxn, par=keq, default=6.0e6),
+            default_kms(model, rxn=rxn, par=kms, value=0.098),
+            default_kmp(model, rxn=rxn, par=kmp, value=1.0),
+            default_keq(model, rxn=rxn, par=keq, value=6.0e6),
         ],
     )
     return model

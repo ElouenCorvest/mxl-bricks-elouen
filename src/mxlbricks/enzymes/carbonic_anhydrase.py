@@ -41,8 +41,8 @@ def add_carbonic_anhydrase_mass_action(
         args=[
             s1,
             p1,
-            default_kf(model, rxn=rxn, par=kf, default=1000),
-            default_keq(model, rxn=rxn, par=keq, default=50),
+            default_kf(model, rxn=rxn, par=kf, value=1000),
+            default_keq(model, rxn=rxn, par=keq, value=50),
         ],
     )
     return model

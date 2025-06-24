@@ -43,7 +43,7 @@ def add_mda_reductase1(
         },
         args=[
             mda,
-            default_kf(model, rxn=rxn, par=kf, default=0.5 / 1e-3),
+            default_kf(model, rxn=rxn, par=kf, value=0.5 / 1e-3),
         ],
     )
     return model

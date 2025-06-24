@@ -70,12 +70,12 @@ def add_glutamate_dehydrogenase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=104,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=104,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=1.54),
-            default_kmp(model, rxn=rxn, par=kmp, default=0.64),
-            default_keq(model, rxn=rxn, par=keq, default=7.2e5),
+            default_kms(model, rxn=rxn, par=kms, value=1.54),
+            default_kmp(model, rxn=rxn, par=kmp, value=0.64),
+            default_keq(model, rxn=rxn, par=keq, value=7.2e5),
         ],
     )
     return model

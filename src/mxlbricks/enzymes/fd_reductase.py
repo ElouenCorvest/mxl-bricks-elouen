@@ -62,8 +62,8 @@ def add_ferredoxin_reductase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=2.5e5,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=2.5e5,  # Source
             ),
             keq,  # no default value, derived from PSI
         ],

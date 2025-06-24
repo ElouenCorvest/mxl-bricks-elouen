@@ -63,10 +63,10 @@ def add_glycine_decarboxylase_yokota(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=100.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=100.0,  # Source
             ),
-            default_kms(model, par=kms, rxn=rxn, default=6.0),
+            default_kms(model, par=kms, rxn=rxn, value=6.0),
         ],
     )
     return model
@@ -116,8 +116,8 @@ def add_glycine_decarboxylase_irreversible(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=100.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=100.0,  # Source
             ),
             static(model, n.kms(rxn), 6.0) if kms is None else kms,
         ],
@@ -176,12 +176,12 @@ def add_glycine_decarboxylase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=100.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=100.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=6.0),
-            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
-            default_keq(model, rxn=rxn, par=keq, default=0.00024),
+            default_kms(model, rxn=rxn, par=kms, value=6.0),
+            default_kmp(model, rxn=rxn, par=kmp, value=1.0),
+            default_keq(model, rxn=rxn, par=keq, value=0.00024),
         ],
     )
     return model

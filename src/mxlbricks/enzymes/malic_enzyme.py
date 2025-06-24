@@ -72,12 +72,12 @@ def add_malic_enzyme(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=39,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=39,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.003),
-            default_kmp(model, rxn=rxn, par=kmp, default=0.00125),
-            default_keq(model, rxn=rxn, par=keq, default=0.2),
+            default_kms(model, rxn=rxn, par=kms, value=0.003),
+            default_kmp(model, rxn=rxn, par=kmp, value=0.00125),
+            default_keq(model, rxn=rxn, par=keq, value=0.2),
         ],
     )
     return model

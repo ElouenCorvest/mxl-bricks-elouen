@@ -68,12 +68,12 @@ def add_malate_dehydrogenase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=1.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=1.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.1),
-            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
-            default_keq(model, rxn=rxn, par=keq, default=44000.0),
+            default_kms(model, rxn=rxn, par=kms, value=0.1),
+            default_kmp(model, rxn=rxn, par=kmp, value=1.0),
+            default_keq(model, rxn=rxn, par=keq, value=44000.0),
         ],
     )
     return model

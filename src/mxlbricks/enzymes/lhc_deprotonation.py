@@ -33,7 +33,7 @@ def add_lhc_deprotonation(
         ),
         args=[
             psbs_pr,
-            default_kf(model, rxn=rxn, par=kf, default=0.0096),
+            default_kf(model, rxn=rxn, par=kf, value=0.0096),
         ],
     )
     return model

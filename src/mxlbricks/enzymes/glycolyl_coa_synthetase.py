@@ -71,10 +71,10 @@ def add_glycolyl_coa_synthetase_irrev(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=4.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=4.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=13.0),
+            default_kms(model, rxn=rxn, par=kms, value=13.0),
         ],
     )
     return model
@@ -130,12 +130,12 @@ def add_glycolyl_coa_synthetase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=4.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=4.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=13.0),
-            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
-            default_keq(model, rxn=rxn, par=keq, default=0.024),
+            default_kms(model, rxn=rxn, par=kms, value=13.0),
+            default_kmp(model, rxn=rxn, par=kmp, value=1.0),
+            default_keq(model, rxn=rxn, par=keq, value=0.024),
         ],
     )
     return model

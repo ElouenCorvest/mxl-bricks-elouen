@@ -43,8 +43,8 @@ def add_phosphoglucomutase(
         args=[
             g6p,
             g1p,
-            default_kre(model, rxn=rxn, par=kre, default=800000000.0),
-            default_keq(model, rxn=rxn, par=keq, default=0.058),
+            default_kre(model, rxn=rxn, par=kre, value=800000000.0),
+            default_keq(model, rxn=rxn, par=keq, value=0.058),
         ],
     )
     return model

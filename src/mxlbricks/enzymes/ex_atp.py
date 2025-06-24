@@ -26,7 +26,7 @@ def add_atp_consumption(
         },
         args=[
             atp,
-            default_kf(model, rxn=rxn, par=kf, default=1.0),
+            default_kf(model, rxn=rxn, par=kf, value=1.0),
         ],
     )
     return model

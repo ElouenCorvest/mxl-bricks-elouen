@@ -63,12 +63,12 @@ def add_mthfc(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=40.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=40.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.2),
-            default_kmp(model, rxn=rxn, par=kmp, default=0.04),
-            default_keq(model, rxn=rxn, par=keq, default=0.1),
+            default_kms(model, rxn=rxn, par=kms, value=0.2),
+            default_kmp(model, rxn=rxn, par=kmp, value=0.04),
+            default_keq(model, rxn=rxn, par=keq, value=0.1),
         ],
     )
 

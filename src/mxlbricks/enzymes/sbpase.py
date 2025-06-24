@@ -57,11 +57,11 @@ def add_sbpase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=0.04 * 8,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=0.04 * 8,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.013),
-            default_kis(model, rxn=rxn, par=ki, substrate=n.pi(), default=12.0),
+            default_kms(model, rxn=rxn, par=kms, value=0.013),
+            default_kis(model, rxn=rxn, par=ki, substrate=n.pi(), value=12.0),
         ],
     )
     return model

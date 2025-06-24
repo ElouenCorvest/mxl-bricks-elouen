@@ -70,12 +70,12 @@ def add_formate_dehydrogenase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=2.9,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=2.9,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.011),
-            default_kmp(model, rxn=rxn, par=kmp, default=0.18),
-            default_keq(model, rxn=rxn, par=keq, default=8700.0),
+            default_kms(model, rxn=rxn, par=kms, value=0.011),
+            default_kmp(model, rxn=rxn, par=kmp, value=0.18),
+            default_keq(model, rxn=rxn, par=keq, value=8700.0),
         ],
     )
     return model

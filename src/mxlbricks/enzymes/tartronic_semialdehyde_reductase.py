@@ -65,12 +65,12 @@ def add_tartronate_semialdehyde_reductase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=243,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=243,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.05),
-            default_kmp(model, rxn=rxn, par=kmp, default=0.28),
-            default_keq(model, rxn=rxn, par=keq, default=1.6e5),
+            default_kms(model, rxn=rxn, par=kms, value=0.05),
+            default_kmp(model, rxn=rxn, par=kmp, value=0.28),
+            default_keq(model, rxn=rxn, par=keq, value=1.6e5),
         ],
     )
     return model

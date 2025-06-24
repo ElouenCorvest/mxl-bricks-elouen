@@ -58,11 +58,11 @@ def add_mda_reductase2(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=2e-3,  # Source
-                kcat_default=1080000 / (60 * 60),  # Source
+                e0_value=2e-3,  # Source
+                kcat_value=1080000 / (60 * 60),  # Source
             ),
-            default_km(model, par=km_nadph, rxn=rxn, subs=nadph, default=23e-3),
-            default_km(model, par=km_mda, rxn=rxn, subs=mda, default=1.4e-3),
+            default_km(model, par=km_nadph, rxn=rxn, subs=nadph, value=23e-3),
+            default_km(model, par=km_mda, rxn=rxn, subs=mda, value=1.4e-3),
         ],
     )
     return model

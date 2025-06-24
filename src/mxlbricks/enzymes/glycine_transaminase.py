@@ -62,10 +62,10 @@ def add_glycine_transaminase_yokota(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=143.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=143.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=3.0),
+            default_kms(model, rxn=rxn, par=kms, value=3.0),
         ],
     )
     return model
@@ -109,10 +109,10 @@ def add_glycine_transaminase_irreversible(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=143.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=143.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=3.0),
+            default_kms(model, rxn=rxn, par=kms, value=3.0),
         ],
     )
 
@@ -161,12 +161,12 @@ def add_glycine_transaminase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=143.0,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=143.0,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=3.0),
-            default_kmp(model, rxn=rxn, par=kmp, default=1.0),
-            default_keq(model, rxn=rxn, par=keq, default=30),
+            default_kms(model, rxn=rxn, par=kms, value=3.0),
+            default_kmp(model, rxn=rxn, par=kmp, value=1.0),
+            default_keq(model, rxn=rxn, par=keq, value=30),
         ],
     )
 

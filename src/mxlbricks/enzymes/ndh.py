@@ -32,7 +32,7 @@ def add_ndh(
         },
         args=[
             pq_ox,
-            default_kf(model, par=kf, rxn=rxn, default=0.002),
+            default_kf(model, par=kf, rxn=rxn, value=0.002),
         ],
     )
     return model

@@ -29,7 +29,7 @@ def add_co2_dissolving(
         args=[
             co2,
             co2_atmosphere,
-            default_kf(model, rxn=rxn, par=kf, default=4.5),
+            default_kf(model, rxn=rxn, par=kf, value=4.5),
         ],
     )
     return model

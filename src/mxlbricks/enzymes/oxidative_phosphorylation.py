@@ -44,8 +44,8 @@ def add_oxidative_phosphorylation(
             adp,
             nadp,
             atp,
-            default_kf(model, rxn=rxn, par=kf, default=1),
-            default_keq(model, rxn=rxn, par=keq, default=3 / 2),
+            default_kf(model, rxn=rxn, par=kf, value=1),
+            default_keq(model, rxn=rxn, par=keq, value=3 / 2),
         ],
     )
     return model

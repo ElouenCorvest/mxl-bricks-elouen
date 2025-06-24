@@ -78,12 +78,12 @@ def add_formate_thf_ligase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=6.08,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=6.08,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=7.6),
-            default_kmp(model, rxn=rxn, par=kmp, default=10.0),
-            default_keq(model, rxn=rxn, par=keq, default=2.0),
+            default_kms(model, rxn=rxn, par=kms, value=7.6),
+            default_kmp(model, rxn=rxn, par=kmp, value=10.0),
+            default_keq(model, rxn=rxn, par=keq, value=2.0),
         ],
     )
 

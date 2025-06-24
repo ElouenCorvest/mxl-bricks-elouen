@@ -182,10 +182,10 @@ def add_rubisco_poolman(
             pga,
             co2,
             default_vmax(
-                model, e0=e0, kcat=kcat, rxn=rxn, e0_default=1.0, kcat_default=0.34 * 8
+                model, e0=e0, kcat=kcat, rxn=rxn, e0_value=1.0, kcat_value=0.34 * 8
             ),
-            default_km(model, par=km_rubp, rxn=rxn, subs=rubp, default=0.02),
-            default_km(model, par=km_co2, rxn=rxn, subs=co2, default=0.0107),
+            default_km(model, par=km_rubp, rxn=rxn, subs=rubp, value=0.02),
+            default_km(model, par=km_co2, rxn=rxn, subs=co2, value=0.0107),
             default_par(model, par=ki_pga, name=n.ki(rxn, n.pga()), value=0.04),
             fbp,
             default_par(model, par=ki_fbp, name=n.ki(rxn, n.fbp()), value=0.04),

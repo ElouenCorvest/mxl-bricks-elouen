@@ -114,8 +114,8 @@ def add_g1p_efflux(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=0.04 * 8,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=0.04 * 8,  # Source
             ),
             km_g1p,
             km_atp,

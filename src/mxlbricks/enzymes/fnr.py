@@ -134,11 +134,11 @@ def add_fnr_mmol_chl(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=3.0,  # Source
-                kcat_default=500.0,  # Source
+                e0_value=3.0,  # Source
+                kcat_value=500.0,  # Source
             ),
-            default_km(model, par=km_fd_red, rxn=rxn, subs=fd_red, default=1.56),
-            default_km(model, par=km_nadp, rxn=rxn, subs=nadp, default=0.22),
+            default_km(model, par=km_fd_red, rxn=rxn, subs=fd_red, value=1.56),
+            default_km(model, par=km_nadp, rxn=rxn, subs=nadp, value=0.22),
             keq,
         ],
     )
@@ -202,8 +202,8 @@ def add_fnr_mm(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=3.0,  # Source
-                kcat_default=500.0,  # Source
+                e0_value=3.0,  # Source
+                kcat_value=500.0,  # Source
             ),
             n.keq(rxn),
             convf,
@@ -244,10 +244,10 @@ def add_fnr_static(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=2.816,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=2.816,  # Source
             ),
-            default_kms(model, par=kms, rxn=rxn, default=0.19),
+            default_kms(model, par=kms, rxn=rxn, value=0.19),
         ],
     )
 
@@ -291,10 +291,10 @@ def add_fnr_energy_dependent(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=2.816,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=2.816,  # Source
             ),
-            default_kms(model, par=kms, rxn=rxn, default=0.19),
+            default_kms(model, par=kms, rxn=rxn, value=0.19),
         ],
     )
 

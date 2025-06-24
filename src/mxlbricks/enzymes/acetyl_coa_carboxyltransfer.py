@@ -87,12 +87,12 @@ def add_acetyl_coa_carboxyltransfer(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=30.1,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=30.1,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.0487),
-            default_kmp(model, rxn=rxn, par=kmp, default=0.1),
-            default_keq(model, rxn=rxn, par=keq, default=40.0),
+            default_kms(model, rxn=rxn, par=kms, value=0.0487),
+            default_kmp(model, rxn=rxn, par=kmp, value=0.1),
+            default_keq(model, rxn=rxn, par=keq, value=40.0),
         ],
     )
 
@@ -152,13 +152,13 @@ def add_acetyl_coa_carboxyltransfer_1i(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=30.1,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=30.1,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.0487),
-            default_kmp(model, rxn=rxn, par=kmp, default=0.1),
-            default_keq(model, rxn=rxn, par=keq, default=40.0),
-            default_ki(model, rxn=rxn, par=ki, default=0.002),
+            default_kms(model, rxn=rxn, par=kms, value=0.0487),
+            default_kmp(model, rxn=rxn, par=kmp, value=0.1),
+            default_keq(model, rxn=rxn, par=keq, value=40.0),
+            default_ki(model, rxn=rxn, par=ki, value=0.002),
         ],
     )
 

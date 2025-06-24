@@ -60,12 +60,12 @@ def add_fbpase(
                 rxn=rxn,
                 e0=e0,
                 kcat=kcat,
-                e0_default=1.0,  # Source
-                kcat_default=0.2 * 8,  # Source
+                e0_value=1.0,  # Source
+                kcat_value=0.2 * 8,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, default=0.03),
-            default_kis(model, par=ki_f6p, rxn=rxn, substrate=f6p, default=0.7),
-            default_kis(model, par=ki_pi, rxn=rxn, substrate=pi, default=12.0),
+            default_kms(model, rxn=rxn, par=kms, value=0.03),
+            default_kis(model, par=ki_f6p, rxn=rxn, substrate=f6p, value=0.7),
+            default_kis(model, par=ki_pi, rxn=rxn, substrate=pi, value=12.0),
         ],
     )
     return model
