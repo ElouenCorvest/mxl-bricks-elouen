@@ -48,7 +48,7 @@ maintainers = [
 ]
 name = "mxlbricks"
 readme = "README.md"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
   "mxlpy>=0.22.0",
 ]
