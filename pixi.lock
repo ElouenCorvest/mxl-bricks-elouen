@@ -4697,7 +4697,7 @@ packages:
 - pypi: ./
   name: mxlbricks
   version: 0.4.0
-  sha256: 0d45d92de518680ee28253a409658ca74fa93607f0edef3844e15c3875977f0f
+  sha256: 88d10a9304ea662c06dfa63037a8c3466c341e8f492d59d3b6a11e4858bb9bb1
   requires_dist:
   - mxlpy>=0.22.0
   requires_python: '>=3.12'
