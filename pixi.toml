@@ -29,9 +29,10 @@ mike-deploy = {cmd = [
   "mike",
   "deploy",
   "--update-aliases",
-  "--push $VERSION",
+  "--push",
+  "$VERSION",
   "latest",
-], env = {JUPYTER_PLATFORM_DIRS = "1"}}
+], env = {JUPYTER_PLATFORM_DIRS = "1", VERSION = "$VERSION"}}
 mike-set-default = {cmd = [
   "mike",
   "set-default",
