@@ -6,6 +6,7 @@ use_directory_urls: false
 
 nav:
   - About: index.ipynb
+  - Models: models.ipynb
 
 theme:
   name: material
