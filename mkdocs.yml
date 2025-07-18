@@ -6,7 +6,9 @@ use_directory_urls: false
 
 nav:
   - About: index.ipynb
-  - Models: models.ipynb
+  - Models:
+      - Overview: models.ipynb
+      - Saadat 2021: saadat2021.ipynb
 
 theme:
   name: material

@@ -205,10 +205,12 @@ def fd_red(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
 
 
 def lhc(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    """Light-harvesting complex"""
     return loc("Light-harvesting complex", compartment, tissue)
 
 
 def lhcp(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    """Protonated light-harvesting complex"""
     return loc("Light-harvesting complex (protonated)", compartment, tissue)
 
 

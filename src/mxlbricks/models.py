@@ -4,6 +4,7 @@ from mxlpy import Model, Parameter, Variable, units
 from sympy.physics.units.quantities import Quantity
 
 from mxlbricks import names as n
+from mxlbricks.enzymes.mda_reductase1 import add_mda_reductase1
 from mxlbricks.enzymes.rubisco import add_rubisco_poolman
 from mxlbricks.utils import fcbb_regulated, static, thioredixon_regulated
 
@@ -195,7 +196,7 @@ def get_matuszynska2016npq(
     )
     model.add_parameters(
         {
-            n.ph(): 7.9,
+            n.ph(): 7.9,  # stroma ph
             n.pfd(): 100.0,
             n.nadph(): 0.6,
             n.o2(chl_lumen): 8.0,
@@ -545,6 +546,7 @@ def get_saadat2021(
     )
 
     ## Mehler
+    add_mda_reductase1(model)
     add_mda_reductase2(model)
     add_ascorbate_peroxidase(model)
     add_glutathion_reductase_irrev(model)
