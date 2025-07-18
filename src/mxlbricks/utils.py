@@ -1,5 +1,7 @@
 from collections.abc import Callable, Mapping
 
+import numpy as np
+import pandas as pd
 import sympy
 from mxlpy import Derived, Model
 from mxlpy.fns import mul
@@ -298,3 +300,54 @@ def default_vmax(
     )
     model.add_derived(vmax := n.vmax(rxn), fn=mass_action_1s, args=[kcat, e0])
     return vmax
+
+
+def get_idxs_of_peaks(light: pd.Series) -> list[list[int]]:
+    cnt = 0
+    idx_groups = []
+
+    arr = light.to_numpy()
+    max_light = light.max()
+    while cnt < len(arr):
+        if arr[cnt] == max_light:
+            # temporary container for all F==maxlight. For each peak it is renewed
+            idxs = []
+            while cnt != len(arr) and arr[cnt] == max_light:
+                idxs.append(cnt)
+                cnt += 1
+            idx_groups.append(idxs)
+        else:
+            cnt += 1
+    return idx_groups
+
+
+def get_idxs_of_peaks_(light: pd.Series) -> list[pd.Index]:
+    """Alternative implementation of get_idxs_of_peaks that returns the
+    indices instead
+    """
+    mask = light == max(light)
+    return list(mask[mask].groupby((1 - mask).cumsum()).apply(lambda x: x.index).values)
+
+
+def get_npq(ppfd: pd.Series, fluorescence: pd.Series) -> pd.Series:
+    """Calculates the non-photochemical quenching from the extracted
+    important points of the PAM simulations
+
+    Returns
+    -------
+    Fm: Fm (first element of list) and Fm' values
+    NPQ: Calculated NPQ values
+    tm: Exact time points of peaks in PAM trace
+    Fo: Fo (first element of list) and Ft' values
+    to: Exact time points of Fo and Ft' values
+    """
+    # container for lists. Each list contains the positions of fluorescence values for one peak
+    # container for position of Fo'
+    t = ppfd.index.to_numpy()
+    fluo = fluorescence.to_numpy()
+
+    # Fm is the maximal value for each peak sequence
+    max_fluo_per_group = [i[np.argmax(fluo[i])] for i in get_idxs_of_peaks(ppfd)]
+    index = t[max_fluo_per_group]
+    Fm = fluo[max_fluo_per_group]
+    return pd.Series((Fm[0] - Fm) / Fm, name="NPQ", index=index)
