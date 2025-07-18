@@ -18,6 +18,18 @@ repos:
         language: python
         types: [toml]
 
+  # Make sure pixi lock is up to date
+  - repo: local
+    hooks:
+      - id: pixi lock
+        name: pixi lock
+        stages: [pre-commit]
+        language: system
+        pass_filenames: false
+        entry: pixi lock
+        files: ^(.*/)?(pixi\.lock|pyproject\.toml)$
+        always_run: True
+
   # Clean jupyter notebooks
   - repo: local
     hooks:
