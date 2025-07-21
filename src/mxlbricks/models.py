@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from mxlpy import Model, Parameter, Variable, units
 from sympy.physics.units.quantities import Quantity
 
 from mxlbricks import names as n
 from mxlbricks.enzymes.mda_reductase1 import add_mda_reductase1
 from mxlbricks.enzymes.rubisco import add_rubisco_poolman
+from mxlbricks.enzymes.thioredoxin import add_cbb_pfd_linear_speedup
 from mxlbricks.utils import fcbb_regulated, static, thioredixon_regulated
 
 from .derived import (
@@ -38,7 +41,7 @@ from .enzymes import (
     add_atp_synthase_static_protons,
     add_b6f,
     add_catalase,
-    add_cbb_pfd_speedup,
+    add_cbb_pfd_mm_speedup,
     add_cyclic_electron_flow,
     add_dehydroascorbate_reductase,
     add_fbpase,
@@ -262,6 +265,7 @@ def get_matuszynska2016npq(
 
 def get_matuszynska2019(
     *,
+    variant: Literal["linear-speedup", "mm-speedup"] | None = None,
     chl_lumen: str = "_lumen",
 ) -> Model:
     model = Model()
@@ -310,7 +314,10 @@ def get_matuszynska2019(
             "convf": 3.2e-2,
         }
     )
-    add_cbb_pfd_speedup(model)
+    if variant == "linear-speedup":
+        add_cbb_pfd_linear_speedup(model)
+    elif variant == "mm-speedup":
+        add_cbb_pfd_mm_speedup(model)
 
     # Moieties / derived compounds
     add_rt(model)
@@ -353,7 +360,11 @@ def get_matuszynska2019(
     add_state_transitions(model)
     add_rubisco_poolman(
         model,
-        e0=fcbb_regulated(model, n.e0(n.rubisco()), 1.0),
+        e0=(
+            fcbb_regulated(model, n.e0(n.rubisco()), 1.0)
+            if variant is not None
+            else static(model, n.e0(n.rubisco()), 1.0)
+        ),
     )
     add_phosphoglycerate_kinase_poolman(model)
     add_gadph(model)
@@ -362,26 +373,42 @@ def get_matuszynska2019(
     add_aldolase_dhap_e4p_req(model)
     add_fbpase(
         model,
-        e0=fcbb_regulated(model, n.e0(n.fbpase()), 1.0),
+        e0=(
+            fcbb_regulated(model, n.e0(n.fbpase()), 1.0)
+            if variant is not None
+            else static(model, n.e0(n.fbpase()), 1.0)
+        ),
     )
     add_transketolase_x5p_e4p_f6p_gap(model)
     add_transketolase_x5p_r5p_s7p_gap(model)
     add_sbpase(
         model,
-        e0=fcbb_regulated(model, n.e0(n.sbpase()), 1.0),
+        e0=(
+            fcbb_regulated(model, n.e0(n.sbpase()), 1.0)
+            if variant is not None
+            else static(model, n.e0(n.sbpase()), 1.0)
+        ),
     )
     add_ribose_5_phosphate_isomerase(model)
     add_ribulose_5_phosphate_3_epimerase(model)
     add_phosphoribulokinase(
         model,
-        e0=fcbb_regulated(model, n.e0(n.phosphoribulokinase()), 1.0),
+        e0=(
+            fcbb_regulated(model, n.e0(n.phosphoribulokinase()), 1.0)
+            if variant is not None
+            else static(model, n.e0(n.phosphoribulokinase()), 1.0)
+        ),
     )
     add_glucose_6_phosphate_isomerase_re(model)
     add_phosphoglucomutase(model)
     add_triose_phosphate_exporters(model)
     add_g1p_efflux(
         model,
-        e0=fcbb_regulated(model, n.e0(n.ex_g1p()), 1.0),
+        e0=(
+            fcbb_regulated(model, n.e0(n.ex_g1p()), 1.0)
+            if variant is not None
+            else static(model, n.e0(n.ex_g1p()), 1.0)
+        ),
     )
 
     add_readouts(

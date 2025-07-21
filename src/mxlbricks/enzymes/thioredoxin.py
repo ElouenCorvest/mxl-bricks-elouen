@@ -8,7 +8,12 @@ Equilibrator
 from mxlpy import Model
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, mass_action_2s, michaelis_menten_1s
+from mxlbricks.fns import (
+    mass_action_1s,
+    mass_action_2s,
+    michaelis_menten_1s,
+    proportional,
+)
 from mxlbricks.utils import (
     default_name,
     default_par,
@@ -16,24 +21,47 @@ from mxlbricks.utils import (
 )
 
 
-def add_cbb_pfd_speedup(
+def add_cbb_pfd_linear_speedup(
     model: Model,
     *,
-    rxn: str | None = None,
+    der: str | None = None,
+    pfd: str | None = None,
+    factor: str | None = None,
+) -> Model:
+    """Add speed-up of CBB enzymes using a linear function"""
+    der = default_name(der, n.light_speedup)
+    pfd = default_name(pfd, n.pfd)
+
+    model.add_derived(
+        der,
+        fn=proportional,
+        args=[
+            pfd,
+            default_par(model, par=factor, name=n.kf(der), value=2.0),
+        ],
+    )
+    return model
+
+
+def add_cbb_pfd_mm_speedup(
+    model: Model,
+    *,
+    der: str | None = None,
     pfd: str | None = None,
     km: str | None = None,
     vmax: str | None = None,
 ) -> Model:
-    rxn = default_name(rxn, n.light_speedup)
+    """Add speed-up of CBB enzymes using a michaelis-menten curve"""
+    der = default_name(der, n.light_speedup)
     pfd = default_name(pfd, n.pfd)
 
     model.add_derived(
-        rxn,
+        der,
         fn=michaelis_menten_1s,
         args=[
             pfd,
-            default_par(model, par=vmax, name=n.vmax(rxn), value=6.0),
-            default_par(model, par=km, name=n.km(rxn), value=150.0),
+            default_par(model, par=vmax, name=n.vmax(der), value=6.0),
+            default_par(model, par=km, name=n.km(der), value=150.0),
         ],
     )
     return model

@@ -128,7 +128,7 @@ from .tartronic_semialdehyde_reductase import add_tartronate_semialdehyde_reduct
 from .tartronyl_coa_reductase import add_tartronyl_coa_reductase
 from .thioesterase import add_thioesterase
 from .thioredoxin import (
-    add_cbb_pfd_speedup,
+    add_cbb_pfd_mm_speedup,
     add_e_relaxation,
     add_e_relaxation_2021,
     add_fd_tr_reductase,
@@ -251,7 +251,7 @@ __all__ = [
     "add_e4p_epimerase",
     "add_glycolyl_coa_synthetase_irrev",
     "add_glycolyl_coa_synthetase",
-    "add_cbb_pfd_speedup",
+    "add_cbb_pfd_mm_speedup",
     "add_fd_tr_reductase_2021",
     "add_fd_tr_reductase",
     "add_nadph_tr_reductase",
