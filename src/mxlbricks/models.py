@@ -598,6 +598,3 @@ def get_saadat2021(
         fluorescence=True,
     )
     return model
-
-
-def 
