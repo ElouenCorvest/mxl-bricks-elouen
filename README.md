@@ -18,6 +18,8 @@ MxlBricks is a Python package to build mechanistic models composed of pre-define
 
 ## Installation
 
+Run `pixi install -e dev` in this directory. This will install the `dev` package. Then to install this local `mxlbricks` as editable, you just need to run `pixi run -e dev dev-install`.
+
 
 Run `pixi install -e dev` in this directory. This will install the `dev` package. Then to install this local `mxlbricks` as editable, you just need to run `pixi run -e dev dev-install`.
 
