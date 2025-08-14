@@ -2,26 +2,6 @@
 build-backend = "hatchling.build"
 requires = ["hatchling"]
 
-[dependency-groups]
-dev = [
-  "toml-sort>=0.23.1,<0.24",
-  "ruff>=0.7.1",
-  "coverage>=7.6.4",
-  "jupyter>=1.1.1",
-  "pytest>=8.3.3",
-  "pytest-cov>=5.0.0",
-  "requests>=2.32.3",
-  "mkdocs>=1.6.1",
-  "mkdocs-jupyter>=0.25.1",
-  "mkdocs-material>=9.5.42",
-  "pre-commit>=4.0.1",
-  "pyright>=1.1.387",
-  "ssort>=0.13.0",
-  "black>=25.1.0",
-  "isort>=6.0.1",
-  "mike>=2.1.3",
-]
-
 [project]
 authors = [{name = "Marvin van Aalst", email = "marvin.vanaalst@gmail.com"}]
 classifiers = [
@@ -56,10 +36,6 @@ dependencies = [
 
 [tool.bandit]
 skips = ["B101", "B301", "B403", "B404", "B603", "B607"]
-
-[tool.hatchling]
-from = "src"
-include = ["mxlbricks"]
 
 [tool.pyright]
 pythonVersion = "3.12"
@@ -136,3 +112,27 @@ package = true
 
 [tool.uv.sources]
 mxlbricks = {workspace = true}
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.tasks]
+dev-install = "pip install -e ."
+
+[tool.pixi.feature.dev.dependencies]
+assimulo = "*"
+python = "*"
+pip = "*"
+ipykernel = "*"
+notebook = "*"
+pytest = "*"
+pytest-cov = "*"
+toml = "*"
+mkdocs = "*"
+mkdocs-jupyter = "*"
+mkdocs-material = "*"
+mike = "*"
+
+[tool.pixi.environments]
+dev = { features = ["dev"] }
