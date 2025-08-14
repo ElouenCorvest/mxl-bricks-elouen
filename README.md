@@ -14,6 +14,10 @@
 [docs-badge]: https://img.shields.io/badge/docs-main-green.svg?style=flat-square
 [docs]: https://computational-biology-aachen.github.io/mxl-bricks/
 
+## Dev Install
+
+Run `pixi install -e dev` in this directory. This will install the `dev` package. Then to install this local `mxlbricks` as editable, you just need to run `pixi run -e dev dev-install`.
+
 ## Installation
 
 
