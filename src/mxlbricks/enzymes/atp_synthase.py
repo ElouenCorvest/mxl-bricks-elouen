@@ -13,12 +13,15 @@ from __future__ import annotations
 
 import math
 
-from mxlpy import Derived, Model
+from mxlpy import Derived, Model, units
 
 from mxlbricks import names as n
 from mxlbricks.fns import mass_action_1s, neg_div, value
 from mxlbricks.utils import (
     default_name,
+    default_vmax,
+    default_km,
+    default_kis,
     filter_stoichiometry,
     static,
 )
@@ -255,16 +258,6 @@ def add_atp_synthase_static_protons(
     adp = default_name(adp, n.adp)
     pi = default_name(pi, n.pi)
 
-    km_adp = (
-        static(model, n.km(rxn, adp), 0.014) if km_adp is None else km_adp
-    )  # FIXME: source
-    km_pi = (
-        static(model, n.km(rxn, pi), 0.3) if km_pi is None else km_pi
-    )  # FIXME: source
-    kcat = static(model, n.kcat(rxn), 2.8) if kcat is None else kcat  # FIXME: source
-    e0 = static(model, n.e0(rxn), 1.0) if e0 is None else e0  # FIXME: source
-    model.add_derived(vmax := n.vmax(rxn), fn=mass_action_1s, args=[kcat, e0])
-
     model.add_reaction(
         name=rxn,
         fn=_rate_atp_synthase_2000,
@@ -278,9 +271,16 @@ def add_atp_synthase_static_protons(
         args=[
             adp,
             pi,
-            vmax,
-            km_adp,
-            km_pi,
+            default_vmax(
+                model,
+                e0=e0,
+                kcat=kcat,
+                rxn=rxn,
+                e0_value=1,
+                kcat_value=2.8,
+            ),
+            default_km(model, par=km_adp, rxn=rxn, subs=adp, value=0.014, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(86)90256-2"),
+            default_km(model, par=km_pi, rxn=rxn, subs=pi, value=0.30, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0014-5793(83)80898-9"),
         ],
     )
     return model

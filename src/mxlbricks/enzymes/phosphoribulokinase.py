@@ -15,9 +15,12 @@ from mxlbricks import names as n
 from mxlbricks.utils import (
     default_name,
     default_vmax,
+    default_km,
+    default_kis,
     filter_stoichiometry,
     static,
 )
+from mxlpy import units
 
 if TYPE_CHECKING:
     from mxlpy import Model
@@ -105,13 +108,13 @@ def add_phosphoribulokinase(
                 e0_value=1.0,  # Source
                 kcat_value=0.9999 * 8,  # Source
             ),
-            static(model, n.km(rxn, n.ru5p()), 0.05) if km_ru5p is None else km_ru5p,
-            static(model, n.km(rxn, n.atp()), 0.05) if km_atp is None else km_atp,
-            static(model, n.ki(rxn, n.pga()), 2.0) if ki1 is None else ki1,
-            static(model, n.ki(rxn, n.rubp()), 0.7) if ki2 is None else ki2,
-            static(model, n.ki(rxn, n.pi()), 4.0) if ki3 is None else ki3,
-            static(model, n.ki(rxn, "4"), 2.5) if ki4 is None else ki4,
-            static(model, n.ki(rxn, "5"), 0.4) if ki5 is None else ki5,
+            default_km(model, par=km_ru5p, rxn=rxn, subs=ru5p, value=0.05, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(83)90156-1"),
+            default_km(model, par=km_atp, rxn=rxn, subs=atp, value=0.05, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(83)90156-1"),
+            default_kis(model, par=ki1, rxn=rxn, substrate=pga, value=2, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(83)90156-1"),
+            default_kis(model, par=ki2, rxn=rxn, substrate=rubp, value=0.7, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(83)90156-1"),
+            default_kis(model, par=ki3, rxn=rxn, substrate=pi, value=4, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(83)90156-1"),
+            default_kis(model, par=ki1, rxn=rxn, substrate=f"{adp}_1", value=2.5, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(83)90156-1"),
+            default_kis(model, par=ki1, rxn=rxn, substrate=f"{adp}_2", value=0.4, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(83)90156-1"),
         ],
     )
     return model

@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from mxlpy import units
+
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s
 from mxlbricks.utils import (
+    default_km,
     default_name,
-    static,
+    default_par,
+    default_vmax,
 )
 
 if TYPE_CHECKING:
@@ -37,6 +40,14 @@ def _rate_out(
     k_efflux: float,
 ) -> float:
     return vmax_efflux * s1 / (n_total * k_efflux)
+
+def _rate_out_pga(
+    s1: float,
+    n_total: float,
+    vmax_efflux: float,
+    k_efflux: float,
+):
+    return 0.75 * _rate_out(s1, n_total, vmax_efflux, k_efflux)
 
 
 def add_pga_exporter(
@@ -129,6 +140,7 @@ def add_triose_phosphate_exporters(
     pga: str | None = None,
     gap: str | None = None,
     dhap: str | None = None,
+    pi_ext: str | None = None,
     e0: str | None = None,
     km_pga: str | None = None,
     km_gap: str | None = None,
@@ -146,36 +158,32 @@ def add_triose_phosphate_exporters(
     gap = default_name(gap, n.gap)
     dhap = default_name(dhap, n.dhap)
 
-    pi_ext = static(model, n.pi_ext(), 0.5)
+    pi_ext = default_par(model, par=pi_ext, name=n.pi_ext(), value=0.5, unit=units.mmol / units.liter)
+    
+    km_pga = default_km(model, par=km_pga, rxn=n_translocator, subs=pga, value=0.25, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(78)90045-2")
+    km_gap = default_km(model, par=km_gap, rxn=n_translocator, subs=gap, value=0.075, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(78)90045-2")
+    km_dhap = default_km(model, par=km_dhap, rxn=n_translocator, subs=dhap, value=0.077, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(78)90045-2")
 
-    km_pga = static(model, n.km(pga_rxn), 0.25) if km_pga is None else km_pga
-    km_gap = static(model, n.km(gap_rxn), 0.075) if km_gap is None else km_gap
-    km_dhap = static(model, n.km(dhap_rxn), 0.077) if km_dhap is None else km_dhap
-    km_pi_ext = static(model, n.km(n_translocator, n.pi_ext()), 0.74)
-    km_pi = static(model, n.km(n_translocator, n.pi()), 0.63)
-
-    kcat_export = (
-        static(model, n.kcat(n_translocator), 0.25 * 8)
-        if kcat_export is None
-        else kcat_export
-    )
-
-    e0 = static(model, n.e0(n_translocator), 1.0) if e0 is None else e0
-    model.add_derived(
-        vmax_export := n.vmax(pga_rxn), fn=mass_action_1s, args=[kcat_export, e0]
+    vmax_export = default_vmax(
+        model,
+        e0=e0,
+        kcat=kcat_export,
+        rxn=n_translocator,
+        e0_value=1,
+        kcat_value=0.25 * 8,
     )
 
     model.add_derived(
         name=n_translocator,
         fn=_rate_translocator,
         args=[
-            n.pi(),
-            n.pga(),
-            n.gap(),
-            n.dhap(),
-            km_pi_ext,
+            pi,
+            pga,
+            gap,
+            dhap,
+            default_km(model, par=km_pi_ext, rxn=n_translocator, subs=pi_ext, value=0.74, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(78)90045-2"),
             pi_ext,
-            km_pi,
+            default_km(model, par=km_pi, rxn=n_translocator, subs=pi, value=0.63, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(78)90045-2"),
             km_pga,
             km_gap,
             km_dhap,

@@ -12,9 +12,9 @@ from mxlpy import Model
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_1s_1p
 from mxlbricks.utils import (
+    default_keq,
     default_kre,
     default_name,
-    static,
 )
 
 
@@ -42,7 +42,7 @@ def add_ribose_5_phosphate_isomerase(
             r5p,
             ru5p,
             default_kre(model, par=kre, rxn=rxn, value=800000000.0),
-            static(model, n.keq(rxn), 0.4) if keq is None else keq,
+            default_keq(model, rxn=rxn, par=keq, value=0.4, source="https://doi.org/10.1016/0005-2728(69)90048-6"),
         ],
     )
     return model

@@ -210,6 +210,25 @@ def default_kis(
         source=source,
         name=n.ki(rxn, substrate),
     )
+    
+def default_kas(
+    model: Model,
+    *,
+    par: str | None,
+    rxn: str,
+    substrate: str,
+    value: float,
+    unit: sympy.Expr | None = None,
+    source: str | None = None,
+) -> str:
+    return default_par(
+        model=model,
+        par=par,
+        value=value,
+        unit=unit,
+        source=source,
+        name=n.ka(rxn, substrate),
+    )
 
 
 def default_kre(

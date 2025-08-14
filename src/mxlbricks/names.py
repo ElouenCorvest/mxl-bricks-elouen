@@ -1135,6 +1135,10 @@ def succinyl_coa_synthetase(compartment: str = EMPTY, tissue: str = EMPTY) -> st
     return loc("succinyl_coa_synthetase", compartment, tissue)
 
 
+def starch_phosphorylase(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    return loc("starch_phosphorylase", compartment, tissue)
+
+
 def tartronate_semialdehyde_reductase(
     compartment: str = EMPTY, tissue: str = EMPTY
 ) -> str:

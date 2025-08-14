@@ -7,7 +7,7 @@ Glycerone phosphate(aq) + D-Erythrose 4-phosphate(aq) ⇌ Sedoheptulose 1,7-bisp
 Keq = 4.8e3 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
 """
 
-from mxlpy import Model
+from mxlpy import Model, units
 
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_2s_1p
@@ -46,7 +46,7 @@ def add_aldolase_dhap_e4p_req(
             e4p,
             sbp,
             default_kre(model, rxn=rxn, par=kre, value=800000000.0),
-            default_keq(model, rxn=rxn, par=keq, value=13.0),
+            default_keq(model, rxn=rxn, par=keq, value=13.0, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(69)90048-6"),
         ],
     )
     return model

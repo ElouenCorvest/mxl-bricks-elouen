@@ -449,7 +449,7 @@ def _pi_cbb(
     ru5p: float,
     atp: float,
 ) -> float:
-    return phosphate_total - (
+    res = phosphate_total - (
         pga
         + 2 * bpga
         + gap
@@ -467,6 +467,8 @@ def _pi_cbb(
         + ru5p
         + atp
     )
+    # print(res)
+    return res
 
 
 def _pi_cbb_pr(

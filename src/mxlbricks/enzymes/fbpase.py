@@ -21,6 +21,7 @@ from mxlbricks.utils import (
     default_name,
     default_vmax,
 )
+from mxlpy import units
 
 if TYPE_CHECKING:
     from mxlpy import Model
@@ -63,9 +64,9 @@ def add_fbpase(
                 e0_value=1.0,  # Source
                 kcat_value=0.2 * 8,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, value=0.03),
-            default_kis(model, par=ki_f6p, rxn=rxn, substrate=f6p, value=0.7),
-            default_kis(model, par=ki_pi, rxn=rxn, substrate=pi, value=12.0),
+            default_kms(model, rxn=rxn, par=kms, value=0.03, unit=units.mmol / units.liter, source="https://doi.org/10.1042/bj1850689"),
+            default_kis(model, par=ki_f6p, rxn=rxn, substrate=f6p, value=0.7, unit=units.mmol / units.liter, source="https://doi.org/10.1111/j.1432-1033.1988.tb14242.x"),
+            default_kis(model, par=ki_pi, rxn=rxn, substrate=pi, value=12.0, unit=units.mmol / units.liter, source="https://doi.org/10.1042/bj1850689"),
         ],
     )
     return model

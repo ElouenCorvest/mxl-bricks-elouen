@@ -40,6 +40,46 @@ if TYPE_CHECKING:
     from mxlpy import Model
 
 
+def add_phosphoglycerate_kinase_poolman2000(
+    model: Model,
+    *,
+    rxn: str | None = None,
+    pga: str | None = None,
+    atp: str | None = None,
+    bpga: str | None = None,
+    adp: str | None = None,
+    kre: str | None = None,
+    keq: str | None = None,
+) -> Model:
+    rxn = default_name(rxn, n.phosphoglycerate_kinase)
+    pga = default_name(pga, n.pga)
+    atp = default_name(atp, n.atp)
+    bpga = default_name(bpga, n.bpga)
+    adp = default_name(adp, n.adp)
+
+    model.add_reaction(
+        name=rxn,
+        fn=rapid_equilibrium_2s_2p,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                pga: -1.0,
+                atp: -1.0,
+                bpga: 1.0,
+                adp: 1.0,
+            },
+        ),
+        args=[
+            pga,
+            atp,
+            bpga,
+            adp,
+            default_kre(model, rxn=rxn, par=kre, value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319"),
+            default_keq(model, rxn=rxn, par=keq, value=3.1e-4, source="https://doi.org/10.1016/0005-2728(69)90048-6"),
+        ],
+    )
+    return model
+
 def add_phosphoglycerate_kinase_poolman(
     model: Model,
     *,

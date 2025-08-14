@@ -57,8 +57,44 @@ from mxlbricks.utils import (
     static,
 )
 
+from mxlpy import units
+from sympy.physics.units.quantities import Quantity
+
 if TYPE_CHECKING:
     from mxlpy import Model
+
+mg_chl = Quantity("mg_chl", abbrev="mg_chl")
+
+def _rate_poolman2000_5i(
+    rubp: float,
+    pga: float,
+    vmax: float,
+    kms_rubp: float,
+    # inhibitors
+    ki_pga: float,
+    fbp: float,
+    ki_fbp: float,
+    sbp: float,
+    ki_sbp: float,
+    pi: float,
+    ki_p: float,
+    nadph: float,
+    ki_nadph: float,
+) -> float:
+    top = vmax * rubp
+    btm = (
+        rubp
+        + kms_rubp
+        * (
+            1
+            + pga / ki_pga
+            + fbp / ki_fbp
+            + sbp / ki_sbp
+            + pi / ki_p
+            + nadph / ki_nadph
+        )
+    )
+    return top / btm
 
 
 def _rate_poolman_5i(
@@ -134,6 +170,64 @@ def _rate_witzel_5i(
             + i5 / ki5
         )
     )
+
+
+def add_rubisco_poolman2000(
+    model: Model,
+    *,
+    rxn: str | None = None,
+    rubp: str | None = None,
+    pga: str | None = None,
+    fbp: str | None = None,
+    sbp: str | None = None,
+    pi: str | None = None,
+    nadph: str | None = None,
+    kcat: str | None = None,
+    e0: str | None = None,
+    km_rubp: str | None = None,
+    ki_pga: str | None = None,
+    ki_fbp: str | None = None,
+    ki_sbp: str | None = None,
+    ki_pi: str | None = None,
+    ki_nadph: str | None = None,
+) -> Model:
+    rxn = default_name(rxn, n.rubisco_carboxylase)
+    rubp = default_name(rubp, n.rubp)
+    pga = default_name(pga, n.pga)
+    fbp = default_name(fbp, n.fbp)
+    sbp = default_name(sbp, n.sbp)
+    pi = default_name(pi, n.pi)
+    nadph = default_name(nadph, n.nadph)
+
+    model.add_reaction(
+        name=n.rubisco_carboxylase(),
+        fn=_rate_poolman2000_5i,
+        stoichiometry=filter_stoichiometry(
+            model,
+            {
+                rubp: -1.0,
+                pga: 2.0,
+            },
+        ),
+        args=[
+            rubp,
+            pga,
+            default_vmax(
+                model, e0=e0, kcat=kcat, rxn=rxn, e0_value=1.0, kcat_value=340  / 1000, kcat_unit=units.mumol_h / mg_chl, kcat_source="https://doi.org/10.1016/0006-291X(74)90192-2"
+            ),
+            default_km(model, par=km_rubp, rxn=rxn, subs=rubp, value=0.02, unit=units.mmol / units.liter, source="https://doi.org/10.1021/bi00511a023"),
+            default_par(model, par=ki_pga, name=n.ki(rxn, n.pga()), value=0.84, unit=units.mmol / units.liter, source="https://doi.org/10.1021/bi00511a023"),
+            fbp,
+            default_par(model, par=ki_fbp, name=n.ki(rxn, n.fbp()), value=0.04, unit=units.mmol / units.liter, source="https://doi.org/10.1021/bi00511a023"),
+            sbp,
+            default_par(model, par=ki_sbp, name=n.ki(rxn, n.sbp()), value=0.075, unit=units.mmol / units.liter, source="https://doi.org/10.1021/bi00511a023"),
+            pi,
+            default_par(model, par=ki_pi, name=n.ki(rxn, n.pi()), value=0.9, unit=units.mmol / units.liter, source="https://doi.org/10.1021/bi00511a023"),
+            nadph,
+            default_par(model, par=ki_nadph, name=n.ki(rxn, n.nadph()), value=0.07, unit=units.mmol / units.liter, source="https://doi.org/10.1021/bi00511a023"),
+        ],
+    )
+    return model
 
 
 def add_rubisco_poolman(

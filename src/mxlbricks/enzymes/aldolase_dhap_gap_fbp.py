@@ -8,7 +8,7 @@ Keq = 1.1e4 (@ pH = 7.5, pMg = 3.0, Ionic strength = 0.25)
 
 """
 
-from mxlpy import Model
+from mxlpy import Model, units
 
 from mxlbricks import names as n
 from mxlbricks.fns import rapid_equilibrium_2s_1p
@@ -46,7 +46,7 @@ def add_aldolase_dhap_gap_req(
             dhap,
             fbp,
             default_kre(model, rxn=rxn, par=kre, value=800000000.0),
-            default_keq(model, rxn=rxn, par=keq, value=7.1),
+            default_keq(model, rxn=rxn, par=keq, value=7.1, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0005-2728(69)90048-6"),
         ],
     )
     return model

@@ -7,8 +7,9 @@ from sympy.physics.units.quantities import Quantity
 
 from mxlbricks import names as n
 from mxlbricks.enzymes.mda_reductase1 import add_mda_reductase1
-from mxlbricks.enzymes.rubisco import add_rubisco_poolman
+from mxlbricks.enzymes.rubisco import add_rubisco_poolman, add_rubisco_poolman2000
 from mxlbricks.enzymes.thioredoxin import add_cbb_pfd_linear_speedup
+from mxlbricks.enzymes.starch_phosphorylase import add_starch_phosphorylase
 from mxlbricks.utils import fcbb_regulated, static, thioredixon_regulated
 
 from .derived import (
@@ -63,6 +64,7 @@ from .enzymes import (
     add_ndh,
     add_phosphoglucomutase,
     add_phosphoglycerate_kinase_poolman,
+    add_phosphoglycerate_kinase_poolman2000,
     add_phosphoglycolate_influx,
     add_phosphoribulokinase,
     add_photosystems,
@@ -84,7 +86,9 @@ from .enzymes import (
 )
 
 mol_chl = Quantity("mol_chl", abbrev="mol_chl")
+mg_chl = Quantity("mg_chl", abbrev="mg Chl")
 mmol_mol_chl = units.mmol / mol_chl
+
 
 
 def get_yokota1985() -> Model:
@@ -114,69 +118,140 @@ def get_yokota1985() -> Model:
 
 
 def get_poolman2000() -> Model:
+    """
+    Poolman2000 model (https://doi.org/10.1093/jexbot/51.suppl_1.319) that is mostly built upon the Pettersson1988 model
+    """
+    
+    
+    
     model = Model()
     model.add_variables(
         {
-            n.pga(): Variable(0.6387788347932627, unit=units.mmol),
+            # n.pga(): Variable(0.6387788347932627, unit=units.mmol),
             n.bpga(): Variable(0.0013570885908749779, unit=units.mmol),
-            n.gap(): Variable(0.011259431827358068, unit=units.mmol),
-            n.dhap(): Variable(0.24770748227012374, unit=units.mmol),
-            n.fbp(): Variable(0.01980222074817044, unit=units.mmol),
-            n.f6p(): Variable(1.093666906864421, unit=units.mmol),
-            n.g6p(): Variable(2.5154338857582377, unit=units.mmol),
-            n.g1p(): Variable(0.14589516537322303, unit=units.mmol),
-            n.sbp(): Variable(0.09132688566151095, unit=units.mmol),
-            n.s7p(): Variable(0.23281380022778891, unit=units.mmol),
-            n.e4p(): Variable(0.02836065066520614, unit=units.mmol),
-            n.x5p(): Variable(0.03647242425941113, unit=units.mmol),
-            n.r5p(): Variable(0.06109130988031577, unit=units.mmol),
-            n.rubp(): Variable(0.2672164362349537, unit=units.mmol),
-            n.ru5p(): Variable(0.0244365238237522, unit=units.mmol),
-            n.atp(): Variable(0.43633201706180874, unit=units.mmol),
+            # n.gap(): Variable(0.011259431827358068, unit=units.mmol),
+            # n.dhap(): Variable(0.24770748227012374, unit=units.mmol),
+            # n.fbp(): Variable(0.01980222074817044, unit=units.mmol),
+            # n.f6p(): Variable(1.093666906864421, unit=units.mmol),
+            # n.g6p(): Variable(2.5154338857582377, unit=units.mmol),
+            # n.g1p(): Variable(0.14589516537322303, unit=units.mmol),
+            # n.sbp(): Variable(0.09132688566151095, unit=units.mmol),
+            # n.s7p(): Variable(0.23281380022778891, unit=units.mmol),
+            # n.e4p(): Variable(0.02836065066520614, unit=units.mmol),
+            # n.x5p(): Variable(0.03647242425941113, unit=units.mmol),
+            # n.r5p(): Variable(0.06109130988031577, unit=units.mmol),
+            # n.rubp(): Variable(0.2672164362349537, unit=units.mmol),
+            # n.ru5p(): Variable(0.0244365238237522, unit=units.mmol),
+            # n.atp(): Variable(0.43633201706180874, unit=units.mmol),
+
+            n.pga(): Variable(3.35479, unit=units.mmol / units.liter),
+            # n.bpga(): Variable(0.14825, unit=units.mmol / units.liter),
+            n.gap(): Variable(0.01334, unit=units.mmol / units.liter),
+            n.dhap(): Variable(0.29345, unit=units.mmol / units.liter),
+            n.fbp(): Variable(0.02776, unit=units.mmol / units.liter),
+            n.f6p(): Variable(1.36481, unit=units.mmol / units.liter),
+            n.g6p(): Variable(3.1396, unit=units.mmol / units.liter),
+            n.g1p(): Variable(0.18206, unit=units.mmol / units.liter),
+            n.sbp(): Variable(1.56486, unit=units.mmol / units.liter),
+            n.s7p(): Variable(0.00541, unit=units.mmol / units.liter),
+            n.e4p(): Variable(0.41021, unit=units.mmol / units.liter),
+            n.x5p(): Variable(0.00363, unit=units.mmol / units.liter),
+            n.r5p(): Variable(0.00599, unit=units.mmol / units.liter),
+            n.rubp(): Variable(0.33644, unit=units.mmol / units.liter),
+            n.ru5p(): Variable(0.00235, unit=units.mmol / units.liter),
+            n.atp(): Variable(0.49806, unit=units.mmol / units.liter),
         }
     )
     model.add_parameters(
         {
-            n.co2(): Parameter(0.2, unit=units.mmol),
-            n.nadph(): Parameter(0.21, unit=units.mmol),
-            n.h(): Parameter(1.2589254117941661e-05, unit=units.mmol),
+            n.co2(): Parameter(0.2, unit=units.mmol / units.liter),
+            n.nadph(): Parameter(0.21, unit=units.mmol / units.liter),
+            n.nadp(): Parameter(0.29, unit=units.mmol / units.liter),
+            n.h(): Parameter(2.512e-5, unit=units.mmol / units.liter),
         }
     )
 
+    # Conserved Quantities
     add_adenosin_moiety(
         model,
         total=static(model, n.total_adenosines(), 0.5),
-    )
-    add_nadp_moiety(
-        model,
-        total=static(model, n.total_nadp(), 0.5),
     )
     add_orthophosphate_moiety_cbb(
         model,
         total=static(model, n.total_orthophosphate(), 15.0),
     )
+    
+    # Reversible Reactions
+    add_phosphoglycerate_kinase_poolman2000(model) # v2
+    add_gadph( # v3
+        model,
+        rxn=n.gadph(),
+        kre=static(model, n.kre(n.gadph()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
+    add_triose_phosphate_isomerase( # v4
+        model,
+        rxn=n.triose_phosphate_isomerase(),
+        kre=static(model, n.kre(n.triose_phosphate_isomerase()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
+    add_aldolase_dhap_gap_req( # v5
+        model,
+        rxn=n.aldolase_dhap_gap(),
+        kre=static(model, n.kre(n.aldolase_dhap_gap()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
+    add_transketolase_x5p_e4p_f6p_gap( # v7
+        model,
+        rxn=n.transketolase_gap_f6p(),
+        kre=static(model, n.kre(n.transketolase_gap_f6p()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
+    add_aldolase_dhap_e4p_req( # v8
+        model,
+        rxn=n.aldolase_dhap_e4p(),
+        kre=static(model, n.kre(n.aldolase_dhap_e4p()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
+    add_transketolase_x5p_r5p_s7p_gap( # v10
+        model,
+        rxn=n.transketolase_gap_s7p(),
+        kre=static(model, n.kre(n.transketolase_gap_s7p()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
+    add_ribose_5_phosphate_isomerase( # v11
+        model,
+        rxn=n.ribose_phosphate_isomerase(),
+        kre=static(model, n.kre(n.ribose_phosphate_isomerase()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
+    add_ribulose_5_phosphate_3_epimerase( # v12
+        model,
+        rxn=n.ribulose_phosphate_epimerase(),
+        kre=static(model, n.kre(n.ribulose_phosphate_epimerase()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
+    add_glucose_6_phosphate_isomerase_re( # v14
+        model,
+        rxn=n.g6pi(),
+        kre=static(model, n.kre(n.g6pi()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
+    add_phosphoglucomutase( # v15
+        model,
+        rxn=n.phosphoglucomutase(),
+        kre=static(model, n.kre(n.phosphoglucomutase()), value=5e8, source="https://doi.org/10.1093/jexbot/51.suppl_1.319")
+    )
 
-    # Reactions
-    add_rubisco_poolman(model)
-    add_phosphoglycerate_kinase_poolman(model)
-    add_gadph(model)
-    add_triose_phosphate_isomerase(model)
-    add_aldolase_dhap_gap_req(model)
-    add_aldolase_dhap_e4p_req(model)
-    add_fbpase(model)
-    add_transketolase_x5p_e4p_f6p_gap(model)
-    add_transketolase_x5p_r5p_s7p_gap(model)
-    add_sbpase(model)
-    add_ribose_5_phosphate_isomerase(model)
-    add_ribulose_5_phosphate_3_epimerase(model)
-    add_phosphoribulokinase(model)
-    add_glucose_6_phosphate_isomerase_re(model)
-    add_phosphoglucomutase(model)
-    add_triose_phosphate_exporters(model)
-    add_g1p_efflux(model)
+    # Irreversible reactions
+    # Rubisco v1
+    add_rubisco_poolman2000(model)
+    # FBPase v6
+    add_fbpase(model, kcat=static(model, name=n.kcat(n.fbpase()), value=200 / 1000, unit=units.mumol_h / mg_chl, source="https://doi.org/10.1111/j.1432-1033.1988.tb14242.x"))
+    # SBPase v9
+    add_sbpase(model, kcat=static(model, name=n.kcat(n.sbpase()), value=40 / 1000, unit=units.mumol_h / mg_chl, source="https://doi.org/10.1016/0005-2728(81)90174-2"))
+    # Phosphoribulokinase v13
+    add_phosphoribulokinase(model, kcat=static(model, name=n.kcat(n.phosphoribulokinase()), value=1000 / 1000, unit=units.mumol_h / mg_chl, source="https://doi.org/10.1016/0005-2728(83)90156-1"))
+    # ATPSynthase v16/Vlight
+    add_atp_synthase_static_protons(model, kcat=static(model, name=n.kcat(n.atp_synthase()), value=3500 / 1000, unit=units.mumol_h / mg_chl, source="https://doi.org/10.1016/0005-2728(86)90256-2"))
+    # Starch Synthase vst/v16
+    add_g1p_efflux(model, kcat=static(model, name=n.kcat(n.ex_g1p()), value=40 / 1000, unit=units.mumol_h / mg_chl))
+    # Triose Exporter vex/vtpt
+    add_triose_phosphate_exporters(model, kcat_export=static(model, name=n.kcat("N_translocator"), value=250 / 1000, unit=units.mumol_h / mg_chl, source="https://doi.org/10.1016/0005-2728(77)90212-2"))
+    # Starch Phosphorylase v17
+    add_starch_phosphorylase(model, kcat=static(model, name=n.kcat(n.starch_phosphorylase()), value=40 / 1000, unit=units.mumol_h / mg_chl, source="Poolman1999"))
 
-    # Other
-    add_atp_synthase_static_protons(model)
     return model
 
 

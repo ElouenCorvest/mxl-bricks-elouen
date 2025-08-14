@@ -93,6 +93,7 @@ from .phosphoglucomutase import add_phosphoglucomutase
 from .phosphoglycerate_kinase import (
     add_phosphoglycerate_kinase,
     add_phosphoglycerate_kinase_poolman,
+    add_phosphoglycerate_kinase_poolman2000,
 )
 from .phosphoglycerate_mutase import add_phosphoglycerate_mutase
 from .phosphoglycolate_phosphatase import (
@@ -186,6 +187,7 @@ __all__ = [
     "add_transaldolase_f6p_gad_xyl_gap",
     "add_erythrulose_kinase",
     "add_phosphoglycerate_kinase_poolman",
+    "add_phosphoglycerate_kinase_poolman2000",
     "add_phosphoglycerate_kinase",
     "add_aspartate_aminotransferase",
     "add_ptox",

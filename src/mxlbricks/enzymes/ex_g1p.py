@@ -11,9 +11,13 @@ from mxlbricks import names as n
 from mxlbricks.utils import (
     default_name,
     default_vmax,
+    default_km,
+    default_kis,
+    default_kas,
     filter_stoichiometry,
     static,
 )
+from mxlpy import units
 
 if TYPE_CHECKING:
     from mxlpy import Model
@@ -80,35 +84,28 @@ def add_g1p_efflux(
     fbp = default_name(fbp, n.fbp)
     starch = default_name(starch, n.starch)
 
-    km_g1p = static(model, n.km(rxn, n.g1p()), 0.08) if km_g1p is None else km_g1p
-    km_atp = static(model, n.km(rxn, n.atp()), 0.08) if km_atp is None else km_atp
-    ki = static(model, n.ki(rxn), 10.0) if ki is None else ki
-    ka_pga = static(model, n.ka(rxn, n.pga()), 0.1) if ka_pga is None else ka_pga
-    ka_f6p = static(model, n.ka(rxn, n.f6p()), 0.02) if ka_f6p is None else ka_f6p
-    ka_fbp = static(model, n.ka(rxn, n.fbp()), 0.02) if ka_fbp is None else ka_fbp
-
     model.add_reaction(
         name=rxn,
         fn=_rate_starch,
         stoichiometry=filter_stoichiometry(
             model,
             {
-                n.g1p(): -1.0,
-                n.atp(): -1.0,
-                n.adp(): 1.0,
+                g1p: -1.0,
+                atp: -1.0,
+                adp: 1.0,
             },
             optional={
-                n.starch(): 1.0,
+                starch: 1.0,
             },
         ),
         args=[
-            n.g1p(),
-            n.atp(),
-            n.adp(),
-            n.pi(),
-            n.pga(),
-            n.f6p(),
-            n.fbp(),
+            g1p,
+            atp,
+            adp,
+            pi,
+            pga,
+            f6p,
+            fbp,
             default_vmax(
                 model,
                 rxn=rxn,
@@ -117,12 +114,12 @@ def add_g1p_efflux(
                 e0_value=1.0,  # Source
                 kcat_value=0.04 * 8,  # Source
             ),
-            km_g1p,
-            km_atp,
-            ki,
-            ka_pga,
-            ka_f6p,
-            ka_fbp,
+            default_km(model, par=km_g1p, rxn=rxn, subs=g1p, value=0.08, unit=units.mmol / units.liter),
+            default_km(model, par=km_atp, rxn=rxn, subs=atp, value=0.08, unit=units.mmol / units.liter),
+            default_kis(model, par=ki, rxn=rxn, substrate=adp, value=10, unit=units.mmol / units.liter),
+            default_kas(model, par=ka_pga, rxn=rxn, substrate=pga, value=0.1, unit=units.mmol / units.liter),
+            default_kas(model, par=ka_f6p, rxn=rxn, substrate=f6p, value=0.02, unit=units.mmol / units.liter),
+            default_kas(model, par=ka_fbp, rxn=rxn, substrate=fbp, value=0.02, unit=units.mmol / units.liter),
         ],
     )
     return model

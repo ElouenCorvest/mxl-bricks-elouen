@@ -20,6 +20,7 @@ from mxlbricks.utils import (
     default_name,
     default_vmax,
 )
+from mxlpy import units
 
 if TYPE_CHECKING:
     from mxlpy import Model
@@ -60,8 +61,8 @@ def add_sbpase(
                 e0_value=1.0,  # Source
                 kcat_value=0.04 * 8,  # Source
             ),
-            default_kms(model, rxn=rxn, par=kms, value=0.013),
-            default_kis(model, rxn=rxn, par=ki, substrate=n.pi(), value=12.0),
+            default_kms(model, rxn=rxn, par=kms, value=0.013, unit=units.mmol / units.liter, source="https://doi.org/10.1016/0003-9861(82)90230-2"),
+            default_kis(model, rxn=rxn, par=ki, substrate=n.pi(), value=12.0, unit=units.mmol / units.liter, source="https://doi.org/10.1111/j.1432-1033.1983.tb07335.x"),
         ],
     )
     return model
