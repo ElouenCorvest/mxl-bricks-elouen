@@ -14,6 +14,8 @@
 [docs-badge]: https://img.shields.io/badge/docs-main-green.svg?style=flat-square
 [docs]: https://computational-biology-aachen.github.io/mxl-bricks/
 
+MxlBricks is a Python package to build mechanistic models composed of pre-defined reactions (bricks). This facilitates re-use and interoperability between different models by sharing common parts.
+
 ## Installation
 
 
@@ -32,12 +34,12 @@ pixi add --pypi mxlbricks
 ## Development setup
 
 Install pixi [as described in the docs](https://pixi.sh/latest/#installation).
+
 Run
 
-```
+```bash
 pixi instal
 ```
-
 
 
 ## Models
@@ -60,3 +62,10 @@ pixi instal
 | Poolman 2000 | CBB cycle, based on Pettersson & Ryde-Pettersson 1988 |
 | Yokota 1985  | Photorespiration                                      |
 | Valero ?     |                                                       |
+
+## Tool family 🏠
+
+`MxlPy` is part of a larger family of tools that are designed with a similar set of abstractions. Check them out!
+
+- [MxlPy](https://github.com/Computational-Biology-Aachen/MxlPy) is a Python package for mechanistic learning (Mxl)
+- [MxlWeb](https://github.com/Computational-Biology-Aachen/mxl-web) brings simulation of mechanistic models to the browser!
