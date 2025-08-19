@@ -14,14 +14,12 @@
 [docs-badge]: https://img.shields.io/badge/docs-main-green.svg?style=flat-square
 [docs]: https://computational-biology-aachen.github.io/mxl-bricks/
 
-## Dev Install
-
-Run `pixi install -e dev` in this directory. This will install the `dev` package. Then to install this local `mxlbricks` as editable, you just need to run `pixi run -e dev dev-install`.
+MxlBricks is a Python package to build mechanistic models composed of pre-defined reactions (bricks). This facilitates re-use and interoperability between different models by sharing common parts.
 
 ## Installation
 
 
-You can install mxlpy using pip: `pip install mxlbricks`.
+Run `pixi install -e dev` in this directory. This will install the `dev` package. Then to install this local `mxlbricks` as editable, you just need to run `pixi run -e dev dev-install`.
 
 
 If you want access to the sundials solver suite via the [assimulo](https://jmodelica.org/assimulo/) package, we recommend setting up a virtual environment via [pixi](https://pixi.sh/) or [mamba / conda](https://mamba.readthedocs.io/en/latest/) using the [conda-forge](https://conda-forge.org/) channel.
@@ -36,12 +34,12 @@ pixi add --pypi mxlbricks
 ## Development setup
 
 Install pixi [as described in the docs](https://pixi.sh/latest/#installation).
+
 Run
 
-```
+```bash
 pixi instal
 ```
-
 
 
 ## Models
@@ -64,3 +62,10 @@ pixi instal
 | Poolman 2000 | CBB cycle, based on Pettersson & Ryde-Pettersson 1988 |
 | Yokota 1985  | Photorespiration                                      |
 | Valero ?     |                                                       |
+
+## Tool family 🏠
+
+`MxlPy` is part of a larger family of tools that are designed with a similar set of abstractions. Check them out!
+
+- [MxlPy](https://github.com/Computational-Biology-Aachen/MxlPy) is a Python package for mechanistic learning (Mxl)
+- [MxlWeb](https://github.com/Computational-Biology-Aachen/mxl-web) brings simulation of mechanistic models to the browser!
