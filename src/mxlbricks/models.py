@@ -598,3 +598,61 @@ def get_saadat2021(
         fluorescence=True,
     )
     return model
+
+def get_li2021(
+    *,
+    chl_lumen: str = "_lumen",
+    chl_stroma: str = "_stroma",
+) -> Model:
+    
+    model = Model()
+    
+    model.add_variables({
+        "QA": 1, # QA_content
+        "QA_red": 0, # Qm_content
+        n.pq_ox(): 7, # PQ_content
+        n.pq_red(): 0, # PQH2_content
+        n.h(): 0.0, # Hin
+        n.ph(chl_lumen): 7.8, # pHlumen
+        "Dy": 0.0, # Dy
+        "pmf": 0.0, # pmf
+        "DeltaGatp": 30.0 + 2.44 * np.log(1/0.0015), # DeltaGatp probably parameter
+        n.pottassium(chl_lumen): 0.1, # Klumen
+        n.pottassium(chl_stroma): 0.1, # Kstroma # Probably parameter
+        n.atp(): 0, # ATP_made
+        n.pc_ox(): 0, # PC_ox
+        n.pc_red(): 2, # PC_red
+        n.a0(): 0.0, # P700_ox
+        n.a1(): 0.667, # P700_red
+        n.zx(): 0.0, # Z
+        n.vx(): 1, # V
+        "NPQ": 0, # NPQ
+        "singletO2": 0, # singletO2
+        "Phi2": 0.83, # Phi2
+        "LEF": 0, # LEF
+        n.fd_red(): 0, # Fd_red
+        n.fd_ox(): 1, # Fd_ox
+        n.atp("_pool"): 4.15, # ATP_pool
+        n.adp("_pool"): 4.15, # ADP_pool
+        n.nadph("_pool"): 1.5, # NADPH_pool
+        n.nadp("_pool"): 3.5, # NADP_pool
+        n.chloride(chl_lumen): 0.04, # Cl_lumen
+        n.chloride(chl_stroma): 0.04, # Cl_stroma
+        n.h(chl_stroma): 0, # Hstroma
+        n.ph(chl_stroma): 7.8, # phstroma
+    })
+    
+    model.add_parameters({
+        "VDE_max_turnover_number": 0.08, # VDE_max_turnover_number
+        n.pka(n.violaxanthin_deepoxidase()): 5.65, # pkvde
+        n.kh(n.violaxanthin_deepoxidase()): 4, # VDE_Hill
+        n.kre(n.zeaxanthin_epoxidase()): 0.004, # kZE
+        n.pka(n.psbs_pr()): 6.2, # pKPsBS
+        "max_NPQ": 3, # max_NPQ
+        
+    })
+    
+    # PSII recombination (two equations available) (recombination_with_pH_effects)
+    
+    
+    return model

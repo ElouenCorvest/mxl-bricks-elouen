@@ -15,7 +15,7 @@ from mxlpy import Derived, Model
 from mxlpy.surrogates import qss
 
 from mxlbricks import names as n
-from mxlbricks.fns import mass_action_1s, mass_action_2s, value
+from mxlbricks.fns import mass_action_1s, mass_action_2s, value, mul
 from mxlbricks.utils import (
     default_name,
     default_par,

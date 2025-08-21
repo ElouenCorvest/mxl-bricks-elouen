@@ -93,6 +93,12 @@ def ka(enzyme: str, substrate: str | None = None) -> str:
         return f"ki_{enzyme}"
     return f"ki_{enzyme}_{substrate}"
 
+def pka(enzyme: str, substrate: str | None = None) -> str:
+    """logarithmic acidic dissociation constant (pKa)"""
+    if substrate is None:
+        return f"pKa_{enzyme}"
+    return f"pKa_{enzyme}_{substrate}"
+
 
 ###############################################################################
 # Parameters / Variables
@@ -652,6 +658,14 @@ def tyrosine(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
 
 def valine(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
     return loc("valine", compartment, tissue)
+
+
+def pottassium(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    return loc("pottasium_ions", compartment, tissue)
+
+
+def chloride(compartment: str = EMPTY, tissue: str = EMPTY) -> str:
+    return loc("chloride_ions", compartment, tissue)
 
 
 ###############################################################################

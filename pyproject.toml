@@ -136,3 +136,6 @@ mike = "*"
 
 [tool.pixi.environments]
 dev = { features = ["dev"] }
+
+[dependency-groups]
+dev = ["ipywidgets>=8.1.7,<9"]
