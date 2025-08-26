@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Literal
 
-from mxlpy import Model, Parameter, Variable, units
 from sympy.physics.units.quantities import Quantity
 
 from mxlbricks import names as n
@@ -10,6 +9,7 @@ from mxlbricks.enzymes.mda_reductase1 import add_mda_reductase1
 from mxlbricks.enzymes.rubisco import add_rubisco_poolman
 from mxlbricks.enzymes.thioredoxin import add_cbb_pfd_linear_speedup
 from mxlbricks.utils import fcbb_regulated, static, thioredixon_regulated
+from mxlpy import Model, Parameter, Variable, units
 
 from .derived import (
     add_adenosin_moiety,
@@ -182,6 +182,7 @@ def get_poolman2000() -> Model:
 
 def get_matuszynska2016npq(
     *,
+    mode: Literal["matrix", "analytical"] = "matrix",
     chl_lumen: str = "_lumen",
 ) -> Model:
     model = Model()
@@ -242,7 +243,7 @@ def get_matuszynska2016npq(
     add_zeaxanthin_epoxidase(model)
     add_fnr_mmol_chl(model)
     add_ndh(model)
-    add_photosystems(model, mehler=False)
+    add_photosystems(model, mode=mode, mehler=False)
     add_proton_leak(model)
     add_ptox(model)
     add_state_transitions(model)
@@ -266,6 +267,7 @@ def get_matuszynska2016npq(
 def get_matuszynska2019(
     *,
     variant: Literal["linear-speedup", "mm-speedup"] | None = None,
+    mode: Literal["matrix", "analytical"] = "matrix",
     chl_lumen: str = "_lumen",
 ) -> Model:
     model = Model()
@@ -354,7 +356,12 @@ def get_matuszynska2019(
     add_zeaxanthin_epoxidase(model)
     add_fnr_mm(model, convf="convf")
     add_ndh(model)
-    add_photosystems(model, mehler=False, convf="convf")
+    add_photosystems(
+        model,
+        mode=mode,
+        mehler=False,
+        convf="convf",
+    )
     add_proton_leak(model)
     add_ptox(model)
     add_state_transitions(model)
@@ -425,6 +432,7 @@ def get_matuszynska2019(
 
 def get_saadat2021(
     *,
+    mode: Literal["matrix", "analytical"] = "matrix",
     chl_lumen: str = "_lumen",
 ) -> Model:
     model = Model()
@@ -527,6 +535,7 @@ def get_saadat2021(
     add_ndh(model)
     add_photosystems(
         model,
+        mode=mode,
         mehler=True,
         convf="convf",
     )
