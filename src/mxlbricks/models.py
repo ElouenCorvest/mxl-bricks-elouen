@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
+from mxlpy import Model, Parameter, Variable, units
 from sympy.physics.units.quantities import Quantity
 
 from mxlbricks import names as n
@@ -9,7 +10,6 @@ from mxlbricks.enzymes.mda_reductase1 import add_mda_reductase1
 from mxlbricks.enzymes.rubisco import add_rubisco_poolman
 from mxlbricks.enzymes.thioredoxin import add_cbb_pfd_linear_speedup
 from mxlbricks.utils import fcbb_regulated, static, thioredixon_regulated
-from mxlpy import Model, Parameter, Variable, units
 
 from .derived import (
     add_adenosin_moiety,

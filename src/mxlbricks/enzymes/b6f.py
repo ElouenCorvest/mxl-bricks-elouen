@@ -1,11 +1,12 @@
 import math
 
+from mxlpy import Derived, Model
+
 from mxlbricks import names as n
 from mxlbricks.utils import (
     default_name,
     static,
 )
-from mxlpy import Derived, Model
 
 
 def _four_div_by(x: float) -> float:
