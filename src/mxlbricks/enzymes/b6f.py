@@ -1,13 +1,11 @@
-from typing import cast
-
-import numpy as np
-from mxlpy import Derived, Model
+import math
 
 from mxlbricks import names as n
 from mxlbricks.utils import (
     default_name,
     static,
 )
+from mxlpy import Derived, Model
 
 
 def _four_div_by(x: float) -> float:
@@ -26,8 +24,7 @@ def _keq_cytb6f(
     DG1 = -2 * F * E0_PQ
     DG2 = -F * E0_PC
     DG = -(DG1 + 2 * dG_pH * pH) + 2 * DG2 + 2 * dG_pH * (pHstroma - pH)
-    Keq = np.exp(-DG / RT)
-    return cast(float, Keq)
+    return math.exp(-DG / RT)
 
 
 def _b6f(
@@ -38,12 +35,9 @@ def _b6f(
     Keq_B6f: float,
     kCytb6f: float,
 ) -> float:
-    return cast(
-        float,
-        np.maximum(
-            kCytb6f * (PQ_red * PC_ox**2 - PQ_ox * PC_red**2 / Keq_B6f),
-            -kCytb6f,
-        ),
+    return max(
+        kCytb6f * (PQ_red * PC_ox**2 - PQ_ox * PC_red**2 / Keq_B6f),
+        -kCytb6f,
     )
 
 

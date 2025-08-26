@@ -119,3 +119,29 @@ def test_steady_state_by_pfd() -> None:
     # Check if all mapped are the same
     to_compare = list(reference.columns.intersection(res.columns))
     pd.testing.assert_frame_equal(reference, res.loc[:, to_compare], rtol=1e-4)
+
+
+def test_steady_state_by_pfd_analytical() -> None:
+    reference = pd.read_csv(CWD / "ss-by-pfd.csv", index_col=0).rename(columns=names)
+    reference.index.name = "PPFD"
+
+    res = scan.steady_state(
+        get_model(variant=None, mode="matrix"),
+        to_scan=pd.DataFrame({n.pfd(): np.arange(100, 1400, 100)}),
+        integrator=Assimulo,
+    ).get_args(
+        include_variables=True,
+        include_parameters=True,
+        include_derived_parameters=True,
+        include_derived_variables=True,
+        include_readouts=True,
+        include_surrogate_fluxes=True,
+        include_surrogate_variables=True,
+    )
+
+    # Check if anything isn't found
+    assert len(reference.columns.difference(res.columns)) == 0
+
+    # Check if all mapped are the same
+    to_compare = list(reference.columns.intersection(res.columns))
+    pd.testing.assert_frame_equal(reference, res.loc[:, to_compare], rtol=1e-4)

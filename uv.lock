@@ -1563,7 +1563,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "mxlpy", specifier = ">=0.23.0" }]
+requires-dist = [{ name = "mxlpy", directory = "mxlpy" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1587,8 +1587,8 @@ dev = [
 
 [[package]]
 name = "mxlpy"
-version = "0.23.0"
-source = { registry = "https://pypi.org/simple" }
+version = "0.24.0"
+source = { directory = "mxlpy" }
 dependencies = [
     { name = "diffrax" },
     { name = "dill" },
@@ -1614,9 +1614,53 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "wadler-lindig" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/31/95/f26487a6edbe7ea8dec0807617af5a14ffacb41a47bd5ac4731e304d1622/mxlpy-0.23.0.tar.gz", hash = "sha256:d99a79f574077157ed86182852ad3f8e0b78505b19584c24b9dae9519d5bafeb", size = 4876821, upload-time = "2025-07-11T10:54:21.405Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/97/6b/fc01b52722ef670ba79058625a20eb6cee62c4aceca4f01d95e542c6ba9c/mxlpy-0.23.0-py3-none-any.whl", hash = "sha256:395e8ff246d54d17d0a8e3683e6d13636fa1d2767f3b0b401e5cffea44ea69b0", size = 121335, upload-time = "2025-07-11T10:54:19.379Z" },
+
+[package.metadata]
+requires-dist = [
+    { name = "diffrax", specifier = ">=0.7.0" },
+    { name = "dill", specifier = ">=0.3.9" },
+    { name = "keras", marker = "extra == 'keras'", specifier = ">=3.9.2" },
+    { name = "latexify-py", specifier = ">=0.4.4" },
+    { name = "lazy-import", specifier = ">=0.2.2" },
+    { name = "matplotlib", specifier = ">=3.9.2" },
+    { name = "mike", specifier = ">=2.1.3" },
+    { name = "more-itertools", specifier = ">=10.5.0" },
+    { name = "numpy", specifier = ">=2.1.2" },
+    { name = "pandas", specifier = ">=2.2.3" },
+    { name = "parameteriser", specifier = ">=0.1.0" },
+    { name = "pebble", specifier = ">=5.0.7" },
+    { name = "pysbml", specifier = ">=0.3.0" },
+    { name = "python-libsbml", specifier = ">=5.20.4" },
+    { name = "salib", specifier = ">=1.5.1" },
+    { name = "scipy", specifier = ">=1.14.1" },
+    { name = "seaborn", specifier = ">=0.13.2" },
+    { name = "symbtools", specifier = ">=0.4.0" },
+    { name = "sympy", specifier = ">=1.13.1" },
+    { name = "tabulate", specifier = ">=0.9.0" },
+    { name = "tensorflow", marker = "extra == 'tensorflow'", specifier = ">=2.19.0" },
+    { name = "toml", specifier = ">=0.10.2" },
+    { name = "torch", marker = "extra == 'torch'", specifier = ">=2.5.1" },
+    { name = "tqdm", specifier = ">=4.66.6" },
+    { name = "typing-extensions", specifier = ">=4.12.2" },
+    { name = "wadler-lindig", specifier = ">=0.1.7" },
+]
+provides-extras = ["torch", "tensorflow", "keras"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "coverage", specifier = ">=7.6.4" },
+    { name = "jupyter", specifier = ">=1.1.1" },
+    { name = "mkdocs", specifier = ">=1.6.1" },
+    { name = "mkdocs-jupyter", specifier = ">=0.25.1" },
+    { name = "mkdocs-material", specifier = ">=9.5.42" },
+    { name = "pre-commit", specifier = ">=4.0.1" },
+    { name = "pyright", specifier = ">=1.1.403" },
+    { name = "pytest", specifier = ">=8.3.3" },
+    { name = "pytest-cov", specifier = ">=5.0.0" },
+    { name = "requests", specifier = ">=2.32.3" },
+    { name = "ruff", specifier = ">=0.12.2" },
+    { name = "ssort", specifier = ">=0.13.0" },
+    { name = "toml-sort", specifier = ">=0.23.1,<0.24" },
 ]
 
 [[package]]
