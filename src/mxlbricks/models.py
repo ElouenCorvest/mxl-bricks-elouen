@@ -600,59 +600,353 @@ def get_saadat2021(
     return model
 
 def get_li2021(
-    *,
-    chl_lumen: str = "_lumen",
-    chl_stroma: str = "_stroma",
+    str_lumen = "_lumen",
+    str_stroma = "_stroma"
 ) -> Model:
-    
     model = Model()
-    
+
     model.add_variables({
-        "QA": 1, # QA_content
-        "QA_red": 0, # Qm_content
-        n.pq_ox(): 7, # PQ_content
-        n.pq_red(): 0, # PQH2_content
-        n.h(): 0.0, # Hin
-        n.ph(chl_lumen): 7.8, # pHlumen
-        "Dy": 0.0, # Dy
-        "pmf": 0.0, # pmf
-        "DeltaGatp": 30.0 + 2.44 * np.log(1/0.0015), # DeltaGatp probably parameter
-        n.pottassium(chl_lumen): 0.1, # Klumen
-        n.pottassium(chl_stroma): 0.1, # Kstroma # Probably parameter
-        n.atp(): 0, # ATP_made
-        n.pc_ox(): 0, # PC_ox
-        n.pc_red(): 2, # PC_red
-        n.a0(): 0.0, # P700_ox
-        n.a1(): 0.667, # P700_red
-        n.zx(): 0.0, # Z
-        n.vx(): 1, # V
-        "NPQ": 0, # NPQ
-        "singletO2": 0, # singletO2
-        "Phi2": 0.83, # Phi2
-        "LEF": 0, # LEF
-        n.fd_red(): 0, # Fd_red
-        n.fd_ox(): 1, # Fd_ox
-        n.atp("_pool"): 4.15, # ATP_pool
-        n.adp("_pool"): 4.15, # ADP_pool
-        n.nadph("_pool"): 1.5, # NADPH_pool
-        n.nadp("_pool"): 3.5, # NADP_pool
-        n.chloride(chl_lumen): 0.04, # Cl_lumen
-        n.chloride(chl_stroma): 0.04, # Cl_stroma
-        n.h(chl_stroma): 0, # Hstroma
-        n.ph(chl_stroma): 7.8, # phstroma
+        "QA_red": 0,
+        n.pq_red(): 0,
+        n.ph(str_lumen): 7.8,
+        "Dy": 0,
+        n.pottassium(str_lumen): 0.1,
+        n.pc_ox(): 0,
+        "P700_ox": 0,
+        n.zx(): 0,
+        "singletO2": 0,
+        n.fd_ox(): 1,
+        n.nadph(): 1.5,
+        n.chloride(str_lumen): 0.04,
+        n.chloride(str_stroma): 0.04
     })
-    
     model.add_parameters({
-        "VDE_max_turnover_number": 0.08, # VDE_max_turnover_number
-        n.pka(n.violaxanthin_deepoxidase()): 5.65, # pkvde
-        n.kh(n.violaxanthin_deepoxidase()): 4, # VDE_Hill
-        n.kre(n.zeaxanthin_epoxidase()): 0.004, # kZE
-        n.pka(n.psbs_pr()): 6.2, # pKPsBS
-        "max_NPQ": 3, # max_NPQ
-        
+        "PAR": 50,
+        "k_recomb": 0.33,
+        "triplet_yield": 0.45,
+        "triplet_to_singletO2_yield": 1,
+        "PSII_antenna_size": 0.5,
+        "b6f_content": 0.433,
+        "pKreg": 6.2,
+        "Em7_PC": 0.37,
+        "Em7_PQH2": 0.11,
+        "max_b6f": 300,
+        "pKPsbS": 6.2,
+        "max_NPQ": 3,
+        "pH_stroma": 7.8,
+        "Em_Fd": -0.42,
+        "k_NDH": 1000,
+        "PGR_vmax": 0,
+        "PSI_antenna_size": 0.5,
+        "kQA": 1000,
+        "Keq_QA_PQ": 200,
+        "k_PC_to_P700": 5000,
+        "k_Fd_to_NADP": 1000,
+        "k_CBC": 60,
+        n.pottassium(str_stroma): 0.1,
+        "k_KEA": 2500000,
+        "perm_K": 150,
+        "lumen_protons_per_turnover": 0.000587,
+        "k_VCCN1": 12,
+        "k_CLCE": 800000,
+        "n": 14/3,
+        "ATP_synthase_max_turnover": 200,
+        "buffering_capacity": 0.014,
+        "Volts_per_charge": 0.047,
+        "kZE": 0.004,
+        "VDE_Hill": 4,
+        "pKvde": 5.65,
+        "VDE_max_turnover_number": 0.08,
+        "k_leak": 3e7,
+        # Moeity
+        "QA_total": 1,
+        n.total_pq(): 7,
+        "P700_total": 0.667,
+        n.total_pc(): 2,
+        n.total_ferredoxin(): 1,
+        n.total_nadp(): 5,
+        n.total_carotenoids(): 1
     })
     
-    # PSII recombination (two equations available) (recombination_with_pH_effects)
+    # Derived
+    add_ferredoxin_moiety(model, total=n.total_ferredoxin())
+    model.add_derived(
+        "QA",
+        fn=moiety_1,
+        args=["QA_red", "QA_total"]
+    )
+    model.add_derived(
+        "P700_red",
+        fn=moiety_1,
+        args=["P700_ox", "P700_total"]
+    )
+    model.add_derived(
+        n.pq_ox(),
+        fn=moiety_1,
+        args=[n.pq_red(), n.total_pq()]
+    )
+    model.add_derived(
+        n.pc_red(),
+        fn=moiety_1,
+        args=[n.pc_ox(), n.total_pc()]
+    )
+    # model.add_derived(
+    #     n.fd_ox(),
+    #     fn=moiety_1,
+    #     args=[n.fd_red(), n.total_ferredoxin()]
+    # )
+    model.add_derived(
+        n.nadp(),
+        fn=moiety_1,
+        args=[n.nadph(), n.total_nadp()]
+    )
+    model.add_derived(
+        n.vx(),
+        fn=moiety_1,
+        args=[n.zx(), n.total_carotenoids()]
+    )
+    model.add_derived(
+        "light_per_L",
+        fn=_light_per_L,
+        args=["PAR"]
+    )
+    model.add_derived(
+        "driving_force_Cl",
+        fn=_driving_force_Cl,
+        args=[n.chloride(str_stroma), n.chloride(str_lumen), "Dy"]
+    )
+    model.add_derived(
+        n.psbs_pr(),
+        fn=calc_PsbS_Protonation,
+        args=[n.ph(str_lumen), "pKPsbS"]
+    )
+    model.add_derived(
+        "NPQ",
+        fn=calc_NPQ,
+        args=[n.zx(), n.psbs_pr(), "max_NPQ"]
+    )
+    model.add_derived(
+        "Phi2",
+        fn=calc_phi2,
+        args=["NPQ", "QA"]
+    )
+    model.add_derived(
+        n.h(str_lumen),
+        fn=calc_h,
+        args=[n.ph(str_lumen)]
+    )
+    model.add_derived(
+        n.h(str_stroma),
+        fn=calc_h,
+        args=[n.ph(str_stroma)]
+    )
+    model.add_derived(
+        "pmf",
+        fn=calc_pmf,
+        args=["Dy", n.ph(str_lumen), n.ph(str_stroma)]
+    )
+    model.add_derived(
+        "kCBB",
+        fn=calc_kCBB,
+        args=["PAR"]
+    )
+    model.add_derived(
+        "delta_pH",
+        fn=moiety_1,
+        args=[n.ph(str_lumen), n.ph(str_stroma)]
+    )
+    model.add_derived(
+        "delta_pH_inVolts",
+        fn=_delta_pH_inVolts,
+        args=["delta_pH"]
+    )
     
-    
+    # Reactions
+    model.add_reaction(
+        "v_PSII_recombination",
+        fn=_v_PSII_recombination,
+        args=["Dy", "QA_red", n.ph(str_lumen), "k_recomb"],
+        stoichiometry={
+            "singletO2": Derived(fn=mul, args=["triplet_yield", "triplet_to_singletO2_yield"]),
+            "QA_red": -1,
+            n.ph(str_lumen): Derived(fn=div, args=["lumen_protons_per_turnover", "buffering_capacity"]),
+            "Dy": Derived(fn=neg, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_PSII_charge_separations",
+        fn=_v_PSII_charge_separations,
+        args=["PSII_antenna_size", "light_per_L", "Phi2"],
+        stoichiometry={
+            "QA_red": 1,
+            n.ph(str_lumen): Derived(fn=neg_div, args=["lumen_protons_per_turnover", "buffering_capacity"]),
+            "Dy": Derived(fn=value, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_PQ_reduction_QA",
+        fn=_v_PQ_reduction_QA,
+        args=["QA_red", n.pq_ox(), "kQA"],
+        stoichiometry={
+            "QA_red": -1,
+            n.pq_red(): 0.5,
+        }
+    )
+    model.add_reaction(
+        "v_PQH2_oxidation_QA",
+        fn=_v_PQH2_oxidation_QA,
+        args=[n.pq_red(), "QA", "kQA", "Keq_QA_PQ"],
+        stoichiometry={
+            "QA_red": 1,
+            n.pq_red(): -0.5,
+        }
+    )
+    model.add_reaction(
+        "v_b6f",
+        fn=_v_b6f,
+        args=[n.ph(str_lumen), n.pq_red(), n.pq_ox(), n.pc_ox(), n.pc_red(), "pKreg", "b6f_content", "Em7_PC", "Em7_PQH2", "pmf", "max_b6f"],
+        stoichiometry={
+            n.pq_red(): -0.5,
+            n.pc_ox(): -1,
+            n.ph(str_lumen): Derived(fn=neg_2_div, args=["lumen_protons_per_turnover", "buffering_capacity"]),
+            "Dy": Derived(fn=value, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_NDH",
+        fn=_v_NDH,
+        args=[n.fd_red(), n.pq_ox(), n.fd_ox(), n.pq_red(), n.ph(str_stroma), "Em7_PQH2", "Em_Fd", "k_NDH", "pmf"],
+        stoichiometry={
+            n.pq_red(): 0.5,
+            n.fd_red(): -1,
+            n.ph(str_lumen): Derived(fn=neg_2_div, args=["lumen_protons_per_turnover", "buffering_capacity"]),
+            "Dy": Derived(fn=twice, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_PGR",
+        fn=_v_PGR,
+        args=[n.fd_red(), n.pq_ox(), n.pq_red(), "PGR_vmax"],
+        stoichiometry={
+            n.pq_red(): 0.5,
+            n.fd_red(): -1,
+        }
+    )
+    model.add_reaction(
+        "v_PSI_charge_separation",
+        fn=_v_PSI_charge_separation,
+        args=[n.fd_ox(), "P700_red", "PSI_antenna_size", "light_per_L"],
+        stoichiometry={
+            "P700_ox": 1,
+            n.fd_red(): 1,
+            "Dy": Derived(fn=value, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_PC_oxidation_P700",
+        fn=_v_PC_oxidation_P700,
+        args=[n.pc_red(), "P700_ox", "k_PC_to_P700"],
+        stoichiometry={
+            "P700_ox": -1,
+            n.pc_ox(): 1
+        }
+    )
+    model.add_reaction(
+        "v_LEF",
+        fn=_v_LEF,
+        args=[n.fd_red(), n.nadp(), "k_Fd_to_NADP"],
+        stoichiometry={
+            n.fd_red(): -1,
+            n.nadph(): 0.5
+        }
+    )
+    model.add_reaction(
+        "v_Mehler",
+        fn=_v_Mehler,
+        args=[n.fd_red(), n.fd_ox()],
+        stoichiometry={
+            n.fd_red(): -1,
+        }
+    )
+    model.add_reaction(
+        "v_CBB_NADPH",
+        fn=_v_CBB_NADPH,
+        args=[n.nadph(), n.nadp(), "time", "k_CBC"],
+        stoichiometry={
+            n.nadph(): -1,
+        }
+    )
+    model.add_reaction(
+        "v_KEA",
+        fn=_v_KEA,
+        args=["QA_red", n.ph(str_lumen), n.pottassium(str_lumen), n.h(str_lumen), n.h(str_stroma), n.pottassium(str_stroma), "k_KEA"],
+        stoichiometry={
+            n.pottassium(str_lumen): Derived(fn=value, args=["lumen_protons_per_turnover"]),
+            n.ph(str_lumen): Derived(fn=div, args=["lumen_protons_per_turnover", "buffering_capacity"])
+        }
+    )
+    model.add_reaction(
+        "v_K_channel",
+        fn=_v_K_channel,
+        args=[n.pottassium(str_lumen), "Dy", n.pottassium(str_stroma), "perm_K"],
+        stoichiometry={
+            n.pottassium(str_lumen): Derived(fn=neg, args=["lumen_protons_per_turnover"]),
+            "Dy": Derived(fn=neg, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_VCCN1",
+        fn=_v_VCCN1,
+        args=[n.chloride(str_lumen), n.chloride(str_stroma), "driving_force_Cl", "k_VCCN1"],
+        stoichiometry={
+            n.chloride(str_lumen): Derived(fn=value, args=["lumen_protons_per_turnover"]),
+            n.chloride(str_stroma): Derived(fn=neg_point_one_val, args=["lumen_protons_per_turnover"]),
+            "Dy": Derived(fn=neg, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_CLCE",
+        fn=_v_CLCE,
+        args=[n.chloride(str_lumen), n.chloride(str_stroma), n.h(str_lumen), n.h(str_stroma), "driving_force_Cl", "pmf", "k_CLCE"],
+        stoichiometry={
+            n.chloride(str_lumen): Derived(fn=twice, args=["lumen_protons_per_turnover"]),
+            n.chloride(str_stroma): Derived(fn=neg_point_two_val, args=["lumen_protons_per_turnover"]),
+            n.ph(str_lumen): Derived(fn=div, args=["lumen_protons_per_turnover", "buffering_capacity"]),
+            "Dy": Derived(fn=neg_thrice, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_leak",
+        fn=_v_leak,
+        args=[n.h(str_lumen), "pmf", "k_leak"],
+        stoichiometry={
+            n.ph(str_lumen): Derived(fn=div, args=["lumen_protons_per_turnover", "buffering_capacity"]),
+            "Dy": Derived(fn=neg, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_pmf_protons_activity",
+        fn=_v_pmf_protons_activity,
+        args=["time", "pmf", "n", "ATP_synthase_max_turnover", "light_per_L"],
+        stoichiometry={
+            n.ph(str_lumen): Derived(fn=div, args=["lumen_protons_per_turnover", "buffering_capacity"]),
+            "Dy": Derived(fn=neg, args=["Volts_per_charge"])
+        }
+    )
+    model.add_reaction(
+        "v_ZE",
+        fn=_v_ZE,
+        args=[n.zx(), "kZE"],
+        stoichiometry={
+            n.zx(): -1
+        }
+    )
+    model.add_reaction(
+        n.violaxanthin_deepoxidase(),
+        fn=_v_VDE,
+        args=[n.vx(), n.ph(str_lumen), "VDE_Hill", "pKvde", "VDE_max_turnover_number"],
+        stoichiometry={
+            n.zx(): 1
+        }
+    )
     return model

@@ -7,6 +7,7 @@ __all__ = [
     "get_poolman2000",
     "get_saadat2021",
     "get_yokota1985",
+    "get_li2021"
 ]
 
 
@@ -16,4 +17,5 @@ from .models import (
     get_poolman2000,
     get_saadat2021,
     get_yokota1985,
+    get_li2021
 )
