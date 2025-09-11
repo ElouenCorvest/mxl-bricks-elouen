@@ -109,6 +109,7 @@ from .psi_psii import (
     add_psi_2019,
     add_psi_2021,
     add_psii,
+    add_psii_analytic,
 )
 from .ptox import add_ptox
 from .pyruvate_dehydrogenase import add_pyruvate_dehydrogenase
@@ -128,6 +129,7 @@ from .tartronic_semialdehyde_reductase import add_tartronate_semialdehyde_reduct
 from .tartronyl_coa_reductase import add_tartronyl_coa_reductase
 from .thioesterase import add_thioesterase
 from .thioredoxin import (
+    add_cbb_pfd_linear_speedup,
     add_cbb_pfd_mm_speedup,
     add_e_relaxation,
     add_e_relaxation_2021,
@@ -214,6 +216,7 @@ __all__ = [
     "add_mthfc",
     "add_ps2_cross_section",
     "add_psii",
+    "add_psii_analytic",
     "add_psi_2019",
     "add_psi_2021",
     "add_mehler",
@@ -251,6 +254,7 @@ __all__ = [
     "add_e4p_epimerase",
     "add_glycolyl_coa_synthetase_irrev",
     "add_glycolyl_coa_synthetase",
+    "add_cbb_pfd_linear_speedup",
     "add_cbb_pfd_mm_speedup",
     "add_fd_tr_reductase_2021",
     "add_fd_tr_reductase",

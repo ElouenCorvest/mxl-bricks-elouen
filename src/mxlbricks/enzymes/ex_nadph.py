@@ -18,7 +18,7 @@ def add_nadph_consumption(
     *,
     rxn: str | None = None,
     nadph: str | None = None,
-    kf: str,
+    kf: str | None = None,
 ) -> Model:
     rxn = default_name(rxn, n.ex_nadph)
     nadph = default_name(nadph, n.nadph)

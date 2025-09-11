@@ -6,9 +6,6 @@ from mxlpy import Model, Parameter, Variable, units
 from sympy.physics.units.quantities import Quantity
 
 from mxlbricks import names as n
-from mxlbricks.enzymes.mda_reductase1 import add_mda_reductase1
-from mxlbricks.enzymes.rubisco import add_rubisco_poolman
-from mxlbricks.enzymes.thioredoxin import add_cbb_pfd_linear_speedup
 from mxlbricks.utils import fcbb_regulated, static, thioredixon_regulated
 
 from .derived import (
@@ -41,6 +38,7 @@ from .enzymes import (
     add_atp_synthase_static_protons,
     add_b6f,
     add_catalase,
+    add_cbb_pfd_linear_speedup,
     add_cbb_pfd_mm_speedup,
     add_cyclic_electron_flow,
     add_dehydroascorbate_reductase,
@@ -58,6 +56,7 @@ from .enzymes import (
     add_hpa_outflux,
     add_lhc_deprotonation,
     add_lhc_protonation,
+    add_mda_reductase1,
     add_mda_reductase2,
     add_nadph_consumption,
     add_ndh,
@@ -71,10 +70,12 @@ from .enzymes import (
     add_ptox,
     add_ribose_5_phosphate_isomerase,
     add_ribulose_5_phosphate_3_epimerase,
+    add_rubisco_poolman,
     add_sbpase,
     add_serine_glyoxylate_transaminase_irreversible,
     add_state_transitions,
     add_thioredoxin_regulation2021,
+    # add_thioredoxin_regulation_from_nadph,
     add_transketolase_x5p_e4p_f6p_gap,
     add_transketolase_x5p_r5p_s7p_gap,
     add_triose_phosphate_exporters,
@@ -605,5 +606,103 @@ def get_saadat2021(
         nadph=True,
         atp=True,
         fluorescence=True,
+    )
+    return model
+
+
+def get_cbb_regulated() -> Model:
+    model = Model()
+    model.add_variables(
+        {
+            n.pga(): 0.9167729479368978,
+            n.bpga(): 0.0003814495319659031,
+            n.gap(): 0.00580821050261484,
+            n.dhap(): 0.1277806166216142,
+            n.fbp(): 0.005269452472931973,
+            n.f6p(): 0.2874944558066638,
+            n.g6p(): 0.6612372482712676,
+            n.g1p(): 0.03835176039761378,
+            n.sbp(): 0.011101373736607443,
+            n.s7p(): 0.1494578301900007,
+            n.e4p(): 0.00668295494870102,
+            n.x5p(): 0.020988553174809618,
+            n.r5p(): 0.035155825913785584,
+            n.rubp(): 0.11293260727162346,
+            n.ru5p(): 0.014062330254191594,
+            # n.e_active(): 2.3976364319593366,
+            # Energy equivalents
+            n.atp(): 1.4612747767895344,
+            n.nadph(): 0.5578718406315588,
+        }
+    )
+    model.add_parameters(
+        {
+            n.pfd(): 100.0,
+            n.co2(): 0.2,
+            n.h(): 1.2589254117941661e-05,
+        }
+    )
+
+    # Moieties / derived compounds
+    add_nadp_moiety(
+        model,
+        total=static(model, n.total_nadp(), 0.8),
+    )
+    add_adenosin_moiety(
+        model,
+        total=static(model, n.total_adenosines(), value=2.55, unit=units.mmol),
+    )
+    add_orthophosphate_moiety_cbb(
+        model,
+        total=static(model, n.total_orthophosphate(), 17.05),
+    )
+
+    # CBB
+    add_rubisco_poolman(
+        model,
+        e0=thioredixon_regulated(model, n.e0(n.rubisco()), 1.0),
+    )
+    add_phosphoglycerate_kinase_poolman(model)
+    add_gadph(model)
+    add_triose_phosphate_isomerase(model)
+    add_aldolase_dhap_gap_req(model)
+    add_aldolase_dhap_e4p_req(model)
+    add_fbpase(
+        model,
+        e0=thioredixon_regulated(model, n.e0(n.fbpase()), 1.0),
+    )
+    add_transketolase_x5p_e4p_f6p_gap(model)
+    add_transketolase_x5p_r5p_s7p_gap(model)
+    add_sbpase(
+        model,
+        e0=thioredixon_regulated(model, n.e0(n.sbpase()), 1.0),
+    )
+    add_ribose_5_phosphate_isomerase(model)
+    add_ribulose_5_phosphate_3_epimerase(model)
+    add_phosphoribulokinase(
+        model,
+        e0=thioredixon_regulated(model, n.e0(n.phosphoribulokinase()), 1.0),
+    )
+    add_glucose_6_phosphate_isomerase_re(model)
+    add_phosphoglucomutase(model)
+    add_triose_phosphate_exporters(model)
+    add_g1p_efflux(
+        model,
+        e0=thioredixon_regulated(model, n.e0(n.ex_g1p()), 1.0),
+    )
+
+    # Misc
+    add_atp_consumption(
+        model,
+        kf=static(model, n.kf(n.ex_atp()), 0.2),
+    )
+    add_nadph_consumption(
+        model,
+        kf=static(model, n.kf(n.ex_nadph()), 0.2),
+    )
+    add_readouts(
+        model,
+        nadph=True,
+        atp=True,
     )
     return model
