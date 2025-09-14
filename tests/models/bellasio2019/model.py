@@ -1,4 +1,4 @@
-from mxlpy import Model, Variable, Parameter, Derived
+from mxlpy import Model, Variable, Parameter, Derived, InitialAssignment
 import mxlpy.units as units
 import mxlbricks.names as n
 from mxlbricks.derived import add_adenosin_moiety, add_nadp_moiety
@@ -108,9 +108,11 @@ def _rubisco_carboxylation_bellasio(rubp, co2, Ract, km_co2, o2, km_o2, vmax_rc,
     
     return top / bottom
 
-def _rubisco_oxygenase_bellasio(co2, o2, S_co, v_c):
-    gamma_star = 1 / (2* S_co)
-    return v_c * 2 * gamma_star * o2 * co2
+def _rubisco_oxygenase_bellasio(co2, o2, S_co_gas, v_c, Kh_o2, Kh_co2):
+    S_co_liq = S_co_gas / Kh_o2 * Kh_co2
+    gamma_star = 1 / (2* S_co_liq)
+    
+    return v_c * 2 * gamma_star * o2 / co2
 
 def _prkase(atp, rubp, ru5p, pga, adp, pi, vmax, k_eq, km_atp, ki_adp, km_ru5p, ki_pga, ki_rubp, ki_pi):
     top = vmax * atp * ru5p - (atp * rubp) / k_eq
@@ -128,7 +130,7 @@ def _v_carbohydrate_synthesis(dhap, pi, adp, vmax, v_pgareduction, keq, km_dhap,
     return top / bottom
 
 def _v_rpp(dhap, ru5p, vmax, k_eq, km_dhap):
-    top = vmax * dhap * (1 - ru5p / k_eq)
+    top = vmax *  (dhap - ru5p / k_eq)
     bottom = dhap + km_dhap
     return top / bottom
 
@@ -143,8 +145,8 @@ def _v_NADPH(nadph, nadp, j_nadph, k_eq, km_nadp, km_nadph):
     return top / bottom
 
 def _v_atp(atp, adp, pi, j_atp, k_eq, km_adp, km_pi, km_atp):
-    top = j_atp * (atp * pi - adp / k_eq)
-    bottom = km_adp * km_pi * (1 + adp / km_adp + atp / km_atp + pi / km_pi + atp * pi / (km_adp * km_pi))
+    top = j_atp * (adp * pi - atp / k_eq)
+    bottom = km_adp * km_pi * (1 + adp / km_adp + atp / km_atp + pi / km_pi + adp * pi / (km_adp * km_pi))
     return top / bottom
 
 def neg_fivethirds_div(x):
@@ -156,7 +158,10 @@ def neg_onethirds_div(x):
 def ci_initial(ca):
     return 0.65 * ca
 
-def get_bellasio2019(Ca=400, Kh_co2=30303) -> Model:
+def co2_initial(ca, Kh_co2):
+    return 0.3 * ca / Kh_co2
+
+def get_bellasio2019() -> Model:
     """
     'A generalised dynamic model of leaf-level C3 photosynthesis combining light and dark reactions with stomatal behaviour'
     
@@ -170,7 +175,7 @@ def get_bellasio2019(Ca=400, Kh_co2=30303) -> Model:
     unit_mM = units.mmol / units.liter
     
     model.add_variables({
-        n.co2(): Variable(0.3 * Ca / Kh_co2, unit_mM),
+        n.co2(): InitialAssignment(fn=co2_initial, args=["Ca", "Kh_co2"]),
         "HCO3": Variable(0.1327, unit_mM),
         n.rubp(): Variable(2, unit_mM),
         n.pga(): Variable(4, unit_mM),
@@ -181,8 +186,8 @@ def get_bellasio2019(Ca=400, Kh_co2=30303) -> Model:
         "Ract": Variable(1),
         "J_NADPH": Variable(0.1, unit_mM), # Check units
         "J_ATP": Variable(0.16, unit_mM), # Check units
-        "Ci": Variable(0.65 * Ca),
-        "gs": Variable(0.25)
+        "Ci": InitialAssignment(fn=ci_initial, args=["Ca"]),
+        "gs": Variable(0.334934046786077)
     })
     
     model.add_parameters({
@@ -205,7 +210,7 @@ def get_bellasio2019(Ca=400, Kh_co2=30303) -> Model:
         "fq": Parameter(1),
         "f_ndh": Parameter(0),
         "h": Parameter(4),
-        "Ca": Parameter(Ca),
+        "Ca": Parameter(400),
         # Rubisco activation
         "alpha_ppfd_rub": 0.0018,
         "V0_ppfd_rub": 0.16,
@@ -226,7 +231,7 @@ def get_bellasio2019(Ca=400, Kh_co2=30303) -> Model:
         n.vmax(n.rubisco_carboxylase()): Parameter(0.2, units.mmol / (units.sqm * units.second)),
         n.kcat(n.rubisco_carboxylase()): Parameter(4.7, units.per_second),
         # Rubisco Oxygenation
-        "S_co": Parameter(2200),
+        "S_co_gas": Parameter(2200),
         # RuP_phosp
         n.vmax(n.r1p_kinase()): Parameter(1.17, units.mmol / (units.sqm * units.second)), 
         n.keq(n.r1p_kinase()): Parameter(6846, unit_mM), 
@@ -243,10 +248,10 @@ def get_bellasio2019(Ca=400, Kh_co2=30303) -> Model:
         n.km("v_pgareduction", n.nadph()): Parameter(0.05, unit_mM),
         n.ki("v_pgareduction", n.adp()): Parameter(0.89, unit_mM),
         # CS
-        n.vmax("v_carbohydrate_synthesis"): Parameter(1, units.mmol / (units.sqm * units.second)),
+        n.vmax("v_carbohydrate_synthesis"): Parameter(0.2235, units.mmol / (units.sqm * units.second)),
         n.keq("v_carbohydrate_synthesis"): Parameter(0.8),
         n.km("v_carbohydrate_synthesis", n.dhap()): Parameter(22, unit_mM),
-        n.ki("v_carbohydrate_synthesis", n.adp()): Parameter(0.3, unit_mM),
+        n.ki("v_carbohydrate_synthesis", n.adp()): Parameter(1, unit_mM),
         # RPP
         n.vmax("v_rpp"): Parameter(0.0585, units.mmol / (units.sqm * units.second)),
         n.keq("v_rpp"): Parameter(0.06),
@@ -270,7 +275,7 @@ def get_bellasio2019(Ca=400, Kh_co2=30303) -> Model:
         "Kj_ATP": Parameter(200, units.second),
         # CO2 Dissolution
         "gm": Parameter(0.5, units.mol / (units.sqm * units.second)),
-        "Kh_co2": Parameter(Kh_co2, units.micro * bar / unit_mM),
+        "Kh_co2": Parameter(30303, units.micro * bar / unit_mM),
         # Stomata
         "Kd": Parameter(150, units.second),
         "Ki": Parameter(900, units.second),
@@ -443,7 +448,7 @@ def get_bellasio2019(Ca=400, Kh_co2=30303) -> Model:
     model.add_reaction(
         n.rubisco_oxygenase(),
         fn=_rubisco_oxygenase_bellasio,
-        args=[n.co2(), n.o2(), "S_co", n.rubisco_carboxylase()],
+        args=[n.co2(), n.o2(), "S_co_gas", n.rubisco_carboxylase(), "Kh_o2", "Kh_co2"],
         stoichiometry={
             n.rubp(): Derived(fn=neg_one_div, args=["V_m"]),
             n.pga(): Derived(fn=one_div, args=["V_m"]),
