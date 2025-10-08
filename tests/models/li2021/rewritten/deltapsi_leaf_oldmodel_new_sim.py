@@ -1126,7 +1126,7 @@ def f(y, t, pKreg, max_PSII, kQA, max_b6f, lumen_protons_per_turnover, PAR, ATP_
     # print(f"{NADPH_pool=}, {NADP_pool=}, {t=}, {k_CBC=}")
     NADPH_CBC = k_CBC*(1.0-np.exp(-t/600))*(np.log(NADPH_pool/NADP_pool)-np.log(1.25))/(np.log(3.5/1.25))#calc_CBC_NADPH(k_CBC, t, d_ATP_made)
     v_lef = k_Fd_to_NADP*NADP_pool*Fd_red
-    print(f"{v_lef=}, {t=}")
+    # print(f"{v_lef=}, {t=}")
     #this number in "np.exp(-t/600)" is important, which impacts the shape of the curves
     dNADPH_pool=0.5 * k_Fd_to_NADP*NADP_pool*Fd_red - NADPH_CBC
     dNADP_pool=-1*dNADPH_pool
@@ -1656,7 +1656,6 @@ def do_complete_sim(y, constants_set_and_trace_times, Kx):
     output["Zx"] = output["Z_array"]
     output["NADPH"] = output["NADPH_pool"]
     output['time_axis_sec']=time_axis
-    print(time_axis/60)
     output['time_axis_min']=time_axis/60
     output['time_axis_h']=time_axis/3600
     

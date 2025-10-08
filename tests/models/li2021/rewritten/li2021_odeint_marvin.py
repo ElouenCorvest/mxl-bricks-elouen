@@ -409,7 +409,6 @@ def _get_rates(t, y, d, p, dp) -> Iterable[float]:
     v_LEF = _v_LEF(Fd_red, NADP, p["k_Fd_to_NADP"])  # Replaced dLEF
     v_Mehler = _v_Mehler(Fd_red, Fd_ox)
     v_CBB_NADPH = _v_CBB_NADPH(NADPH, NADP, t, dp["k_CBC"])
-    print(f"{v_LEF=}, {t=}")
     v_KEA = _v_KEA(QAm, pH_lumen, K_lumen, H_lumen, H_stroma, p["K_stroma"], p["k_KEA"])
     v_K_channel = _v_K_channel(K_lumen, Dy, p["K_stroma"], p["perm_K"])
     v_VCCN1 = _v_VCCN1(Cl_lumen, Cl_stroma, driving_force_Cl, p["k_VCCN1"])
