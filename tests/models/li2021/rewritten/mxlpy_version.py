@@ -1,4 +1,4 @@
-from mxlpy import Model, Derived
+from mxlpy import Model, Derived, InitialAssignment
 import mxlbricks.names as n
 import numpy as np
 from mxlbricks.fns import moiety_1, mul, neg, value, neg_div, div, twice
@@ -6,136 +6,204 @@ from mxlbricks.fns import moiety_1, mul, neg, value, neg_div, div, twice
 def _light_per_L(par: float):
     return 0.84 * par / 0.7
 
+
 def _driving_force_Cl(Cl_stroma: float, Cl_lumen: float, Dy: float):
-    return 0.06* np.log10(Cl_stroma/Cl_lumen) + Dy
+    return 0.06 * np.log10(Cl_stroma / Cl_lumen) + Dy
+
 
 def calc_PsbS_Protonation(pH_lumen: float, pKPsbS: float):
-    return 1 / (10 ** (3*(pH_lumen - pKPsbS)) + 1)
+    return 1 / (10 ** (3 * (pH_lumen - pKPsbS)) + 1)
+
 
 def calc_NPQ(Z, PsbS_H, max_NPQ):
     return 0.4 * max_NPQ * PsbS_H * Z + 0.5 * max_NPQ * PsbS_H + 0.1 * max_NPQ * Z
 
+
 def calc_phi2(NPQ, QA):
-    return 1 / (1 + ( 1 + NPQ)/ (4.88 * QA))
+    return 1 / (1 + (1 + NPQ) / (4.88 * QA))
+
 
 def calc_h(pH):
-    return 10**(-1*pH)
+    return 10 ** (-1 * pH)
+
 
 def calc_pmf(Dy, pH_lumen, pH_stroma):
-    return Dy + 0.06*(pH_stroma-pH_lumen)
+    return Dy + 0.06 * (pH_stroma - pH_lumen)
+
 
 def calc_kCBB(PAR):
-    return 60 * (PAR/(PAR+250))
+    return 60 * (PAR / (PAR + 250))
 
-def _v_PSII_recombination(Dy, QAm, pH_lumen, k_recomb): # correct
-    delta_delta_g_recomb= Dy + 0.06 * (7.0 - pH_lumen)
-    return k_recomb * QAm * 10**(delta_delta_g_recomb / 0.06)
 
-def _v_PSII_charge_separations(antenna_size, light_per_L, Phi2): # correct
+def _v_PSII_recombination(Dy, QAm, pH_lumen, k_recomb):  # correct
+    delta_delta_g_recomb = Dy + 0.06 * (7.0 - pH_lumen)
+    return k_recomb * QAm * 10 ** (delta_delta_g_recomb / 0.06)
+
+
+def _v_PSII_charge_separations(antenna_size, light_per_L, Phi2):  # correct
     return antenna_size * light_per_L * Phi2
 
-def _v_b6f(pH_lumen, PQH2, PQ, PC_ox, PC_red, pKreg, b6f_content, Em7_PC, Em7_PQH2, pmf, max_b6f): # correct
-    pHmod=(1 - (1 / (10 ** (pH_lumen - pKreg) + 1)))
-    b6f_deprot=pHmod*b6f_content
 
-    Em_PC=Em7_PC
-    Em_PQH2= Em7_PQH2 - 0.06*(pH_lumen-7.0)
+def _v_b6f(
+    pH_lumen,
+    PQH2,
+    PQ,
+    PC_ox,
+    PC_red,
+    pKreg,
+    b6f_content,
+    Em7_PC,
+    Em7_PQH2,
+    pmf,
+    max_b6f,
+):  # correct
+    pHmod = 1 - (1 / (10 ** (pH_lumen - pKreg) + 1))
+    b6f_deprot = pHmod * b6f_content
 
-    Keq_b6f = 10**((Em_PC - Em_PQH2 - pmf)/.06)
-    k_b6f=b6f_deprot * max_b6f
+    Em_PC = Em7_PC
+    Em_PQH2 = Em7_PQH2 - 0.06 * (pH_lumen - 7.0)
+
+    Keq_b6f = 10 ** ((Em_PC - Em_PQH2 - pmf) / 0.06)
+    k_b6f = b6f_deprot * max_b6f
 
     k_b6f_reverse = k_b6f / Keq_b6f
-    #print('Keq for PQH2 to PC + pmf is: ' + str(Keq_b6f))
-    f_PQH2=PQH2/(PQH2+PQ) #want to keep the rates in terms of fraction of PQHs, not total number
-    f_PQ=1-f_PQH2
-    return f_PQH2 * PC_ox * k_b6f - f_PQ * PC_red * k_b6f_reverse 
+    f_PQH2 = PQH2 / (
+        PQH2 + PQ
+    )  # want to keep the rates in terms of fraction of PQHs, not total number
+    f_PQ = 1 - f_PQH2
+    return f_PQH2 * PC_ox * k_b6f - f_PQ * PC_red * k_b6f_reverse
+
 
 def _v_NDH(Fd_red, PQ, Fd_ox, PQH2, pH_stroma, Em7_PQH2, Em_Fd, k_NDH, pmf):
-    Em_PQH2 = Em7_PQH2 - 0.06*(pH_stroma - 7.0)
+    Em_PQH2 = Em7_PQH2 - 0.06 * (pH_stroma - 7.0)
     deltaEm = Em_PQH2 - Em_Fd
-    Keq_NDH = 10**((deltaEm - pmf*2)/0.06)
+    Keq_NDH = 10 ** ((deltaEm - pmf * 2) / 0.06)
     k_NDH_reverse = k_NDH / Keq_NDH
     return k_NDH * Fd_red * PQ - k_NDH_reverse * Fd_ox * PQH2
 
+
 def _v_PGR(Fd_red, PQ, PQH2, PGR_vmax):
-    return PGR_vmax * (Fd_red**4/(Fd_red**4+0.1**4))*PQ/(PQ+PQH2)
-    
+    return PGR_vmax * (Fd_red**4 / (Fd_red**4 + 0.1**4)) * PQ / (PQ + PQH2)
+
+
 def _v_PSI_charge_separation(Fd_ox, P700_red, PSI_antenna_size, light_per_L):
     return P700_red * light_per_L * PSI_antenna_size * Fd_ox
+
 
 def _v_PQ_reduction_QA(QAm, PQ, kQA):
     return QAm * PQ * kQA
 
+
 def _v_PQH2_oxidation_QA(PQH2, QA, kQA, Keq_QA_PQ):
     return PQH2 * QA * kQA / Keq_QA_PQ
+
 
 def _v_PC_oxidation_P700(PC_red, P700_ox, k_PC_to_P700):
     return PC_red * k_PC_to_P700 * P700_ox
 
+
 def _v_LEF(Fd_red, NADP_pool, k_Fd_to_NADP):
     return k_Fd_to_NADP * NADP_pool * Fd_red
+
 
 def _v_Mehler(Fd_red, Fd_ox):
     return 4 * 0.000265 * Fd_red / (Fd_red + Fd_ox)
 
+
 def _v_CBB_NADPH(NADPH_pool, NADP_pool, t, k_CBC):
-    return k_CBC*(1.0-np.exp(-t/600))*(np.log(NADPH_pool/NADP_pool)-np.log(1.25))/(np.log(3.5/1.25))
+    # print(f"{NADPH_pool=}, {NADP_pool=}, {t=}, {k_CBC=}")
+    return (
+        k_CBC
+        * (1.0 - np.exp(-t / 600))
+        * (np.log(NADPH_pool / NADP_pool) - np.log(1.25))
+        / (np.log(3.5 / 1.25))
+    )
+
 
 def _v_KEA(QAm, pH_lumen, K_lumen, H_lumen, H_stroma, K_stroma, k_KEA):
     qL = 1 - QAm
-    qL_act = qL**3/(qL**3+0.15**3)
-    pH_act =1/(10**(1*(pH_lumen-6.0))+1)
+    qL_act = qL**3 / (qL**3 + 0.15**3)
+    pH_act = 1 / (10 ** (1 * (pH_lumen - 6.0)) + 1)
     f_KEA_act = qL_act * pH_act
-    return k_KEA * (H_lumen * K_stroma -  H_stroma * K_lumen) * f_KEA_act
+    return k_KEA * (H_lumen * K_stroma - H_stroma * K_lumen) * f_KEA_act
+
 
 def _v_K_channel(K_lumen, Dy, K_stroma, perm_K):
-    K_deltaG = -0.06*np.log10(K_stroma/K_lumen) + Dy
-    return perm_K * K_deltaG*(K_lumen+K_stroma)/2
+    K_deltaG = -0.06 * np.log10(K_stroma / K_lumen) + Dy
+    return perm_K * K_deltaG * (K_lumen + K_stroma) / 2
+
 
 def _v_VCCN1(Cl_lumen, Cl_stroma, driving_force_Cl, k_VCCN1):
-    relative_Cl_flux = 332*(driving_force_Cl**3) + 30.8*(driving_force_Cl**2) + 3.6*driving_force_Cl
-    return k_VCCN1 * relative_Cl_flux * (Cl_stroma + Cl_lumen)/2
+    relative_Cl_flux = (
+        332 * (driving_force_Cl**3)
+        + 30.8 * (driving_force_Cl**2)
+        + 3.6 * driving_force_Cl
+    )
+    return k_VCCN1 * relative_Cl_flux * (Cl_stroma + Cl_lumen) / 2
+
 
 def _v_CLCE(Cl_lumen, Cl_stroma, H_lumen, H_stroma, driving_force_Cl, pmf, k_CLCE):
-    return k_CLCE*(driving_force_Cl*2+pmf)*(Cl_stroma + Cl_lumen)*(H_lumen+H_stroma)/4
+    return (
+        k_CLCE
+        * (driving_force_Cl * 2 + pmf)
+        * (Cl_stroma + Cl_lumen)
+        * (H_lumen + H_stroma)
+        / 4
+    )
+
 
 def _v_leak(H_lumen, pmf, k_leak):
-    return pmf*k_leak*H_lumen
+    return pmf * k_leak * H_lumen
+
 
 def _v_pmf_protons_activity(t, pmf, n, ATP_synthase_max_turnover, light_per_L):
-    x = t/165
-    actvt = 0.2 + 0.8*(x**4/(x**4 + 1))
-    v_proton_active = 1 - (1 / (10 ** ((pmf - 0.132)*1.5/0.06) + 1))#reduced ATP synthase
-    v_proton_inert = 1-(1 / (10 ** ((pmf - 0.204)*1.5/0.06) + 1))#oxidized ATP synthase
-    
+    x = t / 165
+    actvt = 0.2 + 0.8 * (x**4 / (x**4 + 1))
+    v_proton_active = 1 - (
+        1 / (10 ** ((pmf - 0.132) * 1.5 / 0.06) + 1)
+    )  # reduced ATP synthase
+    v_proton_inert = 1 - (
+        1 / (10 ** ((pmf - 0.204) * 1.5 / 0.06) + 1)
+    )  # oxidized ATP synthase
+
     v_active = actvt * v_proton_active * n * ATP_synthase_max_turnover
-    v_inert = (1-actvt) * v_proton_inert * n * ATP_synthase_max_turnover
-    
+    v_inert = (1 - actvt) * v_proton_inert * n * ATP_synthase_max_turnover
+
     v_proton_ATP = v_active + v_inert
-    
+
     if light_per_L > 0:
         return v_proton_ATP
     else:
         return 0
-    
+
+
 def _v_ZE(Z, kZE):
     return Z * kZE
 
+
 def _v_VDE(V, pH_lumen, VDE_Hill, pKvde, VDE_max_turnover_number):
-    pHmod= 1 / (10 ** (VDE_Hill*(pH_lumen - pKvde)) + 1)
+    pHmod = 1 / (10 ** (VDE_Hill * (pH_lumen - pKvde)) + 1)
     return V * VDE_max_turnover_number * pHmod
+
 
 def neg_2_div(x: float, y: float):
     return -2 * x / y
 
+
 def neg_point_one_val(x: float):
     return -0.1 * x
 
+
 def neg_point_two_val(x: float):
-    return -0.1 * 2 * x
+    return -0.2 * x
+
 
 def neg_thrice(x: float):
     return x * -3
+
+
+def moeity(total, x):
+    return total - x
 
 def _delta_pH_inVolts(delta_pH: float):
     return 0.06 * delta_pH
@@ -144,8 +212,10 @@ def get_li2021(
     str_lumen = "_lumen",
     str_stroma = "_stroma"
 ) -> Model:
+    """Implementation of the Li2021 model ()
+    
+    """
     model = Model()
-
     model.add_variables({
         "QA_red": 0,
         n.pq_red(): 0,
@@ -183,7 +253,6 @@ def get_li2021(
         "Keq_QA_PQ": 200,
         "k_PC_to_P700": 5000,
         "k_Fd_to_NADP": 1000,
-        "k_CBC": 60,
         n.pottassium(str_stroma): 0.1,
         "k_KEA": 2500000,
         "perm_K": 150,
@@ -206,8 +275,19 @@ def get_li2021(
         n.total_pc(): 2,
         n.total_ferredoxin(): 1,
         n.total_nadp(): 5,
-        n.total_carotenoids(): 1
+        n.total_carotenoids(): 1,
+    #     "k_CBC": InitialAssignment(    
+    #     fn=calc_kCBB,
+    #     args=["PAR"]
+    # )
     })
+    
+    # NEW
+    model.add_derived(
+        "k_CBC",
+        fn=calc_kCBB,
+        args=["PAR"]
+    )
     
     # Derived
     model.add_derived(

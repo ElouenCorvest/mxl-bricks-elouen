@@ -1444,7 +1444,7 @@ def do_complete_sim(y, constants_set_and_trace_times, Kx):
     soln = odeint(f, y0=y, t=np.linspace(0, 1200, 1000), args=tuple(params), rtol=1e-6, atol=1e-6)
     
     params[5] = 0
-    params[-5] = 60 * (500/(500+250))
+    params[-5] = 60 * (0/(0+250))
     
     soln = np.append(soln, odeint(f, y0=soln[-1, :], t=np.linspace(1200, 1200 + 5 * 60, 1000), args=tuple(params), rtol=1e-6, atol=1e-6), axis=0)
     

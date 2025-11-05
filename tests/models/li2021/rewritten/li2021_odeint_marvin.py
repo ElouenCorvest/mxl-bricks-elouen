@@ -233,7 +233,7 @@ def get_params() -> dict[str, float]:
         "Keq_QA_PQ": 200,
         "k_PC_to_P700": 5000,
         "k_Fd_to_NADP": 1000,
-        "k_CBC": 60,
+        # "k_CBC": 60,
         "K_stroma": 0.1,
         "k_KEA": 2500000,
         "perm_K": 150,
@@ -263,7 +263,7 @@ def get_params() -> dict[str, float]:
 def get_derived_params(p: dict[str, float]) -> dict[str, float]:
     return {
         "light_per_L": _light_per_L(p["PAR"]),
-        "k_CBC": calc_kCBB(500), # CHANGED
+        "k_CBC": calc_kCBB(p["PAR"]), # CHANGED
     }
 
 
