@@ -8,7 +8,7 @@ Equilibrator
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 from mxlpy import Derived, Model
@@ -195,6 +195,249 @@ def _ps2states(
     return np.linalg.solve(state_matrix, a)
 
 
+def _b0(
+    k_pq_red: float,
+    _kh: float,
+    pfd: float,
+    psii_tot: float,
+    k2: float,
+    k_h0: float,
+    q: float,
+    pq_red: float,
+    k_f: float,
+    pq_ox: float,
+    ps2cs: float,
+    keq_pq_red: float,
+) -> float:
+    return (
+        k_pq_red
+        * keq_pq_red
+        * pq_ox
+        * psii_tot
+        * (
+            _kh**2 * q**2
+            + _kh * k2 * q
+            + 2 * _kh * k_f * q
+            + 2 * _kh * k_h0 * q
+            + k2 * k_f
+            + k2 * k_h0
+            + k_f**2
+            + 2 * k_f * k_h0
+            + k_h0**2
+        )
+        / (
+            _kh**2 * k_pq_red * keq_pq_red * pq_ox * q**2
+            + _kh**2 * k_pq_red * pq_red * q**2
+            + _kh * k2 * k_pq_red * keq_pq_red * pq_ox * q
+            + _kh * k2 * k_pq_red * pq_red * q
+            + _kh * k2 * keq_pq_red * pfd * ps2cs * q
+            + 2 * _kh * k_f * k_pq_red * keq_pq_red * pq_ox * q
+            + 2 * _kh * k_f * k_pq_red * pq_red * q
+            + 2 * _kh * k_h0 * k_pq_red * keq_pq_red * pq_ox * q
+            + 2 * _kh * k_h0 * k_pq_red * pq_red * q
+            + _kh * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs * q
+            + _kh * k_pq_red * pfd * pq_red * ps2cs * q
+            + k2 * k_f * k_pq_red * keq_pq_red * pq_ox
+            + k2 * k_f * k_pq_red * pq_red
+            + k2 * k_f * keq_pq_red * pfd * ps2cs
+            + k2 * k_h0 * k_pq_red * keq_pq_red * pq_ox
+            + k2 * k_h0 * k_pq_red * pq_red
+            + k2 * k_h0 * keq_pq_red * pfd * ps2cs
+            + k2 * k_pq_red * pfd * pq_red * ps2cs
+            + k2 * keq_pq_red * pfd**2 * ps2cs**2
+            + k_f**2 * k_pq_red * keq_pq_red * pq_ox
+            + k_f**2 * k_pq_red * pq_red
+            + 2 * k_f * k_h0 * k_pq_red * keq_pq_red * pq_ox
+            + 2 * k_f * k_h0 * k_pq_red * pq_red
+            + k_f * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs
+            + k_f * k_pq_red * pfd * pq_red * ps2cs
+            + k_h0**2 * k_pq_red * keq_pq_red * pq_ox
+            + k_h0**2 * k_pq_red * pq_red
+            + k_h0 * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs
+            + k_h0 * k_pq_red * pfd * pq_red * ps2cs
+        )
+    )
+
+
+def _b1(
+    k_pq_red: float,
+    _kh: float,
+    pfd: float,
+    psii_tot: float,
+    k2: float,
+    k_h0: float,
+    q: float,
+    pq_red: float,
+    k_f: float,
+    pq_ox: float,
+    ps2cs: float,
+    keq_pq_red: float,
+) -> float:
+    return (
+        k_pq_red
+        * keq_pq_red
+        * pfd
+        * pq_ox
+        * ps2cs
+        * psii_tot
+        * (_kh * q + k_f + k_h0)
+        / (
+            _kh**2 * k_pq_red * keq_pq_red * pq_ox * q**2
+            + _kh**2 * k_pq_red * pq_red * q**2
+            + _kh * k2 * k_pq_red * keq_pq_red * pq_ox * q
+            + _kh * k2 * k_pq_red * pq_red * q
+            + _kh * k2 * keq_pq_red * pfd * ps2cs * q
+            + 2 * _kh * k_f * k_pq_red * keq_pq_red * pq_ox * q
+            + 2 * _kh * k_f * k_pq_red * pq_red * q
+            + 2 * _kh * k_h0 * k_pq_red * keq_pq_red * pq_ox * q
+            + 2 * _kh * k_h0 * k_pq_red * pq_red * q
+            + _kh * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs * q
+            + _kh * k_pq_red * pfd * pq_red * ps2cs * q
+            + k2 * k_f * k_pq_red * keq_pq_red * pq_ox
+            + k2 * k_f * k_pq_red * pq_red
+            + k2 * k_f * keq_pq_red * pfd * ps2cs
+            + k2 * k_h0 * k_pq_red * keq_pq_red * pq_ox
+            + k2 * k_h0 * k_pq_red * pq_red
+            + k2 * k_h0 * keq_pq_red * pfd * ps2cs
+            + k2 * k_pq_red * pfd * pq_red * ps2cs
+            + k2 * keq_pq_red * pfd**2 * ps2cs**2
+            + k_f**2 * k_pq_red * keq_pq_red * pq_ox
+            + k_f**2 * k_pq_red * pq_red
+            + 2 * k_f * k_h0 * k_pq_red * keq_pq_red * pq_ox
+            + 2 * k_f * k_h0 * k_pq_red * pq_red
+            + k_f * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs
+            + k_f * k_pq_red * pfd * pq_red * ps2cs
+            + k_h0**2 * k_pq_red * keq_pq_red * pq_ox
+            + k_h0**2 * k_pq_red * pq_red
+            + k_h0 * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs
+            + k_h0 * k_pq_red * pfd * pq_red * ps2cs
+        )
+    )
+
+
+def _b2(
+    k_pq_red: float,
+    _kh: float,
+    pfd: float,
+    psii_tot: float,
+    k2: float,
+    k_h0: float,
+    q: float,
+    pq_red: float,
+    k_f: float,
+    pq_ox: float,
+    ps2cs: float,
+    keq_pq_red: float,
+) -> float:
+    return (
+        psii_tot
+        * (
+            _kh**2 * k_pq_red * pq_red * q**2
+            + _kh * k2 * k_pq_red * pq_red * q
+            + _kh * k2 * keq_pq_red * pfd * ps2cs * q
+            + 2 * _kh * k_f * k_pq_red * pq_red * q
+            + 2 * _kh * k_h0 * k_pq_red * pq_red * q
+            + k2 * k_f * k_pq_red * pq_red
+            + k2 * k_f * keq_pq_red * pfd * ps2cs
+            + k2 * k_h0 * k_pq_red * pq_red
+            + k2 * k_h0 * keq_pq_red * pfd * ps2cs
+            + k_f**2 * k_pq_red * pq_red
+            + 2 * k_f * k_h0 * k_pq_red * pq_red
+            + k_h0**2 * k_pq_red * pq_red
+        )
+        / (
+            _kh**2 * k_pq_red * keq_pq_red * pq_ox * q**2
+            + _kh**2 * k_pq_red * pq_red * q**2
+            + _kh * k2 * k_pq_red * keq_pq_red * pq_ox * q
+            + _kh * k2 * k_pq_red * pq_red * q
+            + _kh * k2 * keq_pq_red * pfd * ps2cs * q
+            + 2 * _kh * k_f * k_pq_red * keq_pq_red * pq_ox * q
+            + 2 * _kh * k_f * k_pq_red * pq_red * q
+            + 2 * _kh * k_h0 * k_pq_red * keq_pq_red * pq_ox * q
+            + 2 * _kh * k_h0 * k_pq_red * pq_red * q
+            + _kh * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs * q
+            + _kh * k_pq_red * pfd * pq_red * ps2cs * q
+            + k2 * k_f * k_pq_red * keq_pq_red * pq_ox
+            + k2 * k_f * k_pq_red * pq_red
+            + k2 * k_f * keq_pq_red * pfd * ps2cs
+            + k2 * k_h0 * k_pq_red * keq_pq_red * pq_ox
+            + k2 * k_h0 * k_pq_red * pq_red
+            + k2 * k_h0 * keq_pq_red * pfd * ps2cs
+            + k2 * k_pq_red * pfd * pq_red * ps2cs
+            + k2 * keq_pq_red * pfd**2 * ps2cs**2
+            + k_f**2 * k_pq_red * keq_pq_red * pq_ox
+            + k_f**2 * k_pq_red * pq_red
+            + 2 * k_f * k_h0 * k_pq_red * keq_pq_red * pq_ox
+            + 2 * k_f * k_h0 * k_pq_red * pq_red
+            + k_f * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs
+            + k_f * k_pq_red * pfd * pq_red * ps2cs
+            + k_h0**2 * k_pq_red * keq_pq_red * pq_ox
+            + k_h0**2 * k_pq_red * pq_red
+            + k_h0 * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs
+            + k_h0 * k_pq_red * pfd * pq_red * ps2cs
+        )
+    )
+
+
+def _b3(
+    k_pq_red: float,
+    _kh: float,
+    pfd: float,
+    psii_tot: float,
+    k2: float,
+    k_h0: float,
+    q: float,
+    pq_red: float,
+    k_f: float,
+    pq_ox: float,
+    ps2cs: float,
+    keq_pq_red: float,
+) -> float:
+    return (
+        pfd
+        * ps2cs
+        * psii_tot
+        * (
+            _kh * k_pq_red * pq_red * q
+            + k2 * k_pq_red * pq_red
+            + k2 * keq_pq_red * pfd * ps2cs
+            + k_f * k_pq_red * pq_red
+            + k_h0 * k_pq_red * pq_red
+        )
+        / (
+            _kh**2 * k_pq_red * keq_pq_red * pq_ox * q**2
+            + _kh**2 * k_pq_red * pq_red * q**2
+            + _kh * k2 * k_pq_red * keq_pq_red * pq_ox * q
+            + _kh * k2 * k_pq_red * pq_red * q
+            + _kh * k2 * keq_pq_red * pfd * ps2cs * q
+            + 2 * _kh * k_f * k_pq_red * keq_pq_red * pq_ox * q
+            + 2 * _kh * k_f * k_pq_red * pq_red * q
+            + 2 * _kh * k_h0 * k_pq_red * keq_pq_red * pq_ox * q
+            + 2 * _kh * k_h0 * k_pq_red * pq_red * q
+            + _kh * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs * q
+            + _kh * k_pq_red * pfd * pq_red * ps2cs * q
+            + k2 * k_f * k_pq_red * keq_pq_red * pq_ox
+            + k2 * k_f * k_pq_red * pq_red
+            + k2 * k_f * keq_pq_red * pfd * ps2cs
+            + k2 * k_h0 * k_pq_red * keq_pq_red * pq_ox
+            + k2 * k_h0 * k_pq_red * pq_red
+            + k2 * k_h0 * keq_pq_red * pfd * ps2cs
+            + k2 * k_pq_red * pfd * pq_red * ps2cs
+            + k2 * keq_pq_red * pfd**2 * ps2cs**2
+            + k_f**2 * k_pq_red * keq_pq_red * pq_ox
+            + k_f**2 * k_pq_red * pq_red
+            + 2 * k_f * k_h0 * k_pq_red * keq_pq_red * pq_ox
+            + 2 * k_f * k_h0 * k_pq_red * pq_red
+            + k_f * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs
+            + k_f * k_pq_red * pfd * pq_red * ps2cs
+            + k_h0**2 * k_pq_red * keq_pq_red * pq_ox
+            + k_h0**2 * k_pq_red * pq_red
+            + k_h0 * k_pq_red * keq_pq_red * pfd * pq_ox * ps2cs
+            + k_h0 * k_pq_red * pfd * pq_red * ps2cs
+        )
+    )
+
+
 def add_ps2_cross_section(
     model: Model,
     lhc: str | None = None,
@@ -253,6 +496,120 @@ def add_psii(
                 b3,
             ],
         ),
+    )
+
+    model.add_reaction(
+        name=rxn,
+        fn=_rate_ps2,
+        stoichiometry={
+            pq_ox: -1,
+            h_lumen: Derived(fn=_two_div_by, args=["bH"]),
+        },
+        args=[
+            b1,
+            "k2",
+        ],
+    )
+    return model
+
+
+def add_psii_analytic(
+    model: Model,
+    *,
+    rxn: str,
+    pq_ox: str,
+    pq_red: str,
+    ps2cs: str,
+    quencher: str,
+    pfd: str,
+    h_lumen: str,
+    b0: str,
+    b1: str,
+    b2: str,
+    b3: str,
+) -> Model:
+    """Use analytically obtain solution for ps2"""
+
+    k_pq_red = "kPQred"
+    psii_tot = "PSII_total"
+    _kh = "kH"
+    k2 = "k2"
+    k_h0 = "kH0"
+    k_f = "kF"
+    keq_pq_red = n.keq(pq_red)
+    q = quencher
+
+    model.add_derived(
+        b0,
+        fn=_b0,
+        args=[
+            k_pq_red,
+            _kh,
+            pfd,
+            psii_tot,
+            k2,
+            k_h0,
+            q,
+            pq_red,
+            k_f,
+            pq_ox,
+            ps2cs,
+            keq_pq_red,
+        ],
+    )
+    model.add_derived(
+        b1,
+        fn=_b1,
+        args=[
+            k_pq_red,
+            _kh,
+            pfd,
+            psii_tot,
+            k2,
+            k_h0,
+            q,
+            pq_red,
+            k_f,
+            pq_ox,
+            ps2cs,
+            keq_pq_red,
+        ],
+    )
+    model.add_derived(
+        b2,
+        fn=_b2,
+        args=[
+            k_pq_red,
+            _kh,
+            pfd,
+            psii_tot,
+            k2,
+            k_h0,
+            q,
+            pq_red,
+            k_f,
+            pq_ox,
+            ps2cs,
+            keq_pq_red,
+        ],
+    )
+    model.add_derived(
+        b3,
+        fn=_b3,
+        args=[
+            k_pq_red,
+            _kh,
+            pfd,
+            psii_tot,
+            k2,
+            k_h0,
+            q,
+            pq_red,
+            k_f,
+            pq_ox,
+            ps2cs,
+            keq_pq_red,
+        ],
     )
 
     model.add_reaction(
@@ -403,6 +760,7 @@ def add_mehler(
 
 def add_photosystems(
     model: Model,
+    mode: Literal["matrix", "analytical"],
     *,
     rxn_psii: str | None = None,
     rxn_psi: str | None = None,
@@ -474,20 +832,36 @@ def add_photosystems(
         args=["E^0_FA", "F", "E^0_Fd", "RT"],
     )
 
-    add_psii(
-        model,
-        rxn=default_name(rxn_psii, n.ps2),
-        pq_ox=pq_ox,
-        pq_red=pq_red,
-        ps2cs=ps2cs,
-        quencher=quencher,
-        pfd=pfd,
-        h_lumen=h_lumen,
-        b0=b0,
-        b1=b1,
-        b2=b2,
-        b3=b3,
-    )
+    if mode == "matrix":
+        add_psii(
+            model,
+            rxn=default_name(rxn_psii, n.ps2),
+            pq_ox=pq_ox,
+            pq_red=pq_red,
+            ps2cs=ps2cs,
+            quencher=quencher,
+            pfd=pfd,
+            h_lumen=h_lumen,
+            b0=b0,
+            b1=b1,
+            b2=b2,
+            b3=b3,
+        )
+    else:
+        add_psii_analytic(
+            model,
+            rxn=default_name(rxn_psii, n.ps2),
+            pq_ox=pq_ox,
+            pq_red=pq_red,
+            ps2cs=ps2cs,
+            quencher=quencher,
+            pfd=pfd,
+            h_lumen=h_lumen,
+            b0=b0,
+            b1=b1,
+            b2=b2,
+            b3=b3,
+        )
 
     if not mehler:
         add_psi_2019(
