@@ -200,7 +200,7 @@ def get_bellasio2019() -> Model:
         "Kh_o2": Parameter(833300, units.micro * bar / unit_mM),
         "V_m": Parameter(0.03, units.liter / units.sqm),
         n.pfd(): Parameter(1500, units.ppfd),
-        "RLight": Parameter(0.001, units.mmol / (units.sqm * units.second)),
+        "RLight": Parameter(0.001, units.mmol / (units.sqm * units.second)), # Taken from Excel
         "s": Parameter(0.43),
         "Y(II)_LL": Parameter(0.72),
         "Y(I)_LL": Parameter(1),
@@ -223,14 +223,14 @@ def get_bellasio2019() -> Model:
         "tau_d": Parameter(1200, units.second),
         # Rubisco Carboxylation
         n.km(n.rubisco_carboxylase(), n.co2()): Parameter(0.014, unit_mM),
-        n.km(n.rubisco_carboxylase(), n.rubp()): Parameter(0.02, unit_mM),
+        n.km(n.rubisco_carboxylase(), n.rubp()): Parameter(0.02, unit_mM), # Appendix
         n.km(n.rubisco_carboxylase(), n.o2()): Parameter(0.222, unit_mM),
         n.ki(n.rubisco_carboxylase(), n.pga()): Parameter(2.52, unit_mM),
         n.ki(n.rubisco_carboxylase(), n.nadp()): Parameter(0.21, unit_mM), # Wrong name in paper
-        n.ki(n.rubisco_carboxylase(), n.adp()): Parameter(0.2, unit_mM),
+        n.ki(n.rubisco_carboxylase(), n.adp()): Parameter(0.2, unit_mM), # Appendix
         n.ki(n.rubisco_carboxylase(), n.pi()): Parameter(3.6, unit_mM),
-        n.vmax(n.rubisco_carboxylase()): Parameter(0.2, units.mmol / (units.sqm * units.second)),
-        n.kcat(n.rubisco_carboxylase()): Parameter(4.7, units.per_second),
+        n.vmax(n.rubisco_carboxylase()): Parameter(0.2, units.mmol / (units.sqm * units.second)), # Appendix
+        n.kcat(n.rubisco_carboxylase()): Parameter(4.7, units.per_second), # Appendix
         # Rubisco Oxygenation
         "S_co_gas": Parameter(2200),
         # RuP_phosp
@@ -249,7 +249,7 @@ def get_bellasio2019() -> Model:
         n.km("v_pgareduction", n.nadph()): Parameter(0.05, unit_mM),
         n.ki("v_pgareduction", n.adp()): Parameter(0.89, unit_mM),
         # CS
-        n.vmax("v_carbohydrate_synthesis"): Parameter(0.2235, units.mmol / (units.sqm * units.second)),
+        n.vmax("v_carbohydrate_synthesis"): Parameter(0.2235, units.mmol / (units.sqm * units.second)), # Taken from Excel
         n.keq("v_carbohydrate_synthesis"): Parameter(0.8),
         n.km("v_carbohydrate_synthesis", n.dhap()): Parameter(22, unit_mM),
         n.ki("v_carbohydrate_synthesis", n.adp()): Parameter(1, unit_mM),
@@ -281,7 +281,7 @@ def get_bellasio2019() -> Model:
         "Kd": Parameter(150, units.second),
         "Ki": Parameter(900, units.second),
         "tau0": Parameter(-0.1, unit_mM),
-        "chi_beta": Parameter(0,5),
+        "chi_beta": Parameter(0.5), # Fixed by AI
         "phi": Parameter(0),
         "pi_e": Parameter(1.2),
         "Kh": Parameter(12),
@@ -541,7 +541,7 @@ def get_bellasio2019() -> Model:
     )
     # CO2 Dissolution
     model.add_reaction(
-        "CO2 dissolution",
+        "CO2 dissolution", # Taken from Excel
         fn=_co2_diss,
         args=["Ci", n.co2(), "gm", "Kh_co2"],
         stoichiometry={
@@ -551,7 +551,7 @@ def get_bellasio2019() -> Model:
     )
     # co2 stomatal diffusion
     model.add_reaction(
-        "CO2 stomatal diffusion",
+        "CO2 stomatal diffusion", # Taken from Excel
         fn=_stom_diff,
         args=["Ci", "gs", "Ca"],
         stoichiometry={

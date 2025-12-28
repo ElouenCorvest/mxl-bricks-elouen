@@ -136,3 +136,6 @@ mike = "*"
 
 [tool.pixi.environments]
 dev = { features = ["dev"] }
+
+[tool.pixi.dependencies]
+pip = ">=25.3,<26"
