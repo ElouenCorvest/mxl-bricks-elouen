@@ -31,7 +31,9 @@ name = "mxlbricks"
 readme = "README.md"
 version = "0.6.0"
 dependencies = [
+  "ipykernel>=7.1.0",
   "mxlpy>=0.26.0",
+  "pip>=25.3",
 ]
 
 [tool.bandit]

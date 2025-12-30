@@ -53,14 +53,14 @@ def _f_pseudocyc(j_nadph, o2, v_nadph, f_pseudocycNR):
 def _j_nadph_steady(j1, f_cyc, f_pseudocyc):
     top = 1 - f_cyc - f_pseudocyc
     bottom = 2
-    return j1 * top / bottom
+    return (j1 * top / bottom) / 1000 # Added from Excel
 
 def _j_atp_steady(j2, j1, f_cyc, fq, f_ndh, h):
     jcyt = (1 - fq) * j1
     jq = fq * j1
     jndh = f_cyc * f_ndh * j1
     
-    return (j2 + jcyt + 2 * jq + 2 * jndh) / h
+    return ((j2 + jcyt + 2 * jq + 2 * jndh) / h) / 1000 # Added from Excel
 
 def _gs_steady(tau0, f_rubp, chi_beta, phi, pi_e, Kh, Ds, gs0):
 
@@ -70,11 +70,14 @@ def _gs_steady(tau0, f_rubp, chi_beta, phi, pi_e, Kh, Ds, gs0):
     
     return max(gs0, top / bottom)
 
+def _calc_ass(vc, vo, RLight):
+    return vc - 0.5 * vo - RLight
+
 def atp_nadph_time_dependance(j_x, j_x_steady, kj_x):
     if j_x < j_x_steady:
         return (j_x_steady - j_x) / kj_x
     else:
-        return j_x_steady
+        return (j_x_steady - j_x) / (0.1 * kj_x)
         
 def non_rect_hyperbole(x, alpha, V0, theta):
     # print(np.sqrt((alpha * x + 1 - V0)**2 - 4 * alpha * x * theta))
@@ -116,7 +119,7 @@ def _rubisco_oxygenase_bellasio(co2, o2, S_co_gas, v_c, Kh_o2, Kh_co2):
     return v_c * 2 * gamma_star * o2 / co2
 
 def _prkase(atp, rubp, ru5p, pga, adp, pi, vmax, k_eq, km_atp, ki_adp, km_ru5p, ki_pga, ki_rubp, ki_pi):
-    top = vmax * atp * ru5p - (atp * rubp) / k_eq
+    top = vmax * (atp * ru5p - adp * rubp / k_eq) # ERROR: Different from paper (typo?)
     bottom = (atp + km_atp * (1 + adp / ki_adp)) * (ru5p + km_ru5p * (1 + pga / ki_pga + rubp / ki_rubp + pi / ki_pi))
     return top / bottom
 
@@ -276,7 +279,7 @@ def get_bellasio2019() -> Model:
         "Kj_ATP": Parameter(200, units.second),
         # CO2 Dissolution
         "gm": Parameter(0.5, units.mol / (units.sqm * units.second)),
-        "Kh_co2": Parameter(30303, units.micro * bar / unit_mM),
+        "Kh_co2": Parameter(30303.0303030303, units.micro * bar / unit_mM), # Taken from Excel
         # Stomata
         "Kd": Parameter(150, units.second),
         "Ki": Parameter(900, units.second),
@@ -393,6 +396,12 @@ def get_bellasio2019() -> Model:
         "gs_steady",
         fn=_gs_steady,
         args=["tau0", "f_rubp", "chi_beta", "phi", "pi_e", "Kh", "Ds", "gs0"]
+    )
+    # Assimilation rate
+    model.add_derived(
+        "A",
+        fn=_calc_ass,
+        args=[n.rubisco_carboxylase(), n.rubisco_oxygenase(), "RLight"]
     )
     
     # Simple ODEs
