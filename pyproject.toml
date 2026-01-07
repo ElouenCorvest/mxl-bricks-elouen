@@ -112,28 +112,3 @@ package = true
 
 [tool.uv.sources]
 mxlbricks = {workspace = true}
-mxlpy = {path = "mxlpy"}
-
-[tool.pixi.project]
-channels = ["conda-forge"]
-platforms = ["linux-64"]
-
-[tool.pixi.tasks]
-dev-install = "pip install -e ."
-
-[tool.pixi.feature.dev.dependencies]
-assimulo = "*"
-python = "*"
-pip = "*"
-ipykernel = "*"
-notebook = "*"
-pytest = "*"
-pytest-cov = "*"
-toml = "*"
-mkdocs = "*"
-mkdocs-jupyter = "*"
-mkdocs-material = "*"
-mike = "*"
-
-[tool.pixi.environments]
-dev = { features = ["dev"] }
