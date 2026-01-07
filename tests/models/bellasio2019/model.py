@@ -5,7 +5,9 @@ from mxlbricks.derived import add_adenosin_moiety, add_nadp_moiety
 from mxlbricks.fns import div, neg_one_div, two_div, one_div, neg_half_div, value, half_div
 import numpy as np
 from sympy.physics.units import bar
-    
+from sympy.physics.units.quantities import Quantity    
+
+
 
 def _pi_bellasio2019(total, pga, dhap, ru5p, rubp, atp):
     return total - pga - dhap - ru5p - 2 * rubp - atp
@@ -204,9 +206,9 @@ def get_bellasio2019() -> Model:
         "V_m": Parameter(0.03, units.liter / units.sqm),
         n.pfd(): Parameter(1500, units.ppfd),
         "RLight": Parameter(0.001, units.mmol / (units.sqm * units.second)), # Taken from Excel
-        "s": Parameter(0.43),
+        "s": Parameter(0.43, unit=Quantity("electron") / Quantity("quanta")),
         "Y(II)_LL": Parameter(0.72),
-        "Y(I)_LL": Parameter(1),
+        "Y(I)_LL": Parameter(1, unit=Quantity("electron") / Quantity("quanta")),
         "alpha_ppfd_Y(II)": Parameter(0.00125),
         "V0_ppfd_Y(II)": Parameter(-0.8),
         "theta_ppfd_Y(II)": Parameter(0.7),
